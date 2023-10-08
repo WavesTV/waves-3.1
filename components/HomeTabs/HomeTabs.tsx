@@ -26,10 +26,10 @@ export function HomeTabs() {
           Following
         </Tabs.Tab>
         <Tabs.Tab
-          value="Popular"
+          value="Hot"
           leftSection={<BsFire style={{ width: rem(16), height: rem(16) }} />}
         >
-          Popular
+          Hot
         </Tabs.Tab>
       </Tabs.List>
      
@@ -42,7 +42,7 @@ export function HomeTabs() {
         <FollowerFeed/>
       </Tabs.Panel>
 
-      <Tabs.Panel value="Popular">
+      <Tabs.Panel value="Hot">
         <HotFeed/>
       </Tabs.Panel>
       </Container>
