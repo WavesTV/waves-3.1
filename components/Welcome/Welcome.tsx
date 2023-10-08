@@ -35,7 +35,7 @@ export const WAVESFEATURE = [
     icon: MdOutlineAttachMoney,
     title: 'Monetization',
     description:
-      'Waves is powered by Deso Wallets, enabling instant Fan-to-Creator Subscription payments. No more jumping through hoops to monetize your content. Currently, Waves pays out 100% directly to creators. Future Waves versions may take up to 20% for platform expenses.',
+      'Waves is powered by Deso Wallets, enabling instant Fan-to-Creator Subscription payments. Waves also enables microtipping posts through Diamonds. No more jumping through hoops to monetize your content. Currently, Waves pays out 100% directly to creators. Future Waves versions may take up to 20% for platform expenses.',
   },
   {
     icon: RiCheckboxMultipleLine,
