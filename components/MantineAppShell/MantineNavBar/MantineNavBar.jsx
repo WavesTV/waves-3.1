@@ -57,7 +57,7 @@ export function MantineNavBar() {
   );
 
   // Check if the current user is following the profiles in filteredPosts
-  const fetchFollowingPosts = async () => {
+  const fetchFollowingWaves = async () => {
     const followingPosts = [];
     for (const post of filteredPosts) {
       const request = {
@@ -77,8 +77,7 @@ export function MantineNavBar() {
 // Fetch the followingPosts when the currentUser changes
 useEffect(() => {
   if (currentUser) {
-    fetchFollowingPosts();
-   
+    fetchFollowingWaves();
   }
 }, [currentUser]);
 
@@ -89,7 +88,7 @@ useEffect(() => {
       <div className={classes.navbarMain}>
       <Space h="lg" />
             
-              <Text fs="italic" size="md" fw={800} c="dimmed" >
+              <Text fs="italic" size="md" fw={800} >
                 Following
               </Text>
               <Space w={2}/>
@@ -141,6 +140,7 @@ useEffect(() => {
                   })
               ) : (
                 <>
+                 <Space h="lg" />
                   <Center>
                     <Text fz="xs" fw={500} lineClamp={2}>
                       No Followers are Live.
@@ -151,6 +151,7 @@ useEffect(() => {
               )
             ) : (
               <>
+               <Space h="lg" />
                 <Center>
                   <Text fz="xs" fw={500} lineClamp={2}>
                     Login to view your Followings' Waves.
@@ -164,7 +165,7 @@ useEffect(() => {
             <Space h="lg" />
 
             
-            <Text fs="italic" size="md" fw={800} c="dimmed" >
+            <Text fs="italic" size="md" fw={800}>
                 Recommended Waves
               </Text>
           
@@ -208,13 +209,14 @@ useEffect(() => {
                 </UnstyledButton>
               ))
             ) : (
-              
+              <>
+              <Space h="lg" />
                 <Center>
                   <Text fz="xs" fw={500} lineClamp={1}>
                     No Waves Right Now.
                   </Text>
                 </Center>
-           
+                </>
             )}
   
       </div>

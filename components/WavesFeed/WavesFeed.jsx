@@ -75,19 +75,7 @@ useEffect(() => {
               <Center>
                 <ActionIcon
                  component={Link}
-                 href="/wave/[post.Username]"
-                 as={`/wave/${post.Username}`}
-                  onClick={() => {
-                    const state = {
-                      userPublicKey: post.PublicKeyBase58Check,
-                      userName: post.Username || post.PublicKeyBase58Check,
-                      description: post.Description || null,
-                      largeProfPic: post.ExtraData?.LargeProfilePicURL || null,
-                      featureImage: post.ExtraData?.FeaturedImageURL || null,
-                    };
-
-                
-                  }}
+                 href={`/wave/${post.Username}`}
                   variant="transparent"
                 >
                   <Avatar
@@ -100,14 +88,14 @@ useEffect(() => {
                     }
                   />
                   <Space w="xs" />
-                  <Text weight="bold" size="sm">
+                  <Text fw={500} size="md">
                     {post.Username}
                   </Text>
                 </ActionIcon>
               </Center>
               <Space h="xl" />
               <Player
-             style={{ width: '100%' }}
+              style={{ width: '100%' }}
                 playbackId={post.ExtraData.WavesStreamPlaybackId}
                 title={post.ExtraData.WavesStreamTitle}
                 

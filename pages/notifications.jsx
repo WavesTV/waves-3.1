@@ -45,24 +45,30 @@ export default function NotificationsPage () {
     try {
       const notificationData = await getNotifications({
         PublicKeyBase58Check: userPublicKey,
-        NumToFetch: 25,
+        NumToFetch: 50,
         FetchStartIndex: -1,
       });
 
-      // Iterate through the notifications and fetch the usernames
-      const updatedNotifications = await Promise.all(
-        notificationData.Notifications.map(async (notification) => {
-          const request = {
-            PublicKeyBase58Check:
-              notification.Metadata.TransactorPublicKeyBase58Check,
-          };
-          const profileResponse = await getSingleProfile(request);
-          return {
-            ...notification,
-            username: profileResponse.Profile.Username,
-          };
-        })
-      );
+  // Iterate through the notifications and fetch the usernames
+  const updatedNotifications = await Promise.all(
+    notificationData.Notifications.map(async (notification) => {
+      const request = {
+        PublicKeyBase58Check: notification.Metadata.TransactorPublicKeyBase58Check,
+        NoErrorOnMissing: true,
+      };
+      const profileResponse = await getSingleProfile(request);
+
+      let username = 'anon'; // Default to 'anon' in case of an error
+      if (profileResponse && profileResponse.Profile && profileResponse.Profile.Username) {
+        username = profileResponse.Profile.Username;
+      }
+
+      return {
+        ...notification,
+        username,
+      };
+    })
+  );
       
   
 

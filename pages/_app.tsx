@@ -4,10 +4,7 @@ import Head from 'next/head';
 import { AppShell, MantineProvider, Button, ActionIcon, Group, Space, Container, Tooltip } from '@mantine/core';
 import { theme } from '../theme';
 import { useDisclosure } from '@mantine/hooks';
-import { MantineHeader } from '../components/MantineAppShell/MantineHeader/MantineHeader';
-import { RiArrowLeftDoubleLine, RiArrowRightDoubleLine } from 'react-icons/ri';
-import { MantineNavBar } from '../components/MantineAppShell/MantineNavBar/MantineNavBar';
-import { MantineAside } from '../components/MantineAppShell/MantineAside/MantineAside';
+import { MantineAppShell } from '@/components/MantineAppShell/MantineAppShell';
 import { configure } from 'deso-protocol';
 import { DeSoIdentityProvider } from 'react-deso-protocol';
 import {
@@ -20,7 +17,7 @@ import '@mantine/notifications/styles.css';
 
 configure({
   spendingLimitOptions: {
-    GlobalDESOLimit: 100000000000, 
+    GlobalDESOLimit: 1000000000, 
     TransactionCountLimitMap: {
       UPDATE_PROFILE: "UNLIMITED",
       CREATE_NFT: "UNLIMITED",
@@ -70,8 +67,6 @@ const livepeerClient = createReactClient({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   return (
     <LivepeerConfig client={livepeerClient}>
@@ -85,70 +80,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="shortcut icon" href="/favicon.svg" />
       </Head>
       <DeSoIdentityProvider>
-      <AppShell
-      padding="md"
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: 'md',
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-      }}
-      aside={{
-        width: 300,
-        breakpoint: 'md',
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-      }}
-    >
-      <AppShell.Header>
-     <MantineHeader/>
-        {!desktopOpened ? (
-          <Tooltip position="right-start" label="Open Sidebars">
-      <ActionIcon onClick={toggleDesktop} visibleFrom="sm"  >
-        <RiArrowRightDoubleLine/>
-      </ActionIcon>
-      </Tooltip>
-    ) : null}
-      </AppShell.Header>
-      <AppShell.Navbar>
-        {desktopOpened ? (
-        <>
-         <Tooltip position="right-start" label="Close Sidebars">
-      <ActionIcon onClick={toggleDesktop} visibleFrom="sm"  >
-       <RiArrowLeftDoubleLine/>
-     </ActionIcon>
-     </Tooltip>
-     </>
-   
-    ) : <Tooltip position="right-start" label="Open Sidebars">
-    <ActionIcon onClick={toggleDesktop} visibleFrom="sm"  >
-      <RiArrowRightDoubleLine/>
-    </ActionIcon>
-    </Tooltip>}
-    <MantineNavBar/>
-    </AppShell.Navbar>
-    <AppShell.Aside>
-    <MantineAside/>
- </AppShell.Aside>
- 
-      <AppShell.Main >
-      <Container
-    style={{
-       
-      flexDirection: 'column',
-      width: '100%',
-      margin: '0 auto',
-      overflowX: 'hidden',
-    }}
-  
-    size="responsive"
-  >
-  
-      <Component {...pageProps} />
-      <Notifications />
-      </Container>
-      </AppShell.Main>
-   </AppShell>
-   </DeSoIdentityProvider>
+        <MantineAppShell>
+          <Component {...pageProps} />
+        <Notifications />
+      </MantineAppShell>
+    </DeSoIdentityProvider>
     </MantineProvider>
     </LivepeerConfig>
   );

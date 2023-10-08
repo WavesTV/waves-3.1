@@ -106,7 +106,17 @@ useEffect(() => {
 
          
 
-            
+            <Container size='xs'>
+            <Paper shadow="xs" radius="md" withBorder p="sm">
+        <Space h='xs'/>
+        
+        <Text fw={500} ta='center'>$DESO Exchange Rate</Text>
+        
+        <Space h='xs'/>   
+          <Text fw={500} c='dimmed' ta='center'>1 $DESO = ${desoPrice} USD</Text>
+          <Space h='sm'/>  
+          </Paper>
+          </Container>
             
             
             <Space h='lg'/>
@@ -133,9 +143,9 @@ useEffect(() => {
         
            
            
-            <Text fw={500} c='dimmed' align='center' >{userDesoBalance} $DESO = ${usdBalance} USD</Text>
+            <Text fw={500} c='dimmed' ta='center' >{userDesoBalance} $DESO = ${usdBalance} USD</Text>
             <Space h='lg'/>
-            
+           
             </Card.Section>
         
           

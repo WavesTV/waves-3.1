@@ -98,7 +98,7 @@ import { DeSoIdentityContext } from 'react-deso-protocol';
     
   
     return (
-      <Box pb={120}>
+      <Box>
         <header className={classes.header}>
           <Group justify="space-between" h="100%">
           <Group>
@@ -353,7 +353,7 @@ import { DeSoIdentityContext } from 'react-deso-protocol';
             <Space h='md'/>
           
 
-          <Group align="center" grow pb="xl" px="md">
+          <Group justify="center" grow pb="xl" px="md">
           {!currentUser && (!alternateUsers || alternateUsers.length === 0) && (
                           <>
                             <Button

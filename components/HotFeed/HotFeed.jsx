@@ -37,35 +37,16 @@ import {
     IconMessageShare,
     IconCheck,
   } from "@tabler/icons-react";
-
+  import Link from 'next/link';
   import { DeSoIdentityContext } from "react-deso-protocol";
   import { notifications } from "@mantine/notifications";
   
-  const useStyles = createStyles((theme) => ({
-    comment: {
-      padding: `${theme.spacing.lg}px ${theme.spacing.xl}px`,
-    },
-  
-    body: {
-      paddingTop: theme.spacing.sm,
-      fontSize: theme.fontSizes.sm,
-      wordWrap: "break-word",
-    },
-  
-    content: {
-      "& > p:last-child": {
-        marginBottom: 0,
-      },
-    },
-  }));
-  
+
   export const HotFeed = () => {
     const [opened, { open, close }] = useDisclosure(false);
-    const { classes } = useStyles();
     const [hotFeed, setHotFeed] = useState([]);
-   
     const [selectedImage, setSelectedImage] = useState("");
-    const { currentUser, isLoading } = useContext(DeSoIdentityContext);
+    const { currentUser } = useContext(DeSoIdentityContext);
   
     useEffect(() => {
       const fetchHotFeed = async () => {
@@ -205,18 +186,15 @@ import {
                   p="xl"
                   withBorder
                   key={post.PostHashHex}
-                  className={classes.comment}
                 >
-                  <Group position="right">
+                  <Group justify="right">
                     <Tooltip label="Go to Post">
                       <ActionIcon
                         color="blue"
                         size="sm"
-                        variant="light"
+                        variant="transparent"
                         component={Link}
-                        href="/wave/[username]"
-                        as={`/post/${post.PostHashHex}`}
-                      
+                        href={`/post/${post.PostHashHex}`}
                       >
                         <IconMessageShare />
                       </ActionIcon>
@@ -225,10 +203,8 @@ import {
                   <Center>
                     <ActionIcon
                      component={Link}
-                     href="/wave/[username]"
-                     as={`/wave/${post.ProfileEntryResponse.Username}`}
-                     
-                      variant="transparent"
+                     href={`/wave/${post.ProfileEntryResponse.Username}`}
+                     variant="transparent"
                     >
                       <Avatar
                         radius="xl"
@@ -242,12 +218,12 @@ import {
                       />
   
                       <Space w="xs" />
-                      <Text weight="bold" size="sm">
+                      <Text fw={500} size="sm">
                         {post.ProfileEntryResponse.Username}
                       </Text>
                     </ActionIcon>
                   </Center>
-  
+                  <Space h="xl" />
                   <Spoiler
                     maxHeight={222}
                     showLabel={
@@ -270,9 +246,9 @@ import {
                     <TypographyStylesProvider>
                       <Space h="sm" />
                       <Text
-                        align="center"
+                        ta="center"
                         size="md"
-                        className={classes.body}
+                        
                         dangerouslySetInnerHTML={{
                           __html: replaceURLs(post.Body.replace(/\n/g, "<br> ")),
                         }}
@@ -309,7 +285,7 @@ import {
                   )}
   
                   {post.ImageURLs && (
-                    <Group position="center">
+                    <Group justify="center">
                       <UnstyledButton
                         onClick={() => {
                           setSelectedImage(post.ImageURLs[0]);
@@ -333,18 +309,16 @@ import {
                       p="xl"
                       withBorder
                       key={post.RepostedPostEntryResponse.PostHashHex}
-                      className={classes.comment}
+                      
                     >
-                      <Group position="right">
+                      <Group justify="right">
                         <Tooltip label="Go to Post">
                           <ActionIcon
                            component={Link}
-                           href="/wave/[username]"
-                           as={`/post/${post.RepostedPostEntryResponse.PostHashHex}`}
-                            
-                            color="blue"
-                            size="sm"
-                            variant="light"
+                           href={`/post/${post.PostHashHex}`}
+                           color="blue"
+                           size="sm"
+                           variant="transparent"
                           >
                             <IconMessageShare />
                           </ActionIcon>
@@ -353,10 +327,8 @@ import {
                       <Center>
                         <ActionIcon
                         component={Link}
-                        href="/wave/[username]"
-                        as={`/wave/${post.RepostedPostEntryResponse.ProfileEntryResponse?.Username}`}
-                        
-                          variant="transparent"
+                        href={`/wave/${post.ProfileEntryResponse.Username}`}
+                        variant="transparent"
                         >
                           <Avatar
                             radius="xl"
@@ -369,7 +341,7 @@ import {
                           />
   
                           <Space w="xs" />
-                          <Text weight="bold" size="sm">
+                          <Text fw={500} size="sm">
                             {
                               post.RepostedPostEntryResponse.ProfileEntryResponse
                                 ?.Username
@@ -377,6 +349,7 @@ import {
                           </Text>
                         </ActionIcon>
                       </Center>
+                      <Space h="xl" />
                       <Spoiler
                         maxHeight={222}
                         showLabel={
@@ -399,9 +372,9 @@ import {
                         <TypographyStylesProvider>
                           <Space h="sm" />
                           <Text
-                            align="center"
+                            ta="center"
                             size="md"
-                            className={classes.body}
+                            
                             dangerouslySetInnerHTML={{
                               __html: replaceURLs(
                                 post.RepostedPostEntryResponse.Body.replace(
@@ -447,7 +420,7 @@ import {
                       )}
                       {post.RepostedPostEntryResponse.ImageURLs &&
                         post.RepostedPostEntryResponse.ImageURLs.length > 0 && (
-                          <Group position="center">
+                          <Group justify="center">
                             <UnstyledButton
                               onClick={() => {
                                 setSelectedImage(
@@ -486,18 +459,11 @@ import {
                         size={36}
                       >
                         <IconHeart
-                          color={
-                            heartSuccess &&
-                            currentHeartPostHash === post.PostHashHex
-                              ? "red"
-                              : "white"
-                          }
-                          size={18}
-                          stroke={1.5}
+                          size={18} 
                         />
                       </ActionIcon>
                     </Tooltip>
-                    <Text size="xs" color="dimmed">
+                    <Text size="xs" c="dimmed">
                       {post.LikeCount}
                     </Text>
   
@@ -518,17 +484,11 @@ import {
                         size={36}
                       >
                         <IconRecycle
-                          color={
-                            repostSuccess && currentPostHash === post.PostHashHex
-                              ? "#228BE6"
-                              : "#FFFFFF"
-                          }
                           size={18}
-                          stroke={1.5}
                         />
                       </ActionIcon>
                     </Tooltip>
-                    <Text size="xs" color="dimmed">
+                    <Text size="xs" c="dimmed">
                       {post.RepostCount}
                     </Text>
   
@@ -553,18 +513,11 @@ import {
                         size={36}
                       >
                         <IconDiamond
-                          color={
-                            diamondTipSuccess &&
-                            currentDiamondPostHash === post.PostHashHex
-                              ? "#228BE6"
-                              : "#FFFFFF"
-                          }
                           size={18}
-                          stroke={1.5}
                         />
                       </ActionIcon>
                     </Tooltip>
-                    <Text size="xs" color="dimmed">
+                    <Text size="xs" c="dimmed">
                       {post.DiamondCount}
                     </Text>
   
@@ -582,10 +535,10 @@ import {
                         radius="md"
                         size={36}
                       >
-                        <IconMessageCircle size={18} stroke={1.5} />
+                        <IconMessageCircle size={18} />
                       </ActionIcon>
                     </Tooltip>
-                    <Text size="xs" color="dimmed">
+                    <Text size="xs" c="dimmed">
                       {post.CommentCount}
                     </Text>
                   </Center>
@@ -601,7 +554,7 @@ import {
                             onChange={(event) => setComment(event.target.value)}
                           />
                           <Space h="sm" />
-                          <Group position="right">
+                          <Group justify="right">
                             <Button radius="md" onClick={() => submitComment()}>
                               Comment
                             </Button>
@@ -616,7 +569,7 @@ import {
                             disabled
                           />
                           <Space h="sm" />
-                          <Group position="right">
+                          <Group justify="right">
                             <Button radius="md" disabled>
                               Comment
                             </Button>

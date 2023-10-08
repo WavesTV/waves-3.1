@@ -31,7 +31,8 @@
     "react-deso-protocol": "^0.0.3",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
-    "react-icons": "^4.11.0"
+    "react-icons": "^4.11.0",
+    "react-twitch-embed": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.22.1",

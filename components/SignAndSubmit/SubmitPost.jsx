@@ -214,7 +214,7 @@ import {
   
                 <Space h="xs" />
               </Center>
-              <Group position="center" grow>
+              <Group justify="center" grow>
                 <TextInput
                   type="text"
                   label="Username"
@@ -265,7 +265,7 @@ import {
   
               <Space h="sm" />
   
-              <Group position="right">
+              <Group justify="right">
                 <Button
                   disabled={isButtonDisabled}
                   onClick={handleUpdateUsername}

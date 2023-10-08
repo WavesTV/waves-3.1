@@ -28,6 +28,7 @@ import {
   Tooltip,
   Image,
   Divider,
+  Container,
 } from "@mantine/core";
 import {
   IconHeartFilled,
@@ -172,6 +173,7 @@ export default function PostPage() {
   return (
     <>
     <Space h={55}/>
+    <Container>
       <Paper
         m="md"
         shadow="lg"
@@ -291,11 +293,12 @@ export default function PostPage() {
                     key={singlePost.RepostedPostEntryResponse.PostHashHex}
                     
                   >
-                    <Center>
+                    
                     <UnstyledButton component={Link} href={`/wave/${
                             singlePost.RepostedPostEntryResponse.ProfileEntryResponse
                               ?.Username
                           }`}>
+                            <Group justify='center'>
                         <Avatar
                           radius="xl"
                           size="lg"
@@ -306,15 +309,16 @@ export default function PostPage() {
                           }
                         />
 
-                        <Space w="xs" />
+                   
                         <Text fw={500} size="md">
                           {
                             singlePost.RepostedPostEntryResponse.ProfileEntryResponse
                               ?.Username
                           }
                         </Text>
+                        </Group>
                       </UnstyledButton>
-                    </Center>
+                  
                     
                     <Spoiler
                       maxHeight={222}
@@ -394,21 +398,19 @@ export default function PostPage() {
           >
             <ActionIcon
               onClick={() => currentUser && submitHeart()}
-              variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} 
+              variant="transparent"
               radius="md"
               size={36}
             >
-              {heartSuccess ? (
-  <IconHeartFilled size={20} />
-) : (
-  <IconHeart size={20} />
-)}
-<Space w={1}/>
+
+  <IconHeart size={18} />
+  </ActionIcon>
+          </Tooltip>
+
 <Text size="xs">
             {singlePost?.LikeCount}
           </Text>
-            </ActionIcon>
-          </Tooltip>
+            
          
 
           <Space w="sm" />
@@ -421,21 +423,20 @@ export default function PostPage() {
           >
             <ActionIcon
               onClick={() => currentUser && submitRepost()}
-              variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} radius="md"
+              variant="transparent" radius="md"
               
               size={36}
             >
               <IconRecycle
-                color={repostSuccess ? "#228BE6" : "#FFFFFF"}
-                size={20}
-              
+                size={18}
+
               />
-<Space w={1}/>
+ </ActionIcon>
+          </Tooltip>
 <Text size="xs">
             {singlePost?.RepostCount}
           </Text>
-            </ActionIcon>
-          </Tooltip>
+           
           
 
           <Space w="sm" />
@@ -448,21 +449,17 @@ export default function PostPage() {
           >
             <ActionIcon
               onClick={() => currentUser && sendDiamondTip()}
-              variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} radius="md"
+              variant="transparent" radius="md"
               
               size={36}
             >
-              <IconDiamond
-                color={diamondTipSuccess ? "#228BE6" : "#FFFFFF"}
-                size={20}
-                
-              />
-              <Space w={1}/>
+              <IconDiamond size={18}/>
+             </ActionIcon>
+          </Tooltip>
               <Text size="xs">
             {singlePost?.DiamondCount}
           </Text>
-            </ActionIcon>
-          </Tooltip>
+            
           
 
           <Space w="sm" />
@@ -474,16 +471,15 @@ export default function PostPage() {
             label="Comments"
           >
           
-            <ActionIcon variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} radius="md" size={36}>
-              <IconMessageCircle size={20} />
-              <Space w={1}/>
+            <ActionIcon variant="transparent" radius="md" size={36}>
+              <IconMessageCircle size={18} />
+              </ActionIcon>
+              </Tooltip>
               <Text size="xs">
             {singlePost?.CommentCount}
           </Text>
-            </ActionIcon>
-            
-        
-          </Tooltip>
+
+          
           
         </Center>
         <Space h="sm" />
@@ -498,7 +494,7 @@ export default function PostPage() {
                   onChange={(event) => setComment(event.target.value)}
                 />
                 <Space h="sm" />
-                <Group position="right">
+                <Group justify="right">
                   <Button radius="md" onClick={() => submitComment()}>
                     Comment
                   </Button>
@@ -513,7 +509,7 @@ export default function PostPage() {
                   disabled
                 />
                 <Space h="sm" />
-                <Group position="right">
+                <Group justify="right">
                   <Button radius="md" disabled>
                     Comment
                   </Button>
@@ -622,7 +618,7 @@ export default function PostPage() {
       <Modal opened={opened} onClose={close} size="auto" centered>
         <Image src={selectedImage} radius="md" alt="post-image" fit="contain" />
       </Modal>
-
+      </Container>
     </>
   );
 };

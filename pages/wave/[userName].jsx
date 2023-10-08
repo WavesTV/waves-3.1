@@ -86,7 +86,7 @@ export default function Wave() {
   const [NFTs, setNFTs] = useState([]);
   const [profile, setProfile] = useState([]);
   const [followerInfo, setFollowers] = useState({ followers: 0, following: 0 });
-  const [activeTab, setActiveTab] = useState("first");
+ 
   const { currentUser } = useContext(DeSoIdentityContext);
   const [isFollowingUser, setisFollowingUser] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
@@ -542,7 +542,7 @@ export default function Wave() {
 
   return (
     <>
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Card ml={17} shadow="sm" padding="lg" radius="md" withBorder>
         <Card.Section>
           <Image
             src={profile.ExtraData?.FeaturedImageURL || null}
@@ -660,12 +660,12 @@ export default function Wave() {
               <Paper shadow="xl" p="xl" withBorder>
              
                 <Space h="xs" />
-                <Text fz="xl" fw={700} c="dimmed" align="center" variant="gradient"
+                <Text fz="xl" fw={700} c="dimmed" ta="center" variant="gradient"
       gradient={{ from: 'indigo', to: 'cyan', deg: 45 }}>
                   {" "}
                   Join {userName}'s Wave
                 </Text>
-                <Text fz="xl" fw={700} c="dimmed" align="center" variant="gradient"
+                <Text fz="xl" fw={700} c="dimmed" ta="center" variant="gradient"
       gradient={{ from: 'indigo', to: 'cyan', deg: 45 }}>
                   {" "}
                   Subscribe to contribute to their
@@ -680,7 +680,7 @@ export default function Wave() {
                       <Grid.Col lg={4} sm={7}>
                         <Paper shadow="xl" p="xl" withBorder>
                           <List>
-                            <Text fw={700} align="center">
+                            <Text fw={700} ta="center">
                               Tier 1
                             </Text>
                             <Divider my="sm" />
@@ -725,7 +725,7 @@ export default function Wave() {
                        
                             </Center>
                             <Space h="xs" />
-                            <Text align="center" fz="xs"  fw={500} c="dimmed"><ThemeIcon radius="xl" size={14} variant="outline">
+                            <Text ta="center" fz="xs"  fw={500} c="dimmed"><ThemeIcon radius="xl" size={14} variant="outline">
                               <TiInfoLargeOutline    />
      </ThemeIcon> This will instantly be paid out to {`${userName}`}</Text>
                            
@@ -753,7 +753,7 @@ export default function Wave() {
                       <Grid.Col lg={4} sm={7}>
                         <Paper shadow="xl" p="xl" withBorder>
                           <List>
-                            <Text fw={700} align="center">
+                            <Text fw={700} ta="center">
                               Tier 2
                             </Text>
                             <Divider my="sm" />
@@ -790,7 +790,7 @@ export default function Wave() {
                             <Text fz="sm" fw={500}>Confirm Purchase</Text>
                             </Center>
                             <Space h="xs" />
-                            <Text align="center" fz="xs"  fw={500} c="dimmed"><ThemeIcon radius="xl" size={14} variant="outline">
+                            <Text ta="center" fz="xs"  fw={500} c="dimmed"><ThemeIcon radius="xl" size={14} variant="outline">
                               <TiInfoLargeOutline    />
      </ThemeIcon> This will instantly be paid out to {`${userName}`}</Text>
                            
@@ -815,7 +815,7 @@ export default function Wave() {
                       <Grid.Col lg={4} sm={7}>
                         <Paper shadow="xl" p="xl" withBorder>
                           <List>
-                            <Text fw={700} align="center">
+                            <Text fw={700} ta="center">
                               Tier 3
                             </Text>
                             <Divider my="sm" />
@@ -852,7 +852,7 @@ export default function Wave() {
                             <Text fz="sm" fw={500}>Confirm Purchase</Text>
                             </Center>
                             <Space h="xs" />
-                            <Text align="center" fz="xs"  fw={500} c="dimmed"><ThemeIcon radius="xl" size={14} variant="outline">
+                            <Text ta="center" fz="xs"  fw={500} c="dimmed"><ThemeIcon radius="xl" size={14} variant="outline">
                               <TiInfoLargeOutline    />
      </ThemeIcon> This will instantly be paid out to {`${userName}`}</Text>
                            
@@ -1037,7 +1037,7 @@ export default function Wave() {
 
       <Space h="xl" />
 
-      <Tabs radius="sm" value={activeTab} onChange={handleTabChange}>
+      <Tabs variant="default" defaultValue="first">
         <Tabs.List grow >
           <Tabs.Tab value="first">
             <Text fz="sm">Posts</Text>
@@ -1059,7 +1059,7 @@ export default function Wave() {
                 key={post.PostHashHex}
                 
               >
-               
+               <Group justify="right">
                   <Tooltip label="Go to Post">
                     <ActionIcon
                       color="blue"
@@ -1074,7 +1074,8 @@ export default function Wave() {
                       <IconMessageShare />
                     </ActionIcon>
                   </Tooltip>
-              
+                  </Group>
+
                 <Center>
                   {post.ProfileEntryResponse &&
                   post.ProfileEntryResponse.ExtraData?.LargeProfilePicURL ? (
@@ -1337,22 +1338,19 @@ export default function Wave() {
           >
             <ActionIcon
               onClick={() => currentUser && submitHeart(post.PostHashHex)}
-              variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} 
+              variant="transparent"
               radius="md"
               size={36}
             >
-              {heartSuccess &&
-                          currentHeartPostHash === post.PostHashHex ? (
-  <IconHeartFilled size={20} />
-) : (
-  <IconHeart size={20} />
-)}
-<Space w={1}/>
+            
+  <IconHeart size={18} />
+
+</ActionIcon>
+          </Tooltip>
 <Text size="xs">
             {post.LikeCount}
           </Text>
-            </ActionIcon>
-          </Tooltip>
+            
          
 
           <Space w="sm" />
@@ -1367,21 +1365,21 @@ export default function Wave() {
               onClick={() =>
                 currentUser && submitRepost(post.PostHashHex)
               }
-              variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} radius="md"
+              variant="transparent" radius="md"
               
               size={36}
             >
               <IconRecycle
               
-                size={20}
+                size={18}
               
               />
-<Space w={1}/>
+</ActionIcon>
+          </Tooltip>
 <Text size="xs">
             {post.RepostCount}
           </Text>
-            </ActionIcon>
-          </Tooltip>
+            
           
 
           <Space w="sm" />
@@ -1400,21 +1398,21 @@ export default function Wave() {
                   post.PosterPublicKeyBase58Check
                 )
               }
-              variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} radius="md"
+              variant="transparent" radius="md"
               
               size={36}
             >
               <IconDiamond
                 
-                size={20}
+                size={18}
                 
               />
-              <Space w={1}/>
+              </ActionIcon>
+          </Tooltip>
               <Text size="xs">
             {post.DiamondCount}
           </Text>
-            </ActionIcon>
-          </Tooltip>
+            
           
 
           <Space w="sm" />
@@ -1426,16 +1424,14 @@ export default function Wave() {
             label="Comments"
           >
           
-            <ActionIcon onClick={() => handleCommentToggle(post.PostHashHex)} variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 160 }} radius="md" size={36}>
-              <IconMessageCircle size={20} />
-              <Space w={1}/>
+            <ActionIcon onClick={() => handleCommentToggle(post.PostHashHex)} variant="transparent" radius="md" size={36}>
+              <IconMessageCircle size={18} />
+              </ActionIcon>
+          </Tooltip>
               <Text size="xs">
             {post.CommentCount}
           </Text>
-            </ActionIcon>
             
-        
-          </Tooltip>
                 </Center>
                 <Collapse in={commentToggles[post.PostHashHex]}>
                   <>
@@ -1449,7 +1445,7 @@ export default function Wave() {
                           onChange={(event) => setComment(event.target.value)}
                         />
                         <Space h="sm" />
-                        <Group position="right">
+                        <Group justify="right">
                           <Button radius="md" onClick={() => submitComment()}>
                             Comment
                           </Button>
@@ -1464,7 +1460,7 @@ export default function Wave() {
                           disabled
                         />
                         <Space h="sm" />
-                        <Group position="right">
+                        <Group justify="right">
                           <Button radius="md" disabled>
                             Comment
                           </Button>
@@ -1506,6 +1502,22 @@ export default function Wave() {
                   key={index}
                   
                 >
+                  <Group justify="right">
+                  <Tooltip label="Go to Post">
+                    <ActionIcon
+                      color="blue"
+                      size="sm"
+                      variant="transparent"
+                    
+                        component={Link}
+                          href={`/post/${nft.PostEntryResponse.PostHashHex}`}
+                        
+                   
+                    >
+                      <IconMessageShare />
+                    </ActionIcon>
+                  </Tooltip>
+                  </Group>
                   <Center>
                     <Avatar
                       size="lg"
@@ -1517,14 +1529,14 @@ export default function Wave() {
                       alt="Profile Picture"
                     />
                     <Space w="xs" />
-                    <Text weight="bold" size="sm">
+                    <Text fw={500} size="md">
                       {userName}
                     </Text>
                   </Center>
                   <Space h="sm" />
                  
                     <Text
-                      align="center"
+                      ta="center"
                       size="md"
                       
                       dangerouslySetInnerHTML={{
@@ -1577,24 +1589,21 @@ export default function Wave() {
                           currentUser &&
                           submitHeart(nft.PostEntryResponse.PostHashHex)
                         }
-                        variant="gradient" 
-                        gradient={{ from: 'blue', to: 'cyan', deg: 160 }} 
+                        variant="transparent" 
+                        
                         radius="md"
                         size={36}
                       >
-                        {heartSuccess &&
-                          currentHeartPostHash === post.PostHashHex ? (
-  <IconHeartFilled size={20} />
-) : (
-  <IconHeart size={20} />
-)}
-                         <Space w={1} />
+                        
+  <IconHeart size={18} />
+
+  </ActionIcon>
+                    </Tooltip>
                          <Text size="xs" >
                       {nft.PostEntryResponse.LikeCount}
                     </Text>
 
-                      </ActionIcon>
-                    </Tooltip>
+                      
                   
                     <Space w="sm" />
 
@@ -1609,18 +1618,18 @@ export default function Wave() {
                           currentUser &&
                           submitRepost(nft.PostEntryResponse.PostHashHex)
                         }
-                        variant="gradient" 
-                        gradient={{ from: 'blue', to: 'cyan', deg: 160 }} 
+                        variant="transparent" 
+                        
                         size={36}
                         radius="md"
                       >
-                        <IconRecycle size={20}/>
-                        <Space w={1} />
+                        <IconRecycle size={18}/>
+                        </ActionIcon>
+                    </Tooltip>
                         <Text size="xs" >
                       {nft.PostEntryResponse.RepostCount}
                     </Text>
-                      </ActionIcon>
-                    </Tooltip>
+                     
                     
 
                     <Space w="sm" />
@@ -1639,21 +1648,20 @@ export default function Wave() {
                             nft.PostEntryResponse.PosterPublicKeyBase58Check
                           )
                         }
-                        variant="gradient" 
-                        gradient={{ from: 'blue', to: 'cyan', deg: 160 }} 
+                        variant="transparent" 
+                        
                         size={36}
                         radius="md"
                       >
                         <IconDiamond size={20}/>
-                        <Space w={1} />
+                        </ActionIcon>
+                    </Tooltip>
                         <Text size="xs">
                       {nft.PostEntryResponse.DiamondCount}
-                    </Text>
-                      </ActionIcon>
+                   </Text>
 
                       
-                    </Tooltip>
-                    
+                
                     
                     <Space w="sm" />
 
@@ -1668,18 +1676,18 @@ export default function Wave() {
                           handleCommentToggle(nft.PostEntryResponse.PostHashHex)
                         }
                         radius="md"
-                        variant="gradient" 
-                        gradient={{ from: 'blue', to: 'cyan', deg: 160 }} 
+                        variant="transparent" 
+                        
                         size={36}
                       >
-                        <IconMessageCircle size={20}  />
-                        <Space w={1} />
+                        <IconMessageCircle size={18}  />
+                        </ActionIcon>
+                      
+                      </Tooltip>
                         <Text size="xs">
                       {nft.PostEntryResponse.CommentCount}
                     </Text>
-                      </ActionIcon>
                       
-                    </Tooltip>
                   
                     
                   </Center>
@@ -1697,7 +1705,7 @@ export default function Wave() {
                             onChange={(event) => setComment(event.target.value)}
                           />
                           <Space h="sm" />
-                          <Group position="right">
+                          <Group justify="right">
                             <Button radius="md" onClick={() => submitComment()}>
                               Comment
                             </Button>
@@ -1712,7 +1720,7 @@ export default function Wave() {
                             disabled
                           />
                           <Space h="sm" />
-                          <Group position="right">
+                          <Group justify="right">
                             <Button radius="md" disabled>
                               Comment
                             </Button>
