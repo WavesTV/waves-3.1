@@ -32,8 +32,9 @@ export function MantineAppShell({ children }) {
         <AppShell.Navbar>
         {desktopOpened ? (
         <>
+        
          <Tooltip position="right-start" label="Close Sidebars">
-            <ActionIcon onClick={toggleDesktop} visibleFrom="sm"  >
+            <ActionIcon mt={11} ml={11}onClick={toggleDesktop} visibleFrom="sm"  >
             <RiArrowLeftDoubleLine/>
             </ActionIcon>
             </Tooltip>

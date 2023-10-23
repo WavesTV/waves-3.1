@@ -247,6 +247,7 @@ import {
       if (currentUser.ProfileEntryResponse === null) {
         return (
           <>
+          <Container>
             <Paper m="md" shadow="lg" radius="sm" p="xl" withBorder>
               <Center>
                 <Badge
@@ -320,6 +321,7 @@ import {
                 </Button>
               </Group>
             </Paper>
+            </Container>
           </>
         );
       } else {

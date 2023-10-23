@@ -102,7 +102,7 @@ export default function NotificationsPage () {
         }
         labelPosition="center"
       />
-<Space h={55}/>
+
       {currentUser ? (
         <>
           {isLoading ? (
