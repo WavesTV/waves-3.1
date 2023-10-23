@@ -38,7 +38,7 @@ import {
   IconDiamond,
   IconRecycle,
   IconMessageCircle,
-  IconCheck
+  IconCheck, IconX
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { DeSoIdentityContext } from "react-deso-protocol";
@@ -75,7 +75,8 @@ export default function PostPage() {
 
     fetchPost();
   }, [postHash]);
-  console.log(singlePost);
+
+
   const replaceURLs = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const atSymbolRegex = /(\S*@+\S*)/g;
@@ -106,7 +107,12 @@ export default function PostPage() {
         message: "Your comment was submitted!",
       });
     } catch (error) {
-      alert("Error submitting comment. Please try again.");
+      notifications.show({
+        title: "Error",
+        icon: <IconX size="1.1rem" />,
+        color: "red",
+        message: "Something Happened!",
+      });
       console.error("Error submitting comment:", error);
     }
 
@@ -127,9 +133,20 @@ export default function PostPage() {
           ImageURLs: [],
         },
       });
+      notifications.show({
+        title: "Success",
+        icon: <IconRecycle size="1.1rem" />,
+        color: "green",
+        message: "Reposted!",
+      });
       setRepostSuccess(true);
     } catch (error) {
-      alert("Error submitting Repost. Please try again.");
+      notifications.show({
+        title: "Error",
+        icon: <IconX size="1.1rem" />,
+        color: "red",
+        message: "Something Happened!",
+      });
       console.error("Error submitting Repost:", error);
     }
   };
@@ -142,12 +159,23 @@ export default function PostPage() {
         TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         PostHashHex: postHash,
         AssociationType: "REACTION",
-        AssociationValue: "LOVE",
+        AssociationValue: "LIKE",
         MinFeeRateNanosPerKB: 1000,
+      });
+      notifications.show({
+        title: "Success",
+        icon: <IconHeartFilled size="1.1rem" />,
+        color: "blue",
+        message: "Liked!",
       });
       setHeartSuccess(true);
     } catch (error) {
-      alert("Error submitting heart. Please try again.");
+      notifications.show({
+        title: "Error",
+        icon: <IconX size="1.1rem" />,
+        color: "red",
+        message: "Something Happened!",
+      });
       console.error("Error submitting heart:", error);
     }
   };
@@ -163,9 +191,20 @@ export default function PostPage() {
         DiamondLevel: 1,
         MinFeeRateNanosPerKB: 1000,
       });
+      notifications.show({
+        title: "Success",
+        icon: <IconDiamond size="1.1rem" />,
+        color: "blue",
+        message: "Diamond Sent!",
+      });
       setDiamondTipSuccess(true);
     } catch (error) {
-      alert("Error submitting diamond. Please try again.");
+      notifications.show({
+        title: "Error",
+        icon: <IconX size="1.1rem" />,
+        color: "red",
+        message: "Something Happened!",
+      });
       console.error("Error submitting diamond:", error);
     }
   };

@@ -308,16 +308,29 @@ console.log(stream)
       </ActionIcon >
         </HoverCard.Target>
         <HoverCard.Dropdown>
-          <Text fw={500} size="sm">
-            Before you start streaming select what type of Stream you want.
+          <Text ta="center" fw={500} size="sm">
+            Select a Stream Type
+          </Text>
+          <Divider my="sm" />
+          <Space h="xs" />
+          <Text size="sm">
+            Streaming via your Webcam is the easiest way to go Live.
           </Text>
           <Space h="xs" />
-          <Text fw={500} size="sm">
-            Streaming via your Webcam is the easiest way to go Live. Once you have created a Stream name just allow access to you Camera/Audio. No 3rd party software is required. It is also Mobile Friendly! 
+          <Text size="sm">
+            No 3rd party software is required. It is also Mobile Friendly! 
+          </Text>
+
+          <Space h="xs" />
+          <Divider my="sm" />
+          <Space h="xs" />
+
+          <Text size="sm">
+            Streaming via OBS Studio or Streamlabs is great for Gamers and more experienced Streamers.
           </Text>
           <Space h="xs" />
-          <Text fw={500} size="sm">
-            Streaming via OBS Studio or Streamlabs is great for Gamers and more experienced Streamers. You'll be given a 1-time use Stream Key/URL to go Live!
+          <Text size="sm">
+            A single use Stream Key will be provided to Go Live!
           </Text>
         </HoverCard.Dropdown>
       </HoverCard>
@@ -370,7 +383,7 @@ console.log(stream)
         </HoverCard.Target>
         <HoverCard.Dropdown>
           <Text fw={500} size="sm">
-            Now that you have created your stream, copy & paste your Stream URL/Key into OBS Studio or Streamlabs to go Live. 
+            Copy & paste your Stream URL/Key into OBS Studio or Streamlabs to go Live. 
           </Text>
           <Space h="xs" />
           <Text  fw={500}  size="sm">

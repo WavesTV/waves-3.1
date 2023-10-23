@@ -38,7 +38,7 @@ import {
     Notification,
   } from "@mantine/core";
   import { useDisclosure } from "@mantine/hooks";
- 
+  import { GiWaveCrest } from "react-icons/gi";
   import { DeSoIdentityContext } from "react-deso-protocol";
   import { Welcome } from "../Welcome/Welcome";
   import { Player, useAssetMetrics, useCreateAsset } from "@livepeer/react";
@@ -116,10 +116,21 @@ import {
           UserPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
           file: imageFile,
         });
-  
+        notifications.show({
+          title: "Success",
+          icon: <IconCheck size="1.1rem" />,
+          color: "green",
+          message: "Uploaded!",
+        });
         setImageURL(response.ImageURL);
         console.log(response);
       } catch (error) {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Something Happened!",
+        });
         console.log("Something happened: " + error);
       }
     };
@@ -161,7 +172,42 @@ import {
     if (!currentUser || !currentUser.BalanceNanos) {
       return (
         <>
-          <Welcome />
+        <Center>
+        
+        <Text fz={66} fw={900} fs="italic" variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 176 }}>Waves</Text>
+        </Center>
+        <Container size={560} p={0}>
+        <Center>
+          <Text fw={700} size="md">
+            Twitch Meets Twitter
+          </Text>
+        </Center>
+        
+  <Space h="xl"/>
+           <Button
+            gradient={{ from: 'blue', to: 'cyan', deg: 354 }}
+       fullWidth
+          leftSection={<GiWaveCrest size="1rem" />}
+          variant="gradient"
+          radius="lg"
+    
+          onClick={() => {
+            identity
+              .login({
+                getFreeDeso: true,
+              })
+              .catch((err) => {
+                if (err?.type === ERROR_TYPES.NO_MONEY) {
+                  alert("You need DESO in order to post!");
+                } else {
+                  alert(err);
+                }
+              });
+          }}
+        >
+          Sign Up
+        </Button>
+        </Container>
           <Space h="md" />
   
           <Container size="30rem" px={0}>

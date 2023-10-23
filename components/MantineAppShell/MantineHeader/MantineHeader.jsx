@@ -33,7 +33,7 @@ import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeTog
 import { identity, getUnreadNotificationsCount, setNotificationMetadata } from 'deso-protocol';
 import { useContext, useEffect, useState} from 'react';
 import { DeSoIdentityContext } from 'react-deso-protocol';
-
+import { PiSealQuestion } from 'react-icons/pi';
 
   
   export function MantineHeader() {
@@ -162,6 +162,24 @@ import { DeSoIdentityContext } from 'react-deso-protocol';
         
     </ActionIcon>
     </Tooltip>
+
+    <Tooltip label="Why Waves" withArrow  position="bottom" offset={3}>
+    <ActionIcon
+    component={Link}
+    href="/why"
+      variant="gradient"
+      size="xl"
+      aria-label="Gradient action icon"
+      gradient={{ from: 'blue', to: 'cyan', deg: 270 }}
+    
+    >
+     
+      <PiSealQuestion size="1.7rem"/>
+     
+   
+  
+    </ActionIcon>
+    </Tooltip>
             </Group>
   
             <Group visibleFrom="sm">
@@ -259,7 +277,7 @@ import { DeSoIdentityContext } from 'react-deso-protocol';
                                 leftSection={<IconSwitchHorizontal size={17} />}
                                 onClick={() => identity.login()}
                               >
-                                Add Account
+                                Switch Account
                               </Menu.Item>
 
                               <Menu.Item
@@ -351,7 +369,20 @@ import { DeSoIdentityContext } from 'react-deso-protocol';
               Notifications
             </Link>
             <Space h='md'/>
-          
+            <Link href="/why" className={classes.link} onClick={closeDrawer}> 
+            <ActionIcon
+   
+      variant="gradient"
+      size="xl"
+      aria-label="Gradient action icon"
+      gradient={{ from: 'blue', to: 'cyan', deg: 270 }}
+    >
+      <PiSealQuestion />
+    </ActionIcon>
+    <Space w='md'/>
+              Why Waves
+            </Link>
+            <Space h='md'/> 
 
           <Group justify="center" grow pb="xl" px="md">
           {!currentUser && (!alternateUsers || alternateUsers.length === 0) && (
@@ -438,7 +469,7 @@ import { DeSoIdentityContext } from 'react-deso-protocol';
                                 leftSection={<IconSwitchHorizontal size={17} />}
                                 onClick={() => identity.login()}
                               >
-                                Add Account
+                                Switch Account
                               </Menu.Item>
 
                               <Menu.Item

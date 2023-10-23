@@ -170,6 +170,7 @@ export default function Wave() {
   };
 
   const followUser = async () => {
+    try {
     await updateFollowingStatus({
       MinFeeRateNanosPerKB: 1000,
       IsUnfollow: false,
@@ -182,10 +183,20 @@ export default function Wave() {
       icon: <IconCheck size="1.1rem" />,
       color: "green",
       message: `You successfully followed ${userName}`,
-    });
+    });  
+  } catch (error) {
+      notifications.show({
+        title: "Error",
+        icon: <IconX size="1.1rem" />,
+        color: "red",
+        message: "Something Happened!",
+      });
+     
+    }
   };
 
   const unfollowUser = async () => {
+    try {
     await updateFollowingStatus({
       MinFeeRateNanosPerKB: 1000,
       IsUnfollow: true,
@@ -199,6 +210,15 @@ export default function Wave() {
       color: "red",
       message: `You successfully unfollowed ${userName}`,
     });
+  } catch (error) {
+    notifications.show({
+      title: "Error",
+      icon: <IconX size="1.1rem" />,
+      color: "red",
+      message: "Something Happened!",
+    });
+   
+  }
   };
 
   const fetchPosts = async () => {
@@ -242,6 +262,13 @@ export default function Wave() {
         AmountNanos: equivalentNanosInt,
         MinFeeRateNanosPerKB: 1000,
       });
+
+      notifications.show({
+        title: "Subcribed",
+        icon: <IconCheck size="1.1rem" />,
+        color: "green",
+        message: `You successfully subscribed to ${userName}`,
+      });
     } catch (error) {
       if (error.message.includes("RuleErrorInsufficientBalance")) {
         notifications.show({
@@ -252,6 +279,13 @@ export default function Wave() {
             "Hey there, please add DeSo to your Wallet to complete this transaction.",
         });
       } else {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message:
+            "Something Happened!",
+        });
         console.error("Error submitting transaction:", error);
       }
     }
@@ -287,6 +321,13 @@ export default function Wave() {
         AmountNanos: equivalentNanosInt,
         MinFeeRateNanosPerKB: 1000,
       });
+
+      notifications.show({
+        title: "Subcribed",
+        icon: <IconCheck size="1.1rem" />,
+        color: "red",
+        message: `You successfully subscribed to ${userName}`,
+      });
     } catch (error) {
       if (error.message.includes("RuleErrorInsufficientBalance")) {
         notifications.show({
@@ -297,6 +338,13 @@ export default function Wave() {
             "Hey there, please add DeSo to your Wallet to complete this transaction.",
         });
       } else {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message:
+            "Something Happened!",
+        });
         console.error("Error submitting transaction:", error);
       }
     }
@@ -332,6 +380,12 @@ export default function Wave() {
         AmountNanos: equivalentNanosInt,
         MinFeeRateNanosPerKB: 1000,
       });
+      notifications.show({
+        title: "Subcribed",
+        icon: <IconCheck size="1.1rem" />,
+        color: "green",
+        message: `You successfully subscribed to ${userName}`,
+      });
     } catch (error) {
       if (error.message.includes("RuleErrorInsufficientBalance")) {
         notifications.show({
@@ -342,6 +396,13 @@ export default function Wave() {
             "Hey there, please add DeSo to your Wallet to complete this transaction.",
         });
       } else {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message:
+            "Something Happened!",
+        });
         console.error("Error submitting transaction:", error);
       }
     }
@@ -479,7 +540,7 @@ export default function Wave() {
         TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         PostHashHex: postHash,
         AssociationType: "REACTION",
-        AssociationValue: "LOVE",
+        AssociationValue: "LIKE",
         MinFeeRateNanosPerKB: 1000,
       });
       notifications.show({
@@ -526,7 +587,7 @@ export default function Wave() {
         title: "Error Tipping",
         icon: <IconX size="1.1rem" />,
         color: "red",
-        message: "Something happened, you may have already tipped this post. Explore more posts to engage with!",
+        message: "Something happened, you may have already tipped this post!",
       });
     }
   };

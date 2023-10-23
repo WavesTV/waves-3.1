@@ -242,8 +242,8 @@ export default function ProfilePage () {
               </Text>
             </Center>
             <Group justify="left">
-            <Button variant="light" compact>
-              <IconSettings onClick={open} />
+            <Button variant="light" compact onClick={open} >
+              <IconSettings />
             </Button>
             </Group>
             <Space h="sm" />
