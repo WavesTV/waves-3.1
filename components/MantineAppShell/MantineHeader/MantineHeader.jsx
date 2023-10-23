@@ -80,12 +80,12 @@ import { PiSealQuestion } from 'react-icons/pi';
  
    const resetUnreadNotifications = async () => {
      const notifData = await getUnreadNotificationsCount({
-       PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+       PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
      });
      await setNotificationMetadata({
-       PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+       PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
        UnreadNotifications: 0,
-       LastUnreadNotificationIndex:  notifData.LastUnreadNotificationIndex
+       LastUnreadNotificationIndex:  notifData?.LastUnreadNotificationIndex
      });
  
      setUnreadNotifs(0)
@@ -106,7 +106,7 @@ import { PiSealQuestion } from 'react-icons/pi';
 <Badge variant="filled" color="blue" radius="sm" className={classes.betaTag}>BETA</Badge>
 </Group>
   
-            <Group h="100%" visibleFrom="sm">
+            <Group h="100%" visibleFrom="sm" justify='center'>
             <Tooltip label="Home" withArrow  position="bottom" offset={3}>
           <ActionIcon
           component={Link}
@@ -156,7 +156,7 @@ import { PiSealQuestion } from 'react-icons/pi';
      
       <IconBellRinging/>
      
-      { unreadNotifs > 0 && (
+      { currentUser && unreadNotifs > 0 && (
           <Text  className={classes.notificationCount} fz="sm" fw={700} c="orange">{unreadNotifs}</Text>
         )}
         
@@ -190,16 +190,9 @@ import { PiSealQuestion } from 'react-icons/pi';
                               variant="default"
                               onClick={() => identity.login()}
                             >
-                              Login
+                              Sign In
                             </Button>
-                            <Button
-                              leftSection={<GiWaveCrest size="1rem" />}
-                              variant="gradient"
-                              gradient={{ from: "cyan", to: "indigo" }}
-                              onClick={() => identity.login()}
-                            >
-                              Sign Up
-                            </Button>
+                            
                           </>
                         )}
 
@@ -284,7 +277,7 @@ import { PiSealQuestion } from 'react-icons/pi';
                                 leftSection={<IconLogout size={17} />}
                                 onClick={handleLogout}
                               >
-                                Logout
+                                Sign Out
                               </Menu.Item>
                             </Menu.Dropdown>
                           </Menu>
@@ -377,7 +370,7 @@ import { PiSealQuestion } from 'react-icons/pi';
       aria-label="Gradient action icon"
       gradient={{ from: 'blue', to: 'cyan', deg: 270 }}
     >
-      <PiSealQuestion />
+      <PiSealQuestion size="1.7rem"/>
     </ActionIcon>
     <Space w='md'/>
               Why Waves
@@ -476,7 +469,7 @@ import { PiSealQuestion } from 'react-icons/pi';
                                 leftSection={<IconLogout size={17} />}
                                 onClick={handleLogout}
                               >
-                                Logout
+                                Sign Out
                               </Menu.Item>
                             </Menu.Dropdown>
                           </Menu>

@@ -16,7 +16,7 @@ import { useContext, useEffect ,useState } from "react";
 import { GiWaveCrest } from "react-icons/gi";
 import { identity, getSingleProfile, getExchangeRates } from "deso-protocol";
 import { IconCheck, IconKey } from '@tabler/icons-react';
-
+import { TiInfoLargeOutline } from 'react-icons/ti';
 
 export default function WalletPage() {
      // Using DeSoIdentityContext from DeSo
@@ -151,6 +151,11 @@ useEffect(() => {
           
       
           <Divider my="sm" />
+          <Group>
+          <TiInfoLargeOutline />
+          <Text size="sm" fw={500}>Your DeSo Wallet Address will be used and 50% of fees will be paid out to you. This is paid out after $50 worth of fees.</Text>
+          </Group>
+          
           <Space h='md'/>
           <iframe
             title="heroswap"

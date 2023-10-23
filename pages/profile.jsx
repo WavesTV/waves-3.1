@@ -850,18 +850,6 @@ export default function ProfilePage () {
         </>
       ) : (
         <>
-          <Divider
-            my="xs"
-            label={
-              <>
-                <Text fw={444} fz="xl">
-                  Profile
-                </Text>
-              </>
-            }
-            labelPosition="center"
-          />
-          <Space h="xl" />
           <Container size="30rem" px={0}>
             <Paper shadow="xl" p="lg" withBorder>
               <Center>
