@@ -9,7 +9,7 @@ import {
   Paper,
   Group, 
   CopyButton, 
-  ActionIcon, Tooltip, Avatar
+  ActionIcon, Tooltip, Avatar, Blockquote
 } from "@mantine/core";
 import { DeSoIdentityContext } from "react-deso-protocol";
 import { useContext, useEffect ,useState } from "react";
@@ -152,11 +152,12 @@ useEffect(() => {
       
           <Divider my="sm" />
           <Group>
-          <TiInfoLargeOutline />
-          <Text size="sm" fw={500}>Your DeSo Wallet Address will be used and 50% of fees will be paid out to you. This is paid out after $50 worth of fees.</Text>
+          <Blockquote color="blue" radius="xl" iconSize={35} icon={<TiInfoLargeOutline />}  mt="xl">
+          Your DeSo Wallet Address will be used and 50% of fees will be paid out to you. This is paid out after $50 worth of fees.
+          </Blockquote>
           </Group>
           
-          <Space h='md'/>
+          <Space h='xl'/>
           <iframe
             title="heroswap"
             width="100%"

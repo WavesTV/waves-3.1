@@ -47,7 +47,7 @@ export const WAVESFEATURE = [
     icon: PiUsersThreeDuotone,
     title: 'Community Oriented',
     description:
-      'Waves prioritizes user experience and plans to use on-chain voting to determine feature development and the platforms direction.',
+      'Waves prioritizes user experience and plans to use onchain voting to determine feature development and the platforms direction.',
   },
   
  
