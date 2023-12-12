@@ -3,17 +3,17 @@ import {
   useCreateStream,
   useUpdateStream,
   Broadcast,
-  useStreamSession 
-} from "@livepeer/react";
-import { useMemo, useState, useContext, useEffect, useRef } from "react";
-import { useDisclosure } from "@mantine/hooks";
+  useStreamSession,
+} from '@livepeer/react';
+import { useMemo, useState, useContext, useEffect, useRef } from 'react';
+import { useDisclosure } from '@mantine/hooks';
 import {
   updateProfile,
   getIsFollowing,
   updateFollowingStatus,
   submitPost,
-  getSingleProfile
-} from "deso-protocol";
+  getSingleProfile,
+} from 'deso-protocol';
 import {
   Title,
   Input,
@@ -31,40 +31,60 @@ import {
   Loader,
   Text,
   Progress,
-  Divider, 
-  Accordion, 
-  useMantineTheme, rem, Collapse, UnstyledButton, ActionIcon, PasswordInput, Switch, HoverCard, Overlay,
-  Image
-} from "@mantine/core";
-import { TwitchPlayer, TwitchChat } from "react-twitch-embed";
-import { IconCopy,IconRocket,  IconCheck, IconScreenShare, IconAt, IconBrandYoutube, IconBrandTwitch, IconKey, IconUser } from "@tabler/icons-react";
-import { useInterval } from "@mantine/hooks";
-import { DeSoIdentityContext } from "react-deso-protocol";
+  Divider,
+  Accordion,
+  useMantineTheme,
+  rem,
+  Collapse,
+  UnstyledButton,
+  ActionIcon,
+  PasswordInput,
+  Switch,
+  HoverCard,
+  Overlay,
+  Image,
+} from '@mantine/core';
+import { TwitchPlayer, TwitchChat } from 'react-twitch-embed';
+import {
+  IconCopy,
+  IconRocket,
+  IconCheck,
+  IconScreenShare,
+  IconAt,
+  IconBrandYoutube,
+  IconBrandTwitch,
+  IconKey,
+  IconUser,
+} from '@tabler/icons-react';
+
+import { RiYoutubeLine } from 'react-icons/ri';
+import { BsTwitch } from 'react-icons/bs';
+import { useInterval } from '@mantine/hooks';
+import { DeSoIdentityContext } from 'react-deso-protocol';
 import { RiKickLine } from 'react-icons/ri';
 import { AiOutlineLink } from 'react-icons/ai';
 import { GrLaunch } from 'react-icons/gr';
 import { VscKey } from 'react-icons/vsc';
 import { BiUserCircle } from 'react-icons/bi';
 import { TiInfoLargeOutline } from 'react-icons/ti';
-import classes from "./Stream.module.css";
+import classes from './Stream.module.css';
 
 export const Stream = () => {
   const { currentUser } = useContext(DeSoIdentityContext);
-  const [streamName, setStreamName] = useState("");
+  const [streamName, setStreamName] = useState('');
   const [isFollowingWaves, setisFollowingWaves] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [disable, { toggle }] = useDisclosure(false);
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState("first");
+  const [activeTab, setActiveTab] = useState('first');
   const [openedMulti, { toggle: toggleMulti }] = useDisclosure(true);
   const embed = useRef(); // We use a ref instead of state to avoid rerenders.
-  
 
   const handleReady = (e) => {
     embed.current = e;
   };
-  const getColor = (color) => theme.colors[color][theme.colorScheme === 'dark' ? 8 : 7];
+
   const interval = useInterval(
     () =>
       setProgress((current) => {
@@ -86,7 +106,7 @@ export const Stream = () => {
     status,
   } = useCreateStream(streamName ? { name: streamName } : null);
 
-  const isLoading = useMemo(() => status === "loading", [status]);
+  const isLoading = useMemo(() => status === 'loading', [status]);
 
   const streamId = stream?.id;
 
@@ -98,105 +118,105 @@ export const Stream = () => {
 
   const handleEndStream = async () => {
     suspendStream?.();
-    setStreamName("");
+    setStreamName('');
     try {
       await updateProfile({
         UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        ProfilePublicKeyBase58Check: "",
-        NewUsername: "",
+        ProfilePublicKeyBase58Check: '',
+        NewUsername: '',
         MinFeeRateNanosPerKB: 1000,
         NewCreatorBasisPoints: 100,
-        NewDescription: "",
+        NewDescription: '',
         NewStakeMultipleBasisPoints: 12500,
         ExtraData: {
-          WavesStreamPlaybackId: "",
-          WavesStreamTitle: "",
+          WavesStreamPlaybackId: '',
+          WavesStreamTitle: '',
         },
       });
     } catch (error) {
-      console.log("something happened: " + error);
+      console.log('something happened: ' + error);
     }
   };
-console.log(stream)
+  console.log(stream);
   const { mutate: recordStream } = useUpdateStream({
     streamId,
     record: true,
   });
   const handleEnableRecording = async () => {
-    recordStream?.()
-    console.log(recordStream)
+    recordStream?.();
+    console.log(recordStream);
   };
-  const [isRecordingEnabled, setIsRecordingEnabled] = useState(false); 
+  const [isRecordingEnabled, setIsRecordingEnabled] = useState(false);
 
-  const [twitchStreamKey, setTwitchStreamKey] = useState("");
-  const [twitchUsername, setTwitchUsername] = useState("");
-  const [twitchInput, setTwitchInput] = useState("");
-  const { mutate: twitchMultistream,  error, isSuccess, status: twitchStatus } = useUpdateStream({
-  streamId,
-  multistream: {
-    targets: [
-      {
-        profile: 'source',
-        spec: {
-          name: "Twitch",
-          url: `rtmp://live.twitch.tv/app/${twitchStreamKey}` // Use the RTMP URL entered by the user
-        },
-      },
-    ],
-  },
-    
-  });
-
-  const handleEnableTwitchMultistream = async () => {
-    setTwitchUsername(twitchInput)
-    twitchMultistream?.()
-  };
-
-
- const [ytStreamKey, setYTStreamKey] = useState("");
- const [ytStreamURL, setYTStreamURL] = useState("");
-  const { mutate: youtubeMultistream, status: ytmulti,  } = useUpdateStream({
+  const [twitchStreamKey, setTwitchStreamKey] = useState('');
+  const [twitchUsername, setTwitchUsername] = useState('');
+  const [twitchInput, setTwitchInput] = useState('');
+  const {
+    mutate: twitchMultistream,
+    error,
+    isSuccess,
+    status: twitchStatus,
+  } = useUpdateStream({
     streamId,
     multistream: {
       targets: [
         {
           profile: 'source',
           spec: {
-            name: "Youtube",
-            url: `${ytStreamURL}/${ytStreamKey}` // Use the RTMP URL entered by the user
+            name: 'Twitch',
+            url: `rtmp://live.twitch.tv/app/${twitchStreamKey}`, // Use the RTMP URL entered by the user
           },
         },
       ],
     },
-      
-    });
+  });
 
-    const handleEnableYTMultistream = async () => {
-      youtubeMultistream?.()
-    };
-  
-    const [kickStreamKey, setKickStreamKey] = useState("");
-    const [kickStreamURL, setKickStreamURL] = useState("");
-     const { mutate: kickMultistream, error: kickmulti,  } = useUpdateStream({
-       streamId,
-       multistream: {
-         targets: [
-           {
-             profile: 'source',
-             spec: {
-               name: "Kick",
-               url: `${kickStreamURL}/app/${kickStreamKey}` // Use the RTMP URL entered by the user
-             },
-           },
-         ],
-       },
-         
-       });
-   
-       const handleEnableKickMultistream = async () => {
-        kickMultistream?.()
-       };
+  const handleEnableTwitchMultistream = async () => {
+    setTwitchUsername(twitchInput);
+    twitchMultistream?.();
+  };
 
+  const [ytStreamKey, setYTStreamKey] = useState('');
+  const [ytStreamURL, setYTStreamURL] = useState('');
+  const { mutate: youtubeMultistream, status: ytmulti } = useUpdateStream({
+    streamId,
+    multistream: {
+      targets: [
+        {
+          profile: 'source',
+          spec: {
+            name: 'Youtube',
+            url: `${ytStreamURL}/${ytStreamKey}`, // Use the RTMP URL entered by the user
+          },
+        },
+      ],
+    },
+  });
+
+  const handleEnableYTMultistream = async () => {
+    youtubeMultistream?.();
+  };
+
+  const [kickStreamKey, setKickStreamKey] = useState('');
+  const [kickStreamURL, setKickStreamURL] = useState('');
+  const { mutate: kickMultistream, error: kickmulti } = useUpdateStream({
+    streamId,
+    multistream: {
+      targets: [
+        {
+          profile: 'source',
+          spec: {
+            name: 'Kick',
+            url: `${kickStreamURL}/app/${kickStreamKey}`, // Use the RTMP URL entered by the user
+          },
+        },
+      ],
+    },
+  });
+
+  const handleEnableKickMultistream = async () => {
+    kickMultistream?.();
+  };
 
   //On the instance where a user clicks off their profile while streaming or the 'end wave' doesnt work
   //Users can clear the playbackid and title
@@ -204,39 +224,37 @@ console.log(stream)
     try {
       await updateProfile({
         UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        ProfilePublicKeyBase58Check: "",
-        NewUsername: "",
+        ProfilePublicKeyBase58Check: '',
+        NewUsername: '',
         MinFeeRateNanosPerKB: 1000,
         NewCreatorBasisPoints: 100,
-        NewDescription: "",
+        NewDescription: '',
         NewStakeMultipleBasisPoints: 12500,
         ExtraData: {
-          WavesStreamPlaybackId: "",
-          WavesStreamTitle: "",
-          WavesStreamID: "",
+          WavesStreamPlaybackId: '',
+          WavesStreamTitle: '',
+          WavesStreamID: '',
         },
       });
     } catch (error) {
-      console.log("something happened: " + error);
+      console.log('something happened: ' + error);
     }
   };
 
-  
   useEffect(() => {
     const getUpdatedProfile = async () => {
       if (setIsButtonDisabled) {
-      try {
-        const result = await getSingleProfile({
-          PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
-        });
+        try {
+          const result = await getSingleProfile({
+            PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+          });
 
-        console.log(result)
-      } catch (error) {
-        console.log("Something went wrong:", error);
+          console.log(result);
+        } catch (error) {
+          console.log('Something went wrong:', error);
+        }
       }
     };
-
-  }  
   }, [setIsButtonDisabled]);
   useEffect(() => {
     const isFollowingPublicKey = async () => {
@@ -244,12 +262,12 @@ console.log(stream)
         const result = await getIsFollowing({
           PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
           IsFollowingPublicKeyBase58Check:
-            "BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6",
+            'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
         });
 
         setisFollowingWaves(result.IsFollowing);
       } catch (error) {
-        console.log("Something went wrong:", error);
+        console.log('Something went wrong:', error);
       }
     };
 
@@ -264,18 +282,17 @@ console.log(stream)
         await updateFollowingStatus({
           MinFeeRateNanosPerKB: 1000,
           IsUnfollow: false,
-          FollowedPublicKeyBase58Check:
-            "BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6",
+          FollowedPublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
           FollowerPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         });
       }
       await updateProfile({
         UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        ProfilePublicKeyBase58Check: "",
-        NewUsername: "",
+        ProfilePublicKeyBase58Check: '',
+        NewUsername: '',
         MinFeeRateNanosPerKB: 1000,
         NewCreatorBasisPoints: 100,
-        NewDescription: "",
+        NewDescription: '',
         NewStakeMultipleBasisPoints: 12500,
         ExtraData: {
           WavesStreamPlaybackId: stream?.playbackId,
@@ -293,19 +310,18 @@ console.log(stream)
         },
       });
     } catch (error) {
-      console.log("something happened: " + error);
+      console.log('something happened: ' + error);
       setIsButtonDisabled(false);
     }
   };
 
   return (
     <Paper shadow="sm" p="lg" withBorder>
-       
-       <HoverCard width={280} closeDelay={700} shadow="md">
+      <HoverCard width={280} closeDelay={700} shadow="md">
         <HoverCard.Target>
-        <ActionIcon radius="xl" size="sm" variant="outline">
-      <TiInfoLargeOutline />
-      </ActionIcon >
+          <ActionIcon radius="xl" size="sm" variant="outline">
+            <TiInfoLargeOutline />
+          </ActionIcon>
         </HoverCard.Target>
         <HoverCard.Dropdown>
           <Text ta="center" fw={500} size="sm">
@@ -313,25 +329,20 @@ console.log(stream)
           </Text>
           <Divider my="sm" />
           <Space h="xs" />
-          <Text size="sm">
-            Streaming via your Webcam is the easiest way to go Live.
-          </Text>
+          <Text size="sm">Streaming via your Webcam is the easiest way to go Live.</Text>
           <Space h="xs" />
-          <Text size="sm">
-            No 3rd party software is required. It is also Mobile Friendly! 
-          </Text>
+          <Text size="sm">No 3rd party software is required. It is also Mobile Friendly!</Text>
 
           <Space h="xs" />
           <Divider my="sm" />
           <Space h="xs" />
 
           <Text size="sm">
-            Streaming via OBS Studio or Streamlabs is great for Gamers and more experienced Streamers.
+            Streaming via OBS Studio or Streamlabs is great for Gamers and more experienced
+            Streamers.
           </Text>
           <Space h="xs" />
-          <Text size="sm">
-            A single use Stream Key will be provided to Go Live!
-          </Text>
+          <Text size="sm">A single use Stream Key will be provided to Go Live!</Text>
         </HoverCard.Dropdown>
       </HoverCard>
       <Space h="md" />
@@ -340,21 +351,16 @@ console.log(stream)
         radius="md"
         value={activeTab}
         onTabChange={setActiveTab}
-       isDisabled={showOverlay}
+        isDisabled={showOverlay}
       >
-        
-        
         <Tabs.List justify="center">
-       
           <Tabs.Tab value="first">Stream via OBS/StreamLabs</Tabs.Tab>
-          <Tabs.Tab value="second">
-            Stream via Webcam (Mobile Friendly)
-          </Tabs.Tab>
+          <Tabs.Tab value="second">Stream via Webcam (Mobile Friendly)</Tabs.Tab>
         </Tabs.List>
-      
+
         <Space h="md" />
         <Tabs.Panel value="first">
-          {" "}
+          {' '}
           <Space h="md" />
           <Center>
             <Text fz="lg" fw={777} c="dimmed" truncate>
@@ -370,309 +376,307 @@ console.log(stream)
             onChange={(e) => setStreamName(e.target.value)}
           />
           <Space h="xl" />
-          {status === "success" && (
+          {status === 'success' && (
             <>
               {streamName ? (
                 <>
-                              <Card shadow="sm" p="lg" radius="md" withBorder>
-                              <HoverCard width={280} closeDelay={700} shadow="md">
-        <HoverCard.Target>
-        <ActionIcon radius="xl" size="sm" variant="outline">
-      <TiInfoLargeOutline    />
-      </ActionIcon >
-        </HoverCard.Target>
-        <HoverCard.Dropdown>
-          <Text fw={500} size="sm">
-            Copy & paste your Stream URL/Key into OBS Studio or Streamlabs to go Live. 
-          </Text>
-          <Space h="xs" />
-          <Text  fw={500}  size="sm">
-            Once your stream is Active, Launch your Wave to your DeSo Account to bring your broadcast to the blockchain!
-          </Text>
-        </HoverCard.Dropdown>
-      </HoverCard>
-      
-      <Space h="md" />
-                              <Group justify="center">
-                    <Title order={1}><Text radius="sm" fw={700} fz="lg" >
-                          {streamName}
-                        </Text> </Title>
-                      </Group>
-                     
-                      <Divider my="sm" />
-                  
-     
-      
-                      <Group justify="center">
-                        <CopyButton
-                          value="rtmp://rtmp.livepeer.com/live"
-                          timeout={2000}
-                        >
-                          {({ copied, copy }) => (
-                            <Button
-                              fullWidth
-                              color={copied ? "teal" : "blue"}
-                              onClick={copy}
-                            >
-                              {copied ? (
-                                <>
-                                  <Center>
-                                    <h4>Stream Server</h4>
-                                    <Space w="xs" />
-                                    <IconCheck size={16} />
-                                  </Center>
-                                </>
-                              ) : (
-                                <>
-                                  <Center>
-                                    <h4>Stream Server</h4>
-                                    <Space w="xs" />
-                                    <IconCopy size={16} />
-                                  </Center>
-                                </>
-                              )}
-                            </Button>
-                          )}
-                        </CopyButton>
-                      </Group>
-                      <Space h="md" />
-                      <Group justify="center">
-                        <CopyButton value={stream.streamKey} timeout={2000}>
-                          {({ copied, copy }) => (
-                            <Button
-                              fullWidth
-                              color={copied ? "teal" : "blue"}
-                              onClick={copy}
-                            >
-                              {copied ? (
-                                <>
-                                  <Center>
-                                    <h4>Stream Key</h4>
-                                    <Space w="xs" />
-                                    <IconCheck size={16} />
-                                  </Center>
-                                </>
-                              ) : (
-                                <>
-                                  <Center>
-                                    <h4>Stream Key</h4>
-                                    <Space w="xs" />
-                                    <IconKey size={16} />
-                                  </Center>
-                                </>
-                              )}
-                            </Button>
-                          )}
-                        </CopyButton>
+                  <Card shadow="sm" p="lg" radius="md" withBorder>
+                    <HoverCard width={280} closeDelay={700} shadow="md">
+                      <HoverCard.Target>
+                        <ActionIcon radius="xl" size="sm" variant="outline">
+                          <TiInfoLargeOutline />
+                        </ActionIcon>
+                      </HoverCard.Target>
+                      <HoverCard.Dropdown>
+                        <Text fw={500} size="sm">
+                          Copy & paste your Stream URL/Key into OBS Studio or Streamlabs to go Live.
+                        </Text>
+                        <Space h="xs" />
+                        <Text fw={500} size="sm">
+                          Once your stream is Active, Launch your Wave to your DeSo Account to bring
+                          your broadcast to the blockchain!
+                        </Text>
+                      </HoverCard.Dropdown>
+                    </HoverCard>
 
-                        <Button
-                        rightIcon={<IconRocket size="1rem" />}
-                        
-                          fullWidth
-                          className={classes.button}
-                          onClick={() => {
-                            attachStreamToDesoProfile();
-                            loaded
-                              ? setLoaded(false)
-                              : !interval.active && interval.start();
-                          }}
-                          color={loaded ? "teal" : "blue"}
-                        >
-                          <div className={classes.label}>
-                            {progress !== 0
-                              ? "Launching"
-                              : loaded
-                              ? "Launched"
-                              : "Launch Wave to Deso"}
-                          </div>
-                          {progress !== 0 && (
-                            <Progress
-                              value={progress}
-                              className={classes.progress}
-                              color={theme.fn.rgba(
-                                theme.colors[theme.primaryColor][2],
-                                0.35
-                              )}
-                              radius="sm"
-                            />
-                          )}
-                        </Button>
-                      </Group>
-                      <Space h="md" />
-                      
-                    </Card>
                     <Space h="md" />
-                  <Group justify="center" >
-         <Button variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} fullWidth radius="xl" size="md" onClick={toggleMulti}> <Text align='center' fw={700} fz="lg">Multistream</Text></Button>
-      </Group>
+                    <Group justify="center">
+                      <Title order={1}>
+                        <Text radius="sm" fw={700} fz="lg">
+                          {streamName}
+                        </Text>{' '}
+                      </Title>
+                    </Group>
 
-      <Collapse in={openedMulti}>
-      <Divider my="sm" />
- <Paper shadow="md" radius="md" p="lg" withBorder>
- <HoverCard width={280} closeDelay={700} shadow="md">
-        <HoverCard.Target>
-        <ActionIcon radius="xl"  size="sm" variant="outline">
-      <TiInfoLargeOutline />
-      </ActionIcon >
-        </HoverCard.Target>
-        <HoverCard.Dropdown>
-          <Text fw={500} size="sm">
-            Broadcast your Stream to multiple platforms with Multistreaming!
-          </Text>
-          <Space h="xs" />
-          <Text fw={500} size="sm">
-           Just paste in the necessary information and click the Launch button.
-          </Text>
-          <Space h="xs" />
-          <Text fw={500} size="sm">
-           It is recommended to have separate tabs open of your Multistreams to ensure everything is working! 
-          </Text>
-          <Space h="xs" />
-          <Text fw={500} size="sm">
-           Be sure to set the Stream Title, Category, etc in the apps you are multistreaming to.
-          </Text>
-        </HoverCard.Dropdown>
-      </HoverCard>
-      <Space h="xs" />
-<Accordion variant="separated" radius="md" defaultValue="Youtube">
-      <Accordion.Item value="Youtube">
-      <Accordion.Control icon={<IconBrandYoutube size={rem(30)} color={getColor('red')} />}><Text c="dimmed" fw={500}>Youtube</Text></Accordion.Control>
-      <Accordion.Panel>
-      
-      <Input
-        icon={<BiUserCircle />}
-        placeholder="Enter Your Youtube Stream URL"
-        radius="md"
-        value={ytStreamURL}
-        onChange={(e) => setYTStreamURL(e.target.value)}
-      />
-      <Space h="md" />
-        <PasswordInput 
-        icon={<AiOutlineLink />}
-        placeholder="Enter Your Youtube Stream Key"
-        radius="md"
-        value={ytStreamKey}
-        onChange={(e) => setYTStreamKey(e.target.value)}
-      />
-      <Space h="md" />
-      <Group justify="right">
-        <Button
-          rightIcon={<IconRocket size="1rem" />}
-          variant="light"
-          size="xs"
-          onClick={handleEnableYTMultistream}
-        >
-          Launch
-        </Button>
-        {ytmulti && <div>{ytmulti.message}</div>}
-        </Group>
+                    <Divider my="sm" />
 
- 
-     
-     
-    </Accordion.Panel>
-      </Accordion.Item>
+                    <Group justify="center">
+                      <CopyButton value="rtmp://rtmp.livepeer.com/live" timeout={2000}>
+                        {({ copied, copy }) => (
+                          <Button fullWidth color={copied ? 'teal' : 'blue'} onClick={copy}>
+                            {copied ? (
+                              <>
+                                <Center>
+                                  <h4>Stream Server</h4>
+                                  <Space w="xs" />
+                                  <IconCheck size={16} />
+                                </Center>
+                              </>
+                            ) : (
+                              <>
+                                <Center>
+                                  <h4>Stream Server</h4>
+                                  <Space w="xs" />
+                                  <IconCopy size={16} />
+                                </Center>
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </CopyButton>
+                    </Group>
+                    <Space h="md" />
+                    <Group justify="center">
+                      <CopyButton value={stream.streamKey} timeout={2000}>
+                        {({ copied, copy }) => (
+                          <Button fullWidth color={copied ? 'teal' : 'blue'} onClick={copy}>
+                            {copied ? (
+                              <>
+                                <Center>
+                                  <h4>Stream Key</h4>
+                                  <Space w="xs" />
+                                  <IconCheck size={16} />
+                                </Center>
+                              </>
+                            ) : (
+                              <>
+                                <Center>
+                                  <h4>Stream Key</h4>
+                                  <Space w="xs" />
+                                  <IconKey size={16} />
+                                </Center>
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </CopyButton>
 
-      <Accordion.Item value="Twitch">
-      <Accordion.Control icon={<IconBrandTwitch size={rem(30)} color={getColor('grape')} />}><Text c="dimmed" fw={500}>Twitch</Text></Accordion.Control>
-      <Accordion.Panel>   
-      <Input
-        icon={<BiUserCircle />}
-        placeholder="Enter Your Twitch Username"
-        radius="md"
-        value={twitchInput}
-        onChange={(e) => setTwitchInput(e.target.value)}
-      />
-      <Space h="md" />
-        <PasswordInput 
-        icon={<VscKey />}
-        placeholder="Enter Your Twitch Stream Key"
-        radius="md"
-        value={twitchStreamKey}
-        onChange={(e) => setTwitchStreamKey(e.target.value)}
-      />
-      <Space h="md" />
-      <Group justify="right">
-        <Button
-          rightIcon={<IconRocket size="1rem" />}
-          variant="light"
-          size="xs"
-          onClick={handleEnableTwitchMultistream}
-        >
-          Launch
-        </Button>
-        {error && <div>{error.message}</div>}
-        </Group>
-
-        {twitchUsername &&
-        <>
-        <Space h="md"/>
-        <Center>
-    <TwitchPlayer
-    channel={twitchUsername}
-    width={333}
-    muted
-    onReady={handleReady}
-    id="1"
-  />
-  <Space w="md"/>
-  <TwitchChat   channel={twitchUsername} darkMode /></Center></>}
-       </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value="Kick">
-      <Accordion.Control icon={<RiKickLine size={rem(30)} color='green' />}> <Text c="dimmed" fw={500}>Kick</Text></Accordion.Control>
-      <Accordion.Panel> 
-      <Input
-      icon={<AiOutlineLink />}
-      placeholder="Enter Kick Stream URL"
-      radius="md"
-      value={kickStreamURL}
-      onChange={(e) => setKickStreamURL(e.target.value)}
-      
-    />
-
-<Space h="md" />
-      <PasswordInput 
-      icon={<VscKey />}
-      placeholder="Enter Kick Stream Key"
-      radius="md"
-      value={kickStreamKey}
-      onChange={(e) => setKickStreamKey(e.target.value)}
-    />  <Space h="md" />
-    <Group justify='right'>
-     <Button        onClick={handleEnableKickMultistream}  rightIcon={<IconRocket size="1rem" />} variant="light" size="xs">
-      Launch
-    </Button>
-    </Group>
-   </Accordion.Panel>
-      </Accordion.Item>
-
-  
-    </Accordion>
-     
-    </Paper>
-      </Collapse>
-                      
-         
+                      <Button
+                        rightIcon={<IconRocket size="1rem" />}
+                        fullWidth
+                        className={classes.button}
+                        onClick={() => {
+                          attachStreamToDesoProfile();
+                          loaded ? setLoaded(false) : !interval.active && interval.start();
+                        }}
+                        color={loaded ? 'teal' : 'blue'}
+                      >
+                        <div className={classes.label}>
+                          {progress !== 0
+                            ? 'Launching'
+                            : loaded
+                            ? 'Launched'
+                            : 'Launch Wave to Deso'}
+                        </div>
+                        {progress !== 0 && (
+                          <Progress
+                            value={progress}
+                            className={classes.progress}
+                            color={theme.fn.rgba(theme.colors[theme.primaryColor][2], 0.35)}
+                            radius="sm"
+                          />
+                        )}
+                      </Button>
+                    </Group>
+                    <Space h="md" />
+                  </Card>
                   <Space h="md" />
                   <Group justify="center">
-                    <Player
-                      title={stream?.name}
-                      playbackId={stream?.playbackId}
-                      
-                      muted
-                    />
+                    <Button
+                      variant="gradient"
+                      gradient={{ from: 'indigo', to: 'cyan' }}
+                      fullWidth
+                      radius="xl"
+                      size="md"
+                      onClick={toggleMulti}
+                    >
+                      {' '}
+                      <Text align="center" fw={700} fz="lg">
+                        Multistream
+                      </Text>
+                    </Button>
+                  </Group>
+
+                  <Collapse in={openedMulti}>
+                    <Divider my="sm" />
+                    <Paper shadow="md" radius="md" p="lg" withBorder>
+                      <HoverCard width={280} closeDelay={700} shadow="md">
+                        <HoverCard.Target>
+                          <ActionIcon radius="xl" size="sm" variant="outline">
+                            <TiInfoLargeOutline />
+                          </ActionIcon>
+                        </HoverCard.Target>
+                        <HoverCard.Dropdown>
+                          <Text fw={500} size="sm">
+                            Broadcast your Stream to multiple platforms with Multistreaming!
+                          </Text>
+                          <Space h="xs" />
+                          <Text fw={500} size="sm">
+                            Just paste in the necessary information and click the Launch button.
+                          </Text>
+                          <Space h="xs" />
+                          <Text fw={500} size="sm">
+                            It is recommended to have separate tabs open of your Multistreams to
+                            ensure everything is working!
+                          </Text>
+                          <Space h="xs" />
+                          <Text fw={500} size="sm">
+                            Be sure to set the Stream Title, Category, etc in the apps you are
+                            multistreaming to.
+                          </Text>
+                        </HoverCard.Dropdown>
+                      </HoverCard>
+                      <Space h="xs" />
+                      <Accordion variant="separated" radius="md" defaultValue="Youtube">
+                        <Accordion.Item value="Youtube">
+                          <Accordion.Control icon={<RiYoutubeLine size={'1.5rem'} color="red" />}>
+                            <Text c="dimmed" fw={500}>
+                              Youtube
+                            </Text>
+                          </Accordion.Control>
+                          <Accordion.Panel>
+                            <Input
+                              icon={<BiUserCircle />}
+                              placeholder="Enter Your Youtube Stream URL"
+                              radius="md"
+                              value={ytStreamURL}
+                              onChange={(e) => setYTStreamURL(e.target.value)}
+                            />
+                            <Space h="md" />
+                            <PasswordInput
+                              icon={<AiOutlineLink />}
+                              placeholder="Enter Your Youtube Stream Key"
+                              radius="md"
+                              value={ytStreamKey}
+                              onChange={(e) => setYTStreamKey(e.target.value)}
+                            />
+                            <Space h="md" />
+                            <Group justify="right">
+                              <Button
+                                rightIcon={<IconRocket size="1rem" />}
+                                variant="light"
+                                size="xs"
+                                onClick={handleEnableYTMultistream}
+                              >
+                                Launch
+                              </Button>
+                              {ytmulti && <div>{ytmulti.message}</div>}
+                            </Group>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+
+                        <Accordion.Item value="Twitch">
+                          <Accordion.Control icon={<BsTwitch size={'1.5rem'} color="purple" />}>
+                            <Text c="dimmed" fw={500}>
+                              Twitch
+                            </Text>
+                          </Accordion.Control>
+                          <Accordion.Panel>
+                            <Input
+                              icon={<BiUserCircle />}
+                              placeholder="Enter Your Twitch Username"
+                              radius="md"
+                              value={twitchInput}
+                              onChange={(e) => setTwitchInput(e.target.value)}
+                            />
+                            <Space h="md" />
+                            <PasswordInput
+                              icon={<VscKey />}
+                              placeholder="Enter Your Twitch Stream Key"
+                              radius="md"
+                              value={twitchStreamKey}
+                              onChange={(e) => setTwitchStreamKey(e.target.value)}
+                            />
+                            <Space h="md" />
+                            <Group justify="right">
+                              <Button
+                                rightIcon={<IconRocket size="1rem" />}
+                                variant="light"
+                                size="xs"
+                                onClick={handleEnableTwitchMultistream}
+                              >
+                                Launch
+                              </Button>
+                              {error && <div>{error.message}</div>}
+                            </Group>
+
+                            {twitchUsername && (
+                              <>
+                                <Space h="md" />
+                                <Center>
+                                  <TwitchPlayer
+                                    channel={twitchUsername}
+                                    width={333}
+                                    muted
+                                    onReady={handleReady}
+                                    id="1"
+                                  />
+                                  <Space w="md" />
+                                  <TwitchChat channel={twitchUsername} darkMode />
+                                </Center>
+                              </>
+                            )}
+                          </Accordion.Panel>
+                        </Accordion.Item>
+
+                        <Accordion.Item value="Kick">
+                          <Accordion.Control icon={<RiKickLine size={'1.5rem'} color="green" />}>
+                            {' '}
+                            <Text c="dimmed" fw={500}>
+                              Kick
+                            </Text>
+                          </Accordion.Control>
+                          <Accordion.Panel>
+                            <Input
+                              icon={<AiOutlineLink />}
+                              placeholder="Enter Kick Stream URL"
+                              radius="md"
+                              value={kickStreamURL}
+                              onChange={(e) => setKickStreamURL(e.target.value)}
+                            />
+                            <Space h="md" />
+                            <PasswordInput
+                              icon={<VscKey />}
+                              placeholder="Enter Kick Stream Key"
+                              radius="md"
+                              value={kickStreamKey}
+                              onChange={(e) => setKickStreamKey(e.target.value)}
+                            />{' '}
+                            <Space h="md" />
+                            <Group justify="right">
+                              <Button
+                                onClick={handleEnableKickMultistream}
+                                rightIcon={<IconRocket size="1rem" />}
+                                variant="light"
+                                size="xs"
+                              >
+                                Launch
+                              </Button>
+                            </Group>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+                      </Accordion>
+                    </Paper>
+                  </Collapse>
+
+                  <Space h="md" />
+                  <Group justify="center">
+                    <Player title={stream?.name} playbackId={stream?.playbackId} muted />
                   </Group>
 
                   <Space h="md" />
                   <Group justify="center">
-                    <Button
-                      fullWidth
-                      color="red"
-                      radius="xl"
-                      onClick={handleEndStream}
-                    >
+                    <Button fullWidth color="red" radius="xl" onClick={handleEndStream}>
                       End Wave
                     </Button>
                   </Group>
@@ -684,12 +688,12 @@ console.log(stream)
               )}
             </>
           )}
-          {status === "loading" && (
+          {status === 'loading' && (
             <Group justify="center">
               <Loader size="sm" />
             </Group>
           )}
-          {status === "error" && (
+          {status === 'error' && (
             <Group justify="center">
               <p>Error occurred while creating your wave.</p>
             </Group>
@@ -716,11 +720,7 @@ console.log(stream)
               timeout={2000}
             >
               {({ copied, copy }) => (
-                <Button
-                  size="xs"
-                  color={copied ? "teal" : "blue"}
-                  onClick={copy}
-                >
+                <Button size="xs" color={copied ? 'teal' : 'blue'} onClick={copy}>
                   {copied ? (
                     <>
                       <Tooltip label="Copied Wave">
@@ -746,7 +746,7 @@ console.log(stream)
           </Group>
         </Tabs.Panel>
         <Tabs.Panel value="second">
-          {" "}
+          {' '}
           <Space h="md" />
           <Center>
             <Text fz="lg" fw={777} c="dimmed" truncate>
@@ -762,95 +762,78 @@ console.log(stream)
             onChange={(e) => setStreamName(e.target.value)}
           />
           <Space h="xl" />
-          {status === "success" && (
+          {status === 'success' && (
             <>
               {streamName ? (
                 <>
-              
                   <Center>
                     <Card shadow="sm" p="lg" radius="md" withBorder>
-                    <HoverCard width={280} closeDelay={700} shadow="md">
-        <HoverCard.Target>
-        <ActionIcon radius="xl"  size="sm" variant="outline">
-      <TiInfoLargeOutline />
-      </ActionIcon >
-        </HoverCard.Target>
-        <HoverCard.Dropdown>
-          <Text fw={500} size="sm">
-            You will be asked to allow Camera/Audio Access for you device. 
-          </Text>
-          <Space h="xs" />
-          <Text fw={500} size="sm">
-            Now just Launch your Wave to DeSo!
-          </Text>
-         
-        </HoverCard.Dropdown>
-      </HoverCard>
-      <Space h="xs" />
-                    <Group justify="center">
-                    <Title order={1}><Text radius="sm" fw={700} fz="lg" >
-                          {streamName}
-                        </Text> </Title>
+                      <HoverCard width={280} closeDelay={700} shadow="md">
+                        <HoverCard.Target>
+                          <ActionIcon radius="xl" size="sm" variant="outline">
+                            <TiInfoLargeOutline />
+                          </ActionIcon>
+                        </HoverCard.Target>
+                        <HoverCard.Dropdown>
+                          <Text fw={500} size="sm">
+                            You will be asked to allow Camera/Audio Access for you device.
+                          </Text>
+                          <Space h="xs" />
+                          <Text fw={500} size="sm">
+                            Now just Launch your Wave to DeSo!
+                          </Text>
+                        </HoverCard.Dropdown>
+                      </HoverCard>
+                      <Space h="xs" />
+                      <Group justify="center">
+                        <Title order={1}>
+                          <Text radius="sm" fw={700} fz="lg">
+                            {streamName}
+                          </Text>{' '}
+                        </Title>
                       </Group>
-                     
+
                       <Divider my="sm" />
-                 
-      
+
                       <Group justify="center">
                         <Button
                           fullWidth
                           className={classes.button}
                           onClick={() => {
                             attachStreamToDesoProfile();
-                            loaded
-                              ? setLoaded(false)
-                              : !interval.active && interval.start();
+                            loaded ? setLoaded(false) : !interval.active && interval.start();
                           }}
-                          color={loaded ? "teal" : "blue"}
+                          color={loaded ? 'teal' : 'blue'}
                         >
                           <div className={classes.label}>
                             {progress !== 0
-                              ? "Launching"
+                              ? 'Launching'
                               : loaded
-                              ? "Launched"
-                              : "Launch Wave to Deso"}
+                              ? 'Launched'
+                              : 'Launch Wave to Deso'}
                           </div>
                           {progress !== 0 && (
                             <Progress
                               value={progress}
                               className={classes.progress}
-                              color={theme.fn.rgba(
-                                theme.colors[theme.primaryColor][2],
-                                0.35
-                              )}
+                              color={theme.fn.rgba(theme.colors[theme.primaryColor][2], 0.35)}
                               radius="sm"
                             />
                           )}
                         </Button>
                       </Group>
                       <Space h="md" />
-                      
                     </Card>
                     <Space h="xl" />
                   </Center>
                   <Space h="md" />
                   <Group justify="center">
-                    <Broadcast
-                      title={stream?.name}
-                      streamKey={stream.streamKey}
-                      
-                      muted
-                    />
+                    <Broadcast title={stream?.name} streamKey={stream.streamKey} muted />
                   </Group>
 
                   <Space h="md" />
                   <Group justify="center">
-                    <Button
-                      fullWidth
-                      color="red"
-                      radius="xl"
-                      onClick={handleEndStream}
-                    >
+                    <Button fullWidth color="red" radius="xl" onClick={handleEndStream}>
                       End Wave
                     </Button>
                   </Group>
@@ -862,12 +845,12 @@ console.log(stream)
               )}
             </>
           )}
-          {status === "loading" && (
+          {status === 'loading' && (
             <Group justify="center">
               <Loader size="sm" />
             </Group>
           )}
-          {status === "error" && (
+          {status === 'error' && (
             <Group justify="center">
               <p>Error occurred while creating your wave.</p>
             </Group>
@@ -895,11 +878,7 @@ console.log(stream)
               timeout={2000}
             >
               {({ copied, copy }) => (
-                <Button
-                  size="xs"
-                  color={copied ? "teal" : "blue"}
-                  onClick={copy}
-                >
+                <Button size="xs" color={copied ? 'teal' : 'blue'} onClick={copy}>
                   {copied ? (
                     <>
                       <Tooltip label="Copied Wave">
