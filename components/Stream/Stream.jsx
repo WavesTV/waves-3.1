@@ -56,7 +56,7 @@ import {
   IconKey,
   IconUser,
 } from '@tabler/icons-react';
-
+import { notifications } from '@mantine/notifications';
 import { RiYoutubeLine } from 'react-icons/ri';
 import { BsTwitch } from 'react-icons/bs';
 import { useInterval } from '@mantine/hooks';
@@ -309,6 +309,13 @@ export const Stream = () => {
           ImageURLs: [],
         },
       });
+
+      notifications.show({
+        title: 'Success',
+        icon: <IconCheck size="1.1rem" />,
+        color: 'green',
+        message: 'Your Wave has Launched to DeSo',
+      });
     } catch (error) {
       console.log('something happened: ' + error);
       setIsButtonDisabled(false);
@@ -462,30 +469,16 @@ export const Stream = () => {
                       </CopyButton>
 
                       <Button
-                        rightIcon={<IconRocket size="1rem" />}
+                        rightSection={<IconRocket size="1rem" />}
                         fullWidth
                         className={classes.button}
                         onClick={() => {
                           attachStreamToDesoProfile();
                           loaded ? setLoaded(false) : !interval.active && interval.start();
                         }}
-                        color={loaded ? 'teal' : 'blue'}
+                        color={'blue'}
                       >
-                        <div className={classes.label}>
-                          {progress !== 0
-                            ? 'Launching'
-                            : loaded
-                            ? 'Launched'
-                            : 'Launch Wave to Deso'}
-                        </div>
-                        {progress !== 0 && (
-                          <Progress
-                            value={progress}
-                            className={classes.progress}
-                            color={theme.fn.rgba(theme.colors[theme.primaryColor][2], 0.35)}
-                            radius="sm"
-                          />
-                        )}
+                        Launch Wave
                       </Button>
                     </Group>
                     <Space h="md" />
@@ -563,7 +556,7 @@ export const Stream = () => {
                             <Space h="md" />
                             <Group justify="right">
                               <Button
-                                rightIcon={<IconRocket size="1rem" />}
+                                rightSection={<IconRocket size="1rem" />}
                                 variant="light"
                                 size="xs"
                                 onClick={handleEnableYTMultistream}
@@ -600,7 +593,7 @@ export const Stream = () => {
                             <Space h="md" />
                             <Group justify="right">
                               <Button
-                                rightIcon={<IconRocket size="1rem" />}
+                                rightSectioncon={<IconRocket size="1rem" />}
                                 variant="light"
                                 size="xs"
                                 onClick={handleEnableTwitchMultistream}
@@ -656,7 +649,7 @@ export const Stream = () => {
                             <Group justify="right">
                               <Button
                                 onClick={handleEnableKickMultistream}
-                                rightIcon={<IconRocket size="1rem" />}
+                                rightSectioncon={<IconRocket size="1rem" />}
                                 variant="light"
                                 size="xs"
                               >
@@ -803,23 +796,9 @@ export const Stream = () => {
                             attachStreamToDesoProfile();
                             loaded ? setLoaded(false) : !interval.active && interval.start();
                           }}
-                          color={loaded ? 'teal' : 'blue'}
+                          color={'blue'}
                         >
-                          <div className={classes.label}>
-                            {progress !== 0
-                              ? 'Launching'
-                              : loaded
-                              ? 'Launched'
-                              : 'Launch Wave to Deso'}
-                          </div>
-                          {progress !== 0 && (
-                            <Progress
-                              value={progress}
-                              className={classes.progress}
-                              color={theme.fn.rgba(theme.colors[theme.primaryColor][2], 0.35)}
-                              radius="sm"
-                            />
-                          )}
+                          Launch Wave
                         </Button>
                       </Group>
                       <Space h="md" />
