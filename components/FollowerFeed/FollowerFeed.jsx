@@ -169,7 +169,7 @@ import {
           {currentUser ? (
             followerFeed && followerFeed.length > 0 ? (
               followerFeed.map((post) => (
-                <Post post={post} username={post.ProfileEntryResponse?.Username} />
+                <Post post={post} username={post.ProfileEntryResponse?.Username} key={post.PostHashHex} />
         
               ))
             ) : (

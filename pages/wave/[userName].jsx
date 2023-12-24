@@ -970,7 +970,7 @@ export default function Wave() {
         <Tabs.Panel value="first">
           {posts && posts.length > 0 ? (
             posts.map((post) => (
-              <Post post={post} username={userName} />
+              <Post post={post} username={userName} key={post.PostHashHex}/>
             ))
           ) : (
             <Center>
@@ -994,7 +994,7 @@ export default function Wave() {
             Object.keys(NFTs).map((key, index) => {
               const nft = NFTs[key];
               return (
-                <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username}/>
+                <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username} key={nft.PostEntryResponse.PostHashHex}/>
               );
             })
           ) : (

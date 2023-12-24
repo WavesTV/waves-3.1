@@ -111,7 +111,7 @@ useEffect(() => {
                             setActive(post);
                           }}
                         >
-                          <Group style={{ flex: 1 }} noWrap>
+                          <Group style={{ flex: 1 }} nowrap>
                             <Space w={1} />
                             <Avatar
                               radius="xl"

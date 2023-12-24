@@ -46,7 +46,7 @@ import {
   import formatDate from "@/formatDate";
 
 
-export default function Post({ post, username }) {
+export default function Post({ post, username, key }) {
     const { currentUser } = useContext(DeSoIdentityContext);
     const [commentToggles, setCommentToggles] = useState({});
     const [commentPostHash, setCommentPostHash] = useState("");
@@ -203,7 +203,7 @@ export default function Post({ post, username }) {
                 radius="md"
                 p={3}
                 withBorder
-                key={post.PostHashHex}
+                
               >
                 <Space h="xs"/>
             <div
@@ -352,7 +352,7 @@ export default function Post({ post, username }) {
                   </Group>
                 )}
 
-                {post.RepostedPostEntryResponse && (
+{post.RepostedPostEntryResponse && (
                   <Post post={post.RepostedPostEntryResponse} username={post.RepostedPostEntryResponse.ProfileEntryResponse.Username}/>
                 )}
 

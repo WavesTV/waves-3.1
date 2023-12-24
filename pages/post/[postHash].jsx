@@ -40,13 +40,16 @@ export default function PostPage() {
     <>
     <Space h={55}/>
       <Container>
-      <Post post={singlePost} username={singlePost.ProfileEntryResponse?.Username} />
+      <Post post={singlePost} username={singlePost.ProfileEntryResponse?.Username} key={singlePost.PostHashHex}/>
       </Container>   
+      
         
       <Container size="sm">
       {comments && comments.length > 0 ? (
         comments.map((comment) => (
-         <Post post={comment} username={comment.ProfileEntryResponse?.Username}/>
+          <>
+           <Post  post={comment} username={comment.ProfileEntryResponse?.Username} key={comment.PostHashHex} />
+          </>
         ))
       ) : (
         <>

@@ -35,7 +35,7 @@ import Post from "@/components/Post";
           {hotFeed && hotFeed.length > 0 ? (
             hotFeed.map((post) => (
               <>
-                <Post post={post} username={post.ProfileEntryResponse?.Username} />
+              <Post post={post} username={post.ProfileEntryResponse?.Username} key={post.PostHashHex} />
               </>
             ))
           ) : (
