@@ -353,7 +353,7 @@ export default function Post({ post, username }) {
                 )}
 
                 {post.RepostedPostEntryResponse && (
-                  <Post post={post.RepostedPostEntryResponse} username={post.RepostedPostEntryResponse.ProfileEntryResponse.username}/>
+                  <Post post={post.RepostedPostEntryResponse} username={post.RepostedPostEntryResponse.ProfileEntryResponse.Username}/>
                 )}
 
                 <Space h="md" />

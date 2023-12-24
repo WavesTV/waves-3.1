@@ -994,7 +994,7 @@ export default function Wave() {
             Object.keys(NFTs).map((key, index) => {
               const nft = NFTs[key];
               return (
-                <Post post={nft.PostEntryResponse} username={userName}/>
+                <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username}/>
               );
             })
           ) : (

@@ -357,7 +357,7 @@ export default function ProfilePage () {
                 Object.keys(NFTs).map((key, index) => {
                   const nft = NFTs[key];
                   return (
-                    <Post post={nft.PostEntryResponse} username={currentUser.ProfileEntryResponse?.Username}/>
+                    <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username}/>
                   );
                 })
               ) : (
