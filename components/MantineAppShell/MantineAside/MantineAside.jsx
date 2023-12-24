@@ -1,12 +1,13 @@
-import { Search } from "@/components/Search";
+import { Spotlight } from "@/components/Spotlight/Spotlight";
 import { Space } from "@mantine/core"
 export function MantineAside() {
 
 
     return(
 <>
-<Space h="md"/>
-<Search/>
+<Space h="lg" />
+
+<Spotlight />
     
 </>
 

@@ -836,7 +836,7 @@ export default function NotificationsPage () {
                   variant="default"
                   onClick={() => identity.login()}
                 >
-                  Login
+                  Sign In
                 </Button>
               </Center>
             </Paper>

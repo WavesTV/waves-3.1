@@ -26,9 +26,6 @@ import {
   updateFollowingStatus,
   getIsFollowing,
   identity,
-  submitPost,
-  createPostAssociation,
-  sendDiamonds,
   sendDeso,
   getExchangeRates,
 } from "deso-protocol";
@@ -45,16 +42,12 @@ import {
   Text,
   Card,
   Space,
-  rem,
-  Spoiler,
   Modal,
   Center,
   Divider,
   Image,
   Tabs,
   Badge,
- 
-
   ActionIcon,
   Tooltip,
   Button,
@@ -62,18 +55,16 @@ import {
   Collapse,
   UnstyledButton,
   List,
-  HoverCard,
-  BackgroundImage
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { DeSoIdentityContext } from "react-deso-protocol";
 import { RiUserUnfollowLine } from "react-icons/ri";
 import { useDisclosure } from "@mantine/hooks";
-import { GiWaveSurfer } from "react-icons/gi";
 import { TiInfoLargeOutline } from 'react-icons/ti';
 import { useRouter } from 'next/router'
 import Link from 'next/link';
 import classes from './wave.module.css';
+import Post from "@/components/Post";
 
 export default function Wave() {
 
@@ -95,6 +86,18 @@ export default function Wave() {
   const [openedSub2, { toggle: toggleSub2 }] = useDisclosure(false);
   const [openedSub3, { toggle: toggleSub3 }] = useDisclosure(false);
   const [openedSub, { open: openSub, close: closeSub }] = useDisclosure(false);
+
+  const replaceURLs = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const atSymbolRegex = /(\S*@+\S*)/g;
+
+    return text
+      .replace(
+        urlRegex,
+        (url) => `<a href="${url}" target="_blank">${url}</a>`,
+      )
+      .replace(atSymbolRegex, (match) => ` ${match} `);
+  };
   // Retrieve the user's DESO balance from profile.DESOBalanceNanos
   const userDESOBalance = profile.DESOBalanceNanos;
   console.log(userDESOBalance);
@@ -228,10 +231,13 @@ export default function Wave() {
         NumToFetch: 25,
       });
       setPosts(postData.Posts);
+      console.log(postData)
     } catch (error) {
       console.error("Error fetching user posts:", error);
     }
   };
+
+  
   const subTier1 = async () => {
     try {
       const exchangeRateData = await getExchangeRates({
@@ -452,154 +458,7 @@ export default function Wave() {
     fetchNFTs(25); // Fetch NFTs initially
   }, [profile.PublicKeyBase58Check]);
 
-  const [commentToggles, setCommentToggles] = useState({});
-
-  const [comment, setComment] = useState("");
-
-  // Add a new state variable to track the current comment post hash
-  const [commentPostHash, setCommentPostHash] = useState("");
-
-  // Function to handle comment submission
-  const submitComment = async () => {
-    try {
-      await submitPost({
-        UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        ParentStakeID: commentPostHash, // Use the commentPostHash as ParentStakeID
-        BodyObj: {
-          Body: comment,
-          VideoURLs: [],
-          ImageURLs: [],
-        },
-      });
-
-      notifications.show({
-        title: "Success",
-        icon: <IconCheck size="1.1rem" />,
-        color: "green",
-        message: "Your comment was submitted!",
-      });
-    } catch (error) {
-      notifications.show({
-        title: "Error",
-        icon: <IconX size="1.1rem" />,
-        color: "red",
-        message: "Something Happened",
-      });
-      
-    }
-
-    // Reset the comment and commentPostHash state after submitting
-    setComment("");
-    setCommentPostHash("");
-  };
-
-  // Function to handle toggling the comment section
-  const handleCommentToggle = (postHash) => {
-    // Update the commentPostHash state when the user clicks on the comment button
-    setCommentPostHash(postHash);
-    setCommentToggles((prevState) => ({
-      ...prevState,
-      [postHash]: !prevState[postHash],
-    }));
-  };
-
- 
-  const submitRepost = async (postHash) => {
-    try {
-      await submitPost({
-        UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        RepostedPostHashHex: postHash,
-        BodyObj: {
-          Body: "",
-          VideoURLs: [],
-          ImageURLs: [],
-        },
-      });
-      notifications.show({
-        title: "Success",
-        icon: <IconRecycle size="1.1rem" />,
-        color: "blue",
-        message: "You reposted this post. Keep it going!",
   
-      });
-    } catch (error) {
-      notifications.show({
-        title: "Error",
-        icon: <IconX size="1.1rem" />,
-        color: "red",
-        message: "Something Happened",
-      });
-    }
-  };
-
-  const [heartSuccess, setHeartSuccess] = useState(false);
-  const [currentHeartPostHash, setCurrentHeartPostHash] = useState("");
-  const submitHeart = async (postHash) => {
-    try {
-      await createPostAssociation({
-        TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        PostHashHex: postHash,
-        AssociationType: "REACTION",
-        AssociationValue: "LIKE",
-        MinFeeRateNanosPerKB: 1000,
-      });
-      notifications.show({
-        title: "Success",
-        icon: <IconHeartFilled size="1.1rem" />,
-        color: "blue",
-        message: "You Loved their post. Keep it going!",
-      });
-      setHeartSuccess(true);
-      setCurrentHeartPostHash(postHash);
-    } catch (error) {
-      notifications.show({
-        title: "Error",
-        icon: <IconX size="1.1rem" />,
-        color: "red",
-        message: "Something Happened",
-      });
-    }
-  };
-
-  const [diamondTipSuccess, setDiamondTipSuccess] = useState(false);
-  const [currentDiamondPostHash, setCurrentDiamondPostHash] = useState("");
-  const sendDiamondTip = async (postHash, postPubKey) => {
-    setCurrentDiamondPostHash(postHash);
-
-    try {
-      await sendDiamonds({
-        ReceiverPublicKeyBase58Check: postPubKey,
-        SenderPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        DiamondPostHashHex: postHash,
-        DiamondLevel: 1,
-        MinFeeRateNanosPerKB: 1000,
-      });
-      notifications.show({
-        title: "Success",
-        icon: <IconDiamond size="1.1rem" />,
-        color: "blue",
-        message: "You tipped a Diamond. Keep it going!",
-  
-      });
-      setDiamondTipSuccess(true);
-    } catch (error) {
-      notifications.show({
-        title: "Error Tipping",
-        icon: <IconX size="1.1rem" />,
-        color: "red",
-        message: "Something happened, you may have already tipped this post!",
-      });
-    }
-  };
-
-  const replaceURLs = (text) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const atSymbolRegex = /(\S*@+\S*)/g;
-
-    return text
-      .replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-      .replace(atSymbolRegex, (match) => ` ${match} `);
-  };
 
   return (
     <>
@@ -991,7 +850,7 @@ export default function Wave() {
                               variant="default"
                               onClick={() => identity.login()}
                             >
-                              Login
+                              Sign In
                             </Button>
                           </Paper>
                         </Container>
@@ -1091,7 +950,7 @@ export default function Wave() {
             radius="md"
             onClick={() => identity.login()}
           >
-            Login to Follow
+            Sign In to Follow
           </Button>
         )}
       </Card>
@@ -1110,427 +969,8 @@ export default function Wave() {
         </Tabs.List>
         <Tabs.Panel value="first">
           {posts && posts.length > 0 ? (
-            posts.map((post, index) => (
-              <Paper
-                m="md"
-                shadow="lg"
-                radius="md"
-                p="xl"
-                withBorder
-                key={post.PostHashHex}
-                
-              >
-               <Group justify="right">
-                  <Tooltip label="Go to Post">
-                    <ActionIcon
-                      color="blue"
-                      size="sm"
-                      variant="transparent"
-                    
-                        component={Link}
-                          href={`/post/${post.PostHashHex}`}
-                        
-                   
-                    >
-                      <IconMessageShare />
-                    </ActionIcon>
-                  </Tooltip>
-                  </Group>
-
-                <Center>
-                  {post.ProfileEntryResponse &&
-                  post.ProfileEntryResponse.ExtraData?.LargeProfilePicURL ? (
-                    <Avatar
-                      radius="xl"
-                      size="lg"
-                      src={
-                        post.ProfileEntryResponse.ExtraData?.LargeProfilePicURL
-                      }
-                    />
-                  ) : (
-                    <Avatar
-                      radius="xl"
-                      size="lg"
-                      src={`https://node.deso.org/api/v0/get-single-profile-picture/${profile.PublicKeyBase58Check}`}
-                    />
-                  )}
-
-                  <Space w="xs" />
-                  <Text fw={500} size="md">
-                    {userName}
-                  </Text>
-                </Center>
-
-                <Spoiler
-                  maxHeight={222}
-                  showLabel={
-                    <>
-                      <Space h="xs" />
-                      <Tooltip label="Show More">
-                        <IconScriptPlus />
-                      </Tooltip>
-                    </>
-                  }
-                  hideLabel={
-                    <>
-                      <Space h="xs" />
-                      <Tooltip label="Show Less">
-                        <IconScriptMinus />
-                      </Tooltip>
-                    </>
-                  }
-                >
-                  <Space h="xl" />
-                 
-          
-                    <Text
-                    ta="center"
-                    size="md"
-                  fw={333}
-                    dangerouslySetInnerHTML={{
-                      __html: replaceURLs(
-                        post && post.Body
-                          ? post.Body.replace(/\n/g, "<br> ")
-                          : ""
-                      ),
-                    }}
-                  />  
-                   
-                  
-                </Spoiler>
-
-                <Space h="md" />
-                {post.PostExtraData?.EmbedVideoURL && (
-             
-             <Group  style={{
-                   
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-                  <iframe
-                    style={{
-                      height: "50vh",
-                      width: "100vw",
-                      border: "none",
-                      borderRadius: "22px",
-                    }}
-                      src={post.PostExtraData.EmbedVideoURL}
-                    />
-                  </Group>
-                )}
-                {post.VideoURLs && (
-                  <iframe
-                    style={{ width: "100%", height: "100%" }}
-                    src={post.VideoURLs}
-                    title={post.PostHashHex}
-                  />
-                )}
-
-                {post.ImageURLs && (
-                  <Group justify="center">
-                    <UnstyledButton
-                      onClick={() => {
-                        setSelectedImage(post.ImageURLs[0]);
-                        open();
-                      }}
-                    >
-                      <Image
-                        src={post.ImageURLs[0]}
-                        radius="md"
-                        alt="post-image"
-                        fit="contain"
-                      />
-                    </UnstyledButton>
-                  </Group>
-                )}
-
-                {post.RepostedPostEntryResponse && (
-                  <Paper
-                    m="md"
-                    shadow="lg"
-                    radius="md"
-                    p="xl"
-                    withBorder
-                    key={post.RepostedPostEntryResponse.PostHashHex}
-                  
-                  >
-                  
-                      <Tooltip label="Go to Post">
-                        <ActionIcon
-                          color="blue"
-                          size="sm"
-                          variant="transparent"
-                          component={Link}
-                          href={`/post/${post.RepostedPostEntryResponse.PostHashHex}`}
-                 
-                        
-                        >
-                          <IconMessageShare />
-                        </ActionIcon>
-                      </Tooltip>
-                
-                    <Center>
-                      
-                    <UnstyledButton component={Link} href={`/wave/${post.RepostedPostEntryResponse.ProfileEntryResponse?.Username}`}>
-                            <Group>
-                        <Avatar
-                          radius="xl"
-                          size="lg"
-                          src={
-                            post.RepostedPostEntryResponse?.ProfileEntryResponse
-                              ?.ExtraData?.LargeProfilePicURL ||
-                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.RepostedPostEntryResponse?.ProfileEntryResponse?.PublicKeyBase58Check}`
-                          }
-                        />
-
-                        <Text fw={500} size="md">
-                          {
-                            post.RepostedPostEntryResponse.ProfileEntryResponse
-                              ?.Username
-                          }
-                        </Text>
-                        </Group>
-                      </UnstyledButton>
-                    </Center>
-                    
-                    <Spoiler
-                      maxHeight={222}
-                      showLabel={
-                        <>
-                          <Space h="xs" />
-                          <Tooltip label="Show More">
-                            <IconScriptPlus />
-                          </Tooltip>
-                        </>
-                      }
-                      hideLabel={
-                        <>
-                          <Space h="xs" />
-                          <Tooltip label="Show Less">
-                            <IconScriptMinus />
-                          </Tooltip>
-                        </>
-                      }
-                    >
-                      <Space h="xl" />
-                      
-                        <Space h="sm" />
-                        {post.RepostedPostEntryResponse && (
-                          <Text
-                            ta="center"
-                            size="md"
-                          
-                            dangerouslySetInnerHTML={{
-                              __html: replaceURLs(
-                                post.RepostedPostEntryResponse.Body.replace(
-                                  /\n/g,
-                                  "<br> "
-                                )
-                              ),
-                            }}
-                          />
-                        )}
-                     
-                    </Spoiler>
-                    <Space h="md" />
-                    {post.RepostedPostEntryResponse.PostExtraData
-                      ?.EmbedVideoURL && (
-                        <Group  style={{
-                   
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}>
-                              <iframe
-                                style={{
-                                  height: "50vh",
-                                  width: "100vw",
-                                  border: "none",
-                                  borderRadius: "22px",
-                                }}
-                          title="embed"
-                          src={
-                            post.RepostedPostEntryResponse.PostExtraData
-                              .EmbedVideoURL
-                          }
-                        />
-                      </Group>
-                    )}
-                    {post.RepostedPostEntryResponse.VideoURLs && (
-                      <iframe
-                        style={{ width: "100%", height: "100%" }}
-                        src={post.RepostedPostEntryResponse.VideoURLs}
-                        title={post.RepostedPostEntryResponse.PostHashHex}
-                      />
-                    )}
-
-                    {post.RepostedPostEntryResponse.ImageURLs &&
-                      post.RepostedPostEntryResponse.ImageURLs.length > 0 && (
-                        <Group justify="center">
-                          <UnstyledButton
-                            onClick={() => {
-                              setSelectedImage(
-                                post.RepostedPostEntryResponse.ImageURLs[0]
-                              );
-                              open();
-                            }}
-                          >
-                            <Image
-                              src={post.RepostedPostEntryResponse.ImageURLs[0]}
-                              radius="md"
-                              alt="repost-image"
-                              fit="contain"
-                            />
-                          </UnstyledButton>
-                        </Group>
-                      )}
-                  </Paper>
-                )}
-
-                <Space h="md" />
-
-                <Center>
-                <Tooltip
-            transition="slide-down"
-            withArrow
-            position="bottom"
-            label="Like"
-          >
-            <ActionIcon
-              onClick={() => currentUser && submitHeart(post.PostHashHex)}
-              variant="transparent"
-              radius="md"
-              size={36}
-            >
-            
-  <IconHeart size={18} />
-
-</ActionIcon>
-          </Tooltip>
-<Text size="xs">
-            {post.LikeCount}
-          </Text>
-            
-         
-
-          <Space w="sm" />
-
-          <Tooltip
-            transition="slide-down"
-            withArrow
-            position="bottom"
-            label="Repost"
-          >
-            <ActionIcon
-              onClick={() =>
-                currentUser && submitRepost(post.PostHashHex)
-              }
-              variant="transparent" radius="md"
-              
-              size={36}
-            >
-              <IconRecycle
-              
-                size={18}
-              
-              />
-</ActionIcon>
-          </Tooltip>
-<Text size="xs">
-            {post.RepostCount}
-          </Text>
-            
-          
-
-          <Space w="sm" />
-
-          <Tooltip
-            transition="slide-down"
-            withArrow
-            position="bottom"
-            label="Diamonds"
-          >
-            <ActionIcon
-              onClick={() =>
-                currentUser &&
-                sendDiamondTip(
-                  post.PostHashHex,
-                  post.PosterPublicKeyBase58Check
-                )
-              }
-              variant="transparent" radius="md"
-              
-              size={36}
-            >
-              <IconDiamond
-                
-                size={18}
-                
-              />
-              </ActionIcon>
-          </Tooltip>
-              <Text size="xs">
-            {post.DiamondCount}
-          </Text>
-            
-          
-
-          <Space w="sm" />
-
-          <Tooltip
-            transition="slide-down"
-            withArrow
-            position="bottom"
-            label="Comments"
-          >
-          
-            <ActionIcon onClick={() => handleCommentToggle(post.PostHashHex)} variant="transparent" radius="md" size={36}>
-              <IconMessageCircle size={18} />
-              </ActionIcon>
-          </Tooltip>
-              <Text size="xs">
-            {post.CommentCount}
-          </Text>
-            
-                </Center>
-                <Collapse in={commentToggles[post.PostHashHex]}>
-                  <>
-                    {currentUser && currentUser.ProfileEntryResponse ? (
-                      <>
-                      <Space h="md"/>
-                        <Textarea
-                          placeholder="Enter your comment..."
-                          variant="filled"
-                          value={comment}
-                          onChange={(event) => setComment(event.target.value)}
-                        />
-                        <Space h="sm" />
-                        <Group justify="right">
-                          <Button radius="md" onClick={() => submitComment()}>
-                            Comment
-                          </Button>
-                        </Group>
-                      </>
-                    ) : (
-                      <>
-                        <Textarea
-                          placeholder="Please Login/Signup or Set username to Comment."
-                          description="Your comment"
-                          variant="filled"
-                          disabled
-                        />
-                        <Space h="sm" />
-                        <Group justify="right">
-                          <Button radius="md" disabled>
-                            Comment
-                          </Button>
-                        </Group>
-                      </>
-                    )}
-                  </>
-                </Collapse>
-              </Paper>
+            posts.map((post) => (
+              <Post post={post} username={userName} />
             ))
           ) : (
             <Center>
@@ -1554,243 +994,7 @@ export default function Wave() {
             Object.keys(NFTs).map((key, index) => {
               const nft = NFTs[key];
               return (
-                <Paper
-                  m="md"
-                  shadow="lg"
-                  radius="md"
-                  p="xl"
-                  withBorder
-                  key={index}
-                  
-                >
-                  <Group justify="right">
-                  <Tooltip label="Go to Post">
-                    <ActionIcon
-                      color="blue"
-                      size="sm"
-                      variant="transparent"
-                    
-                        component={Link}
-                          href={`/post/${nft.PostEntryResponse.PostHashHex}`}
-                        
-                   
-                    >
-                      <IconMessageShare />
-                    </ActionIcon>
-                  </Tooltip>
-                  </Group>
-                  <Center>
-                    <Avatar
-                      size="lg"
-                      radius="xl"
-                      src={
-                        `https://node.deso.org/api/v0/get-single-profile-picture/${profile.PublicKeyBase58Check}` ||
-                        null
-                      }
-                      alt="Profile Picture"
-                    />
-                    <Space w="xs" />
-                    <Text fw={500} size="md">
-                      {userName}
-                    </Text>
-                  </Center>
-                  <Space h="sm" />
-                 
-                    <Text
-                      ta="center"
-                      size="md"
-                      
-                      dangerouslySetInnerHTML={{
-                        __html: replaceURLs(
-                          nft && nft.PostEntryResponse.Body
-                            ? nft.PostEntryResponse.Body.replace(/\n/g, "<br> ")
-                            : ""
-                        ),
-                      }}
-                    />
-                
-
-                  <Space h="md" />
-                  {nft.PostEntryResponse.VideoURLs && (
-                    <iframe
-                      style={{ width: "100%", height: "100%" }}
-                      src={nft.PostEntryResponse.VideoURLs}
-                      title={nft.PostEntryResponse.PostHashHex}
-                    />
-                  )}
-                  {nft.PostEntryResponse.ImageURLs && (
-                    <Group justify="center">
-                      <UnstyledButton
-                        onClick={() => {
-                          setSelectedImage(nft.PostEntryResponse.ImageURLs[0]);
-                          open();
-                        }}
-                      >
-                        <Image
-                          src={nft.PostEntryResponse.ImageURLs[0]}
-                          radius="md"
-                          alt="repost-image"
-                          fit="contain"
-                        />
-                      </UnstyledButton>
-                    </Group>
-                  )}
-
-                  <Space h="md" />
-
-                  <Center>
-                    <Tooltip
-                      transition="slide-down"
-                      withArrow
-                      position="bottom"
-                      label="Like"
-                    >
-                      <ActionIcon
-                        onClick={() =>
-                          currentUser &&
-                          submitHeart(nft.PostEntryResponse.PostHashHex)
-                        }
-                        variant="transparent" 
-                        
-                        radius="md"
-                        size={36}
-                      >
-                        
-  <IconHeart size={18} />
-
-  </ActionIcon>
-                    </Tooltip>
-                         <Text size="xs" >
-                      {nft.PostEntryResponse.LikeCount}
-                    </Text>
-
-                      
-                  
-                    <Space w="sm" />
-
-                    <Tooltip
-                      transition="slide-down"
-                      withArrow
-                      position="bottom"
-                      label="Repost"
-                    >
-                      <ActionIcon
-                        onClick={() =>
-                          currentUser &&
-                          submitRepost(nft.PostEntryResponse.PostHashHex)
-                        }
-                        variant="transparent" 
-                        
-                        size={36}
-                        radius="md"
-                      >
-                        <IconRecycle size={18}/>
-                        </ActionIcon>
-                    </Tooltip>
-                        <Text size="xs" >
-                      {nft.PostEntryResponse.RepostCount}
-                    </Text>
-                     
-                    
-
-                    <Space w="sm" />
-
-                    <Tooltip
-                      transition="slide-down"
-                      withArrow
-                      position="bottom"
-                      label="Diamonds"
-                    >
-                      <ActionIcon
-                        onClick={() =>
-                          currentUser &&
-                          sendDiamondTip(
-                            nft.PostEntryResponse.PostHashHex,
-                            nft.PostEntryResponse.PosterPublicKeyBase58Check
-                          )
-                        }
-                        variant="transparent" 
-                        
-                        size={36}
-                        radius="md"
-                      >
-                        <IconDiamond size={20}/>
-                        </ActionIcon>
-                    </Tooltip>
-                        <Text size="xs">
-                      {nft.PostEntryResponse.DiamondCount}
-                   </Text>
-
-                      
-                
-                    
-                    <Space w="sm" />
-
-                    <Tooltip
-                      transition="slide-down"
-                      withArrow
-                      position="bottom"
-                      label="Comments"
-                    >
-                      <ActionIcon  
-                        onClick={() =>
-                          handleCommentToggle(nft.PostEntryResponse.PostHashHex)
-                        }
-                        radius="md"
-                        variant="transparent" 
-                        
-                        size={36}
-                      >
-                        <IconMessageCircle size={18}  />
-                        </ActionIcon>
-                      
-                      </Tooltip>
-                        <Text size="xs">
-                      {nft.PostEntryResponse.CommentCount}
-                    </Text>
-                      
-                  
-                    
-                  </Center>
-                  <Collapse
-                    in={commentToggles[nft.PostEntryResponse.PostHashHex]}
-                  >
-                    <>
-                      {currentUser && currentUser.ProfileEntryResponse ? (
-                        <>
-                        <Space h="md"/>
-                          <Textarea
-                            placeholder="Enter your comment..."
-                            variant="filled"
-                            value={comment}
-                            onChange={(event) => setComment(event.target.value)}
-                          />
-                          <Space h="sm" />
-                          <Group justify="right">
-                            <Button radius="md" onClick={() => submitComment()}>
-                              Comment
-                            </Button>
-                          </Group>
-                        </>
-                      ) : (
-                        <>
-                          <Textarea
-                            placeholder="Please Login/Signup or Set username to Comment."
-                            description="Your comment"
-                            variant="filled"
-                            disabled
-                          />
-                          <Space h="sm" />
-                          <Group justify="right">
-                            <Button radius="md" disabled>
-                              Comment
-                            </Button>
-                          </Group>
-                        </>
-                      )}
-                    </>
-                  </Collapse>
-                </Paper>
+                <Post post={nft.PostEntryResponse} username={userName}/>
               );
             })
           ) : (

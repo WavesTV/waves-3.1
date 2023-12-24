@@ -186,10 +186,10 @@ import {
   <Space h="xl"/>
            <Button
             gradient={{ from: 'blue', to: 'cyan', deg: 354 }}
-       fullWidth
-          leftSection={<GiWaveCrest size="1rem" />}
-          variant="gradient"
-          radius="lg"
+            fullWidth
+            leftSection={<GiWaveCrest size="1rem" />}
+            variant="gradient"
+            radius="lg"
     
           onClick={() => {
             identity
@@ -210,8 +210,7 @@ import {
         </Container>
           <Space h="md" />
   
-          <Container size="30rem" px={0}>
-            <Paper m="md" shadow="lg" radius="sm" p="xl" withBorder>
+       
               <Group>
                 <Avatar size="md" radius="xl" alt="Profile Picture" />
                 <Text fz="lg" fw={777} variant="gradient" truncate></Text>
@@ -222,13 +221,13 @@ import {
                 name="body"
                 radius="md"
                 autosize
-                placeholder="Login or Sign Up to Create!"
+                placeholder="Sign In or Sign Up to Create!"
                 variant="filled"
                 size="md"
               />
               <Space h="sm" />
               <Group postion="apart">
-                <Tooltip label="Login or Sign Up to Create!">
+                <Tooltip label="Sign In or Sign Up to Create!">
                   <Button
                     raduis="sm"
                     data-disabled
@@ -239,16 +238,14 @@ import {
                   </Button>
                 </Tooltip>
               </Group>
-            </Paper>
-          </Container>
+          
         </>
       );
     } else {
       if (currentUser.ProfileEntryResponse === null) {
         return (
           <>
-          <Container>
-            <Paper m="md" shadow="lg" radius="sm" p="xl" withBorder>
+
               <Center>
                 <Badge
                   size="md"
@@ -320,15 +317,13 @@ import {
                   Update
                 </Button>
               </Group>
-            </Paper>
-            </Container>
+        
           </>
         );
       } else {
         return (
           <>
-            <Container size="30rem" px={0}>
-              <Paper m="md" shadow="lg" radius="sm" p="xl" withBorder>
+          
                 <form
                   ref={formRef}
                   onSubmit={async (e) => {
@@ -540,8 +535,7 @@ import {
                     </Collapse>
                   </Group>
                 </form>
-              </Paper>
-            </Container>
+             
           </>
         );
       }

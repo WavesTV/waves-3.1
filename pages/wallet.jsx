@@ -205,22 +205,19 @@ useEffect(() => {
                     variant="default"
                     onClick={() => identity.login()}
                   >
-                    Login
+                    Sign In
                   </Button>
                 </Center>
-                <Space h='md'/>
-
-                
-      <Space h="md" />
               </Paper>
-
-            
             </Container>
             <Space h="md" />
-            <Center>
-            <iframe
+            
+            
+            <Container>
+        <Center>
+        <iframe
               title="heroswap"
-              width="50%"
+              width="100%"
               style={{
                 border: "none",
                 borderRadius: "22px",
@@ -228,7 +225,8 @@ useEffect(() => {
               }}
               src="https://heroswap.com/widget?affiliateAddress=BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6"
             />
-            </Center>
+        </Center>
+      </Container>
 
           </>
         )}

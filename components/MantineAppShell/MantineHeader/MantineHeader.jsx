@@ -8,7 +8,7 @@ import {
     Drawer,
     ScrollArea,
     rem,
-    useMantineTheme,
+    Modal,
     ActionIcon,
     Tooltip,
     Badge,
@@ -34,16 +34,20 @@ import { identity, getUnreadNotificationsCount, setNotificationMetadata } from '
 import { useContext, useEffect, useState} from 'react';
 import { DeSoIdentityContext } from 'react-deso-protocol';
 import { PiSealQuestion } from 'react-icons/pi';
+import { SignAndSubmitTx } from '@/components/SignAndSubmit/SubmitPost';
+import { Search } from '@/components/Search';
+import { BsPlusCircleDotted } from "react-icons/bs";
+import { BiSearchAlt } from "react-icons/bi";
 
-  
   export function MantineHeader() {
-    const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
-    const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
-    const theme = useMantineTheme();
-    const { currentUser, alternateUsers } = useContext(DeSoIdentityContext);
-    
-    
-      const handleUserSwitch = (publicKey) => {
+   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
+   const { currentUser, alternateUsers } = useContext(DeSoIdentityContext);
+   const [openedSearch, { open: openSearch, close: closeSearch }] =
+   useDisclosure(false);
+  const [openedCreate, { open: openCreate, close: closeCreate }] =
+   useDisclosure(false);
+   
+  const handleUserSwitch = (publicKey) => {
     identity.setActiveUser(publicKey);
   };
 
@@ -98,6 +102,16 @@ import { PiSealQuestion } from 'react-icons/pi';
     
   
     return (
+      <>
+      <Modal size="xl" opened={openedCreate} onClose={closeCreate}>
+        <SignAndSubmitTx/>
+      </Modal>
+
+      <Modal size="md" opened={openedSearch} onClose={closeSearch}>
+        <Search />
+      </Modal>
+
+
       <Box>
         <header className={classes.header}>
           <Group justify="space-between" h="100%">
@@ -107,6 +121,20 @@ import { PiSealQuestion } from 'react-icons/pi';
 </Group>
   
             <Group h="100%" visibleFrom="sm" justify='center'>
+            {currentUser && (
+              <Tooltip label="Create Post">
+                  <ActionIcon
+                    onClick={openCreate}
+                    variant="light"
+                    size="lg"
+                    radius="xl"
+                  >
+                    <BsPlusCircleDotted size="1.3rem" />
+                  </ActionIcon>
+                </Tooltip>
+            )}
+                
+             
             <Tooltip label="Home" withArrow  position="bottom" offset={3}>
           <ActionIcon
           component={Link}
@@ -156,7 +184,7 @@ import { PiSealQuestion } from 'react-icons/pi';
      
       <IconBellRinging/>
      
-      { currentUser && unreadNotifs > 0 && (
+      {currentUser && unreadNotifs > 0 && (
           <Text  className={classes.notificationCount} fz="sm" fw={700} c="orange">{unreadNotifs}</Text>
         )}
         
@@ -175,11 +203,19 @@ import { PiSealQuestion } from 'react-icons/pi';
     >
      
       <PiSealQuestion size="1.7rem"/>
-     
-   
-  
     </ActionIcon>
     </Tooltip>
+
+    <Tooltip label="Search Profiles">
+                <ActionIcon
+                  onClick={openSearch}
+                  variant="light"
+                  size="lg"
+                  radius="xl"
+                >
+                  <BiSearchAlt size="1.2rem" />
+                </ActionIcon>
+              </Tooltip>
             </Group>
   
             <Group visibleFrom="sm">
@@ -210,16 +246,13 @@ import { PiSealQuestion } from 'react-icons/pi';
                                
                               >
                                  <Avatar
-              
-                
-              variant="light" radius="xl" size={48} color="rgba(0, 174, 186, 1)"
-               
-                src={
-                  `https://node.deso.org/api/v0/get-single-profile-picture/${currentUser.PublicKeyBase58Check}` ||
-                  null
-                }
-                alt="Profile Picture"
-              />
+                          variant="light" radius="xl" size="md"
+                          src={
+                            `https://node.deso.org/api/v0/get-single-profile-picture/${currentUser.PublicKeyBase58Check}` ||
+                            null
+                          }
+                          alt="Profile Picture"
+                          />
                         
                               </UnstyledButton>
                             </Menu.Target>
@@ -384,7 +417,7 @@ import { PiSealQuestion } from 'react-icons/pi';
                               variant="default"
                               onClick={() => identity.login()}
                             >
-                              Login
+                              Sign In
                             </Button>
                             <Button
                               leftSection={<GiWaveCrest size="1rem" />}
@@ -478,5 +511,6 @@ import { PiSealQuestion } from 'react-icons/pi';
         </ScrollArea>
       </Drawer>
       </Box>
+      </>
     );
   }
