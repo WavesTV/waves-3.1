@@ -238,7 +238,7 @@ export default function Post({ post, username, key }) {
               variant="light"
               radius="xl"
               size="lg"
-              src={`https://node.deso.org/api/v0/get-single-profile-picture/${currentUser.PublicKeyBase58Check}` || null}
+              src={`https://node.deso.org/api/v0/get-single-profile-picture/${currentUser?.PublicKeyBase58Check}` || null}
               alt="Profile Picture"
               mb={20}
             />
@@ -253,17 +253,14 @@ export default function Post({ post, username, key }) {
             style={{ flexGrow: 1, width: 'auto' }} // Make Textarea grow to fill space
           />
         </Group>
-
-          <Post post={post} username={username}/>
-
-          <Group justify="right">
+        <Group justify="right">
               <Button onClick={() =>{ 
                 if (currentUser) {
                   submitQuote(); 
                 } else {
                   notifications.show({
                     title: "Must be Signed In",
-                    icon: <IconAlertCircle size="1.1rem" />,
+                    icon: <IconX size="1.1rem" />,
                     color: "Red",
                     message: "Please sign in to post.",
                   });
@@ -274,6 +271,10 @@ export default function Post({ post, username, key }) {
                 Quote
               </Button>
           </Group>
+
+          <Post post={post} username={username}/>
+
+         
         </Modal>
         
             <Paper
@@ -463,14 +464,15 @@ export default function Post({ post, username, key }) {
 
                   <Space w="sm" />
 
-                  <Tooltip
+                  
+                    <Menu offset={2} shadow="md" width={111} withArrow>
+                    <Menu.Target>
+                    <Tooltip
                     transition="slide-down"
                     withArrow
                     position="bottom"
                     label="Repost"
                   >
-                    <Menu offset={2} shadow="md" width={111} withArrow>
-                    <Menu.Target>
                     <ActionIcon
                       variant="subtle"
                       radius="md"
@@ -480,6 +482,7 @@ export default function Post({ post, username, key }) {
                         size={18}
                       />
                     </ActionIcon>
+                    </Tooltip>
                     </Menu.Target>
 
                     <Menu.Dropdown>
@@ -501,7 +504,7 @@ export default function Post({ post, username, key }) {
                   </Menu.Dropdown>
 
                     </Menu>
-                  </Tooltip>
+                  
 
                   
                   <Text size="xs" c="dimmed">
@@ -582,7 +585,7 @@ export default function Post({ post, username, key }) {
                       <Space h="md"/>
                         <Textarea
                           placeholder="Please Sign In to Comment!"
-                          description="Your comment"
+                          
                           variant="filled"
                           disabled
                         />
