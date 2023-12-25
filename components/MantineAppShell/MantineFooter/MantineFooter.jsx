@@ -72,7 +72,7 @@ export function MantineFooter() {
         <SignAndSubmitTx/>
       </Modal>
 
-      <Group position="center" spacing="lg" grow nowrap hiddenFrom="md">
+      <Group position="center" spacing="lg" grow wrap="nowrap" hiddenFrom="md">
         <ActionIcon
           className={classes.link}
           data-active={active === "/" || undefined}
