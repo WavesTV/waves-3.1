@@ -1,4 +1,4 @@
-import { ActionIcon, AppShell, Container, Group, Modal, Tooltip } from '@mantine/core';
+import { ActionIcon, AppShell, Container, Group, Modal, Tooltip, Space } from '@mantine/core';
 import { RiArrowRightDoubleLine, RiArrowLeftDoubleLine } from 'react-icons/ri';
 import { useDisclosure } from '@mantine/hooks';
 import { MantineHeader } from '@/components/MantineAppShell/MantineHeader/MantineHeader';
@@ -73,7 +73,10 @@ export function MantineAppShell({ children }) {
           <PiShootingStarLight size="1.4rem" />
         </ActionIcon>
       </Tooltip>
+
+      
       </Group>
+      <Space h="xl"/>
         {!desktopOpened ? (
           <Tooltip position="right-start" label="Open Sidebars">
             <div style={{ position: 'fixed' }}>
