@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Modal } from "@mantine/core";
+import { ActionIcon, Group, Modal, Text } from "@mantine/core";
 import {
   IconBellRinging,
   IconHome2,
@@ -139,8 +139,8 @@ export function MantineFooter() {
             resetUnreadNotifications();
           }}
         >
-          {unreadNotifs > 0 && (
-          <Text  className={classes.notificationCount} fz="sm" fw={700} c="orange">{unreadNotifs}</Text>
+          {currentUser && unreadNotifs > 0 && (
+          <Text fz="sm" fw={700} c="orange">{unreadNotifs}</Text>
         )}  
           <IconBellRinging size="1.4rem" />
         </ActionIcon>

@@ -96,11 +96,6 @@ import { BiSearchAlt } from "react-icons/bi";
    };
  
   
-
- 
- 
-    
-  
     return (
       <>
       <Modal size="xl" opened={openedCreate} onClose={closeCreate}>
@@ -185,7 +180,7 @@ import { BiSearchAlt } from "react-icons/bi";
       <IconBellRinging/>
      
       {currentUser && unreadNotifs > 0 && (
-          <Text  className={classes.notificationCount} fz="sm" fw={700} c="orange">{unreadNotifs}</Text>
+          <Text fz="sm" fw={700} c="orange">{unreadNotifs}</Text>
         )}
         
     </ActionIcon>

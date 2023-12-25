@@ -259,7 +259,7 @@ export default function Post({ post, username, key }) {
 
                     <Space w="xs" />
                     <Text fw={500} size="sm">
-                      {username}
+                    {username}
                     </Text>
                   </UnstyledButton>
               </Group>
