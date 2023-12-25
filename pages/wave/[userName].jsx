@@ -420,7 +420,7 @@ export default function Wave() {
         UserPublicKeyBase58Check: profile.PublicKeyBase58Check,
         IsForSale: true,
       });
-
+      
       const nftKeys = Object.keys(nftData.NFTsMap);
       const limitedNFTKeys = nftKeys.slice(0, limit);
 
@@ -430,11 +430,13 @@ export default function Wave() {
       }, {});
 
       setNFTs(limitedNFTs);
-      console.log(limitedNFTs);
+      console.log(nftData, nftData);
     } catch (error) {
       console.error("Error fetching user NFTs:", error);
     }
   };
+
+ 
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);

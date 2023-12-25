@@ -333,7 +333,7 @@ export default function ProfilePage () {
               {posts && posts.length > 0 ? (
                 posts.map((post) => (
                   <>
-                  <Post post={post} username={post.ProfileEntryResponse?.Username} key={post.PostHashHex} />
+                  <Post post={post} username={currentUser.ProfileEntryResponse?.Username} key={post.PostHashHex} />
                   </>
                 ))
               ) : (

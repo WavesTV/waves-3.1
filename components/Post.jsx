@@ -14,10 +14,10 @@ import {
     UnstyledButton,
     Avatar,
     Group,
-    Badge,
-    createStyles,
+    TextInput,
+    rem,
     Paper,
-    TypographyStylesProvider,
+    Menu,
     Center,
     Space,
     ActionIcon,
@@ -44,7 +44,8 @@ import {
   import { useDisclosure } from "@mantine/hooks";
   import { notifications } from "@mantine/notifications";
   import formatDate from "@/formatDate";
-
+  import { BsChatQuoteFill } from "react-icons/bs";
+  import { BiRepost } from "react-icons/bi";
 
 export default function Post({ post, username, key }) {
     const { currentUser } = useContext(DeSoIdentityContext);
@@ -52,7 +53,8 @@ export default function Post({ post, username, key }) {
     const [commentPostHash, setCommentPostHash] = useState("");
     const [comment, setComment] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
-    const [opened, { open, close }] = useDisclosure(false);
+    const [openedImage, { open: openImage, close: closeImage }] = useDisclosure(false);
+    const [openedQuote, { open: openQuote, close: closeQuote }] = useDisclosure(false); 
 
     const handleCommentToggle = (postHash) => {
       setCommentPostHash(postHash);
@@ -120,6 +122,36 @@ export default function Post({ post, username, key }) {
           message: "Something Happened!",
         });
         console.error("Error submitting Repost:", error);
+      }
+    };
+
+    const [quoteBody, setQuoteBody] = useState('');
+    const submitQuote = async (postHash) => {
+      try {
+        await submitPost({
+          UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+          RepostedPostHashHex: postHash,
+          BodyObj: {
+            Body: quoteBody,
+            VideoURLs: [],
+            ImageURLs: [],
+          },
+        });
+        notifications.show({
+          title: "Success",
+          icon: <IconRecycle size="1.1rem" />,
+          color: "green",
+          message: "Quoted!",
+        });
+        
+      } catch (error) {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Something Happened!",
+        });
+        console.error("Error submitting Quote:", error);
       }
     };
   
@@ -193,8 +225,55 @@ export default function Post({ post, username, key }) {
 
     return(
         <>
-        <Modal opened={opened} onClose={close} size="auto" centered>
+        <Modal opened={openedImage} onClose={closeImage} size="auto" centered>
           <Image src={selectedImage} radius="md" alt="post-image" fit="contain" />
+        </Modal>
+
+        <Modal opened={openedQuote} onClose={closeQuote} size="xl" centered>
+          
+        
+        <Group style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <div style={{ marginRight: '10px' }}>
+            <Avatar
+              variant="light"
+              radius="xl"
+              size="lg"
+              src={`https://node.deso.org/api/v0/get-single-profile-picture/${currentUser.PublicKeyBase58Check}` || null}
+              alt="Profile Picture"
+              mb={20}
+            />
+          </div>
+
+          <Textarea
+            variant="unstyled"
+            placeholder="Say some dope shit"
+            size="lg"
+            value={quoteBody}
+            onChange={(event) => setQuoteBody(event.currentTarget.value)}
+            style={{ flexGrow: 1, width: 'auto' }} // Make Textarea grow to fill space
+          />
+        </Group>
+
+          <Post post={post} username={username}/>
+
+          <Group justify="right">
+              <Button onClick={() =>{ 
+                if (currentUser) {
+                  submitQuote(); 
+                } else {
+                  notifications.show({
+                    title: "Must be Signed In",
+                    icon: <IconAlertCircle size="1.1rem" />,
+                    color: "Red",
+                    message: "Please sign in to post.",
+                  });
+                }
+              }}
+              disabled={!quoteBody.trim()}
+              >
+                Quote
+              </Button>
+          </Group>
         </Modal>
         
             <Paper
@@ -339,7 +418,7 @@ export default function Post({ post, username, key }) {
                     <UnstyledButton
                       onClick={() => {
                         setSelectedImage(post.ImageURLs[0]);
-                        open();
+                        openImage();
                       }}
                     >
                       <Image
@@ -352,7 +431,7 @@ export default function Post({ post, username, key }) {
                   </Group>
                 )}
 
-{post.RepostedPostEntryResponse && (
+              {post.RepostedPostEntryResponse && (
                   <Post post={post.RepostedPostEntryResponse} username={post.RepostedPostEntryResponse.ProfileEntryResponse.Username}/>
                 )}
 
@@ -390,19 +469,41 @@ export default function Post({ post, username, key }) {
                     position="bottom"
                     label="Repost"
                   >
+                    <Menu offset={2} shadow="md" width={111} withArrow>
+                    <Menu.Target>
                     <ActionIcon
-                      onClick={() =>
-                        currentUser && submitRepost(post.PostHashHex)
-                      }
                       variant="subtle"
                       radius="md"
                       size={36}
                     >
-                      <IconRecycle
+                      <IconRecycle 
                         size={18}
                       />
                     </ActionIcon>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                    
+                    <Menu.Item 
+                    onClick={() =>
+                        currentUser && submitRepost(post.PostHashHex)
+                      } 
+                    leftSection={<IconRecycle style={{ width: rem(16), height: rem(16) }} />}>
+                      Repost
+                    </Menu.Item>
+                    
+                    <Menu.Item 
+                    onClick={() => openQuote()}
+                    leftSection={<BsChatQuoteFill  style={{ width: rem(16), height: rem(16) }} />}>
+                      Quote
+                    </Menu.Item>
+                
+                  </Menu.Dropdown>
+
+                    </Menu>
                   </Tooltip>
+
+                  
                   <Text size="xs" c="dimmed">
                     {post.RepostCount}
                   </Text>

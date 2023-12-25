@@ -32,7 +32,7 @@ import {
   IconCoinOff,
   IconMoneybag
 } from "@tabler/icons-react";
-
+import { BiRepost } from "react-icons/bi";
 
 
 export default function NotificationsPage () {
@@ -349,7 +349,7 @@ export default function NotificationsPage () {
                               aria-label="Gradient action icon"
                               gradient={{ from: 'rgba(255, 110, 13, 1)', to: 'blue', deg: 90 }}
                           >
-                            <IconRecycle/>
+                            <BiRepost/>
                             <Space w='md'/>
                         <Text fw={500} size="sm">
                           Reposted
