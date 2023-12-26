@@ -12,6 +12,8 @@ export function MantineAppShell({ children }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
     const [opened, { open, close }] = useDisclosure(false);
+    const [navOpened, { toggle: toggleNav }] = useDisclosure(true);
+    const [asideOpened, { toggle: toggleAside }] = useDisclosure(true);
 
     return (
  <>
@@ -24,12 +26,12 @@ export function MantineAppShell({ children }) {
         navbar={{
           width: 300,
           breakpoint: 'md',
-          collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+          collapsed: { mobile: !mobileOpened, desktop: !navOpened },
         }}
         aside={{
           width: 300,
           breakpoint: 'md',
-          collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+          collapsed: { mobile: !mobileOpened, desktop: !asideOpened },
         }}
       >
         <AppShell.Header>
@@ -37,21 +39,42 @@ export function MantineAppShell({ children }) {
         </AppShell.Header>
 
         <AppShell.Navbar>
-        {desktopOpened ? (
-        <>
-        
-         <Tooltip position="right-start" label="Close Sidebars">
-            <ActionIcon mt={11} ml={11}onClick={toggleDesktop} visibleFrom="sm"  >
-            <RiArrowLeftDoubleLine/>
-            </ActionIcon>
-            </Tooltip>
+        {navOpened && (
+            <>
+            <Group justify="right">
+              <Tooltip position="right-start" label="Close Navbar">
+                <ActionIcon
+                  variant="light"
+                  mt={11}
+                  mr={11}
+                  onClick={toggleNav}
+                  visibleFrom="sm"
+                >
+                  <RiArrowLeftDoubleLine />
+                </ActionIcon>
+              </Tooltip>
+              </Group>
             </>
-            ) : 
-            null}
+          )}
             <MantineNavBar/>
         </AppShell.Navbar>
 
         <AppShell.Aside>
+        {asideOpened && (
+            <>
+              <Tooltip position="right-start" label="Close Sidebar">
+                <ActionIcon
+                variant="light"
+                  mt={11}
+                  ml={11}
+                  onClick={toggleAside}
+                  visibleFrom="sm"
+                >
+                  <RiArrowRightDoubleLine />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
             <MantineAside/>
         </AppShell.Aside>
 
@@ -76,28 +99,32 @@ export function MantineAppShell({ children }) {
 
       
       </Group>
-      <Space h="xl"/>
-        {!desktopOpened ? (
-          <Tooltip position="right-start" label="Open Sidebars">
-            <div style={{ position: 'fixed' }}>
-                <ActionIcon onClick={toggleDesktop} visibleFrom="sm">
-                <RiArrowRightDoubleLine />
+          <Group justify='space-between'>
+      {!navOpened && (
+            <Tooltip position="right-start" label="Open Navbar">
+              <Group style={{ position: "fixed", zIndex: 9999 }}>
+                <ActionIcon variant="light" onClick={toggleNav} visibleFrom="sm">
+                  <RiArrowRightDoubleLine />
                 </ActionIcon>
-            </div>
+              </Group>
             </Tooltip>
-            ) : null}
+          )}
+      
+        {!asideOpened && (
+            <Tooltip position="right-start" label="Open Sidebar">
+              <Group mr={5} justify="right" style={{ position: "fixed", zIndex: 9999, right: "1px"}}>
+                <ActionIcon variant="light" onClick={toggleAside} visibleFrom="sm">
+                  <RiArrowLeftDoubleLine />
+                </ActionIcon>
+              </Group>
+            </Tooltip>
+          )}
 
-            <Container
-                style={{
-            flexDirection: 'column',
-            width: '100%',
-            margin: '0 auto',
-            overflowX: 'hidden',
-                }}
-          size="responsive"
-    >    
-       {children}
-        </Container>
+      </Group>
+          <Space h="md"/>
+           
+              {children}
+          
         </AppShell.Main>
      </AppShell>
      </>

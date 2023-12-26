@@ -85,7 +85,7 @@ useEffect(() => {
   return (
     
     <nav className={classes.navbar}>
-      <div className={classes.navbarMain}>
+      <div>
       <Space h="lg" />
             
               <Text fs="italic" size="md" fw={800} >
@@ -101,41 +101,37 @@ useEffect(() => {
                   .filter((post) => post.Username !== currentUser.Username)
                   .map((post) => {
                     return (
-                   <UnstyledButton component={Link}
-                   href={`/wave/${post.Username}`} style={{ width: "100%" }}>
-                      <div key={post.PublicKeyBase58Check}
-                          
-                          className={(classes.link)}
-                          onClick={() => {
-                      
-                            setActive(post);
-                          }}
-                        >
-                          <Group style={{ flex: 1 }} wrap="nowrap">
-                            <Space w={1} />
-                            <Avatar
-                              radius="xl"
-                              size="sm"
-                              src={
-                                post.ExtraData?.LargeProfilePicURL ||
-                                `https://node.deso.org/api/v0/get-single-profile-picture/${post.PublicKeyBase58Check}` ||
-                                null
-                              }
-                            />
+                    <UnstyledButton
+                      component={Link}
+                      href={`/wave/${post.Username}`}
+                      className={classes.user}
+                      >
+                      <Group>
+                        <Avatar
+                           src={
+                            post.ExtraData?.LargeProfilePicURL ||
+                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.PublicKeyBase58Check}` ||
+                            null
+                          }
+                          radius="xl"
+                          size="sm"
+                        />
+            
+                        <div style={{ flex: 1 }}>
+                          <Text size="sm" fw={500}>
+                          {post.Username}
+                          </Text>
+                        </div>
 
-                            <span>
-                              <Text fz="xs" fw={500} truncate lineClamp={1}>
-                                {post.Username}
-                              </Text>
-                            </span>
-                          </Group>
-                          <Space w="lg" />
-                          <Group postition="right">
-                            <RxDotFilled size={22} color="red" />{" "}
-                          </Group>
-                       
-                      </div>
-                      </UnstyledButton>
+                        <Space w="lg" />
+                    <Group postition="right">
+                      <RxDotFilled size={22} color="red" />{" "}
+                    </Group>
+                      </Group>
+
+                      
+                    </UnstyledButton>
+
                     );
                   })
               ) : (
@@ -173,40 +169,36 @@ useEffect(() => {
             <Space h="sm" />
             {filteredPosts && filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
-                <UnstyledButton component={Link}
-                   href={`/wave/${post.Username}`} style={{ width: "100%" }}>
-                <div key={post.PublicKeyBase58Check}
-              
-                    className={(classes.link)}
-                    onClick={() => {
-                      setActive(post);
-                    }}
-                  >
-                    <Group style={{ flex: 1 }} >
-                      <Space w={1} />
-                      <Avatar
-                        radius="xl"
-                        size="sm"
-                        src={
-                          post.ExtraData?.LargeProfilePicURL ||
-                          `https://node.deso.org/api/v0/get-single-profile-picture/${post.PublicKeyBase58Check}` ||
-                          null
-                        }
-                      />
-
-                      <span>
-                        <Text fz="xs" fw={500} truncate lineClamp={1}>
+                <UnstyledButton
+                      component={Link}
+                      href={`/wave/${post.Username}`}
+                      className={classes.user}
+                      >
+                      <Group>
+                        <Avatar
+                           src={
+                            post.ExtraData?.LargeProfilePicURL ||
+                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.PublicKeyBase58Check}` ||
+                            null
+                          }
+                          radius="xl"
+                          size="sm"
+                        />
+            
+                        <div style={{ flex: 1 }}>
+                          <Text size="sm" fw={500}>
                           {post.Username}
-                        </Text>
-                      </span>
-                    </Group>
-                    <Space w="lg" />
+                          </Text>
+                        </div>
+
+                        <Space w="lg" />
                     <Group postition="right">
                       <RxDotFilled size={22} color="red" />{" "}
                     </Group>
-                 
-                </div>
-                </UnstyledButton>
+                      </Group>
+
+                      
+                    </UnstyledButton>
               ))
             ) : (
               <>

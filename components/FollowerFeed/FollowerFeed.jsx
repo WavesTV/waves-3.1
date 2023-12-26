@@ -156,6 +156,14 @@ import {
                   </Center>
                   <Space h="xl" />
                   <Player
+                  priority 
+                  controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+                  showPipButton
+                  theme={{
+                      colors: {
+                        loading: '#3cdfff',
+                      }
+                    }}
                     playbackId={post.ExtraData.WavesStreamPlaybackId}
                     title={post.ExtraData.WavesStreamTitle}
                     
