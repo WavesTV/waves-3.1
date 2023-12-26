@@ -513,6 +513,14 @@ export default function Wave() {
 
 <Player
 
+priority 
+              controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+              showPipButton
+              theme={{
+                  colors: {
+                    loading: '#3cdfff',
+                  }
+                }}
               playbackId={profile.ExtraData?.WavesStreamPlaybackId}
               title={profile.ExtraData?.WavesStreamTitle}
               
@@ -875,7 +883,7 @@ export default function Wave() {
             dangerouslySetInnerHTML={{
               __html:
                 profile && profile.Description
-                  ? replaceURLs(profile.Description.replace(/\n/g, "<br> "))
+                  ? replaceURLs(profile.Description.replace(/\n/g, "<br>"))
                   : "",
             }}
           />

@@ -286,7 +286,7 @@ export default function ProfilePage () {
                   __html:
                     profile && profile.Profile && profile.Profile.Description
                       ? replaceURLs(
-                          profile.Profile.Description.replace(/\n/g, "<br> ")
+                          profile.Profile.Description.replace(/\n/g, "<br>")
                         )
                       : "",
                 }}

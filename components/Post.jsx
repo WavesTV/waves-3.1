@@ -210,15 +210,13 @@ export default function Post({ post, username, key }) {
       }
     };
 
-    const replaceURLs = (text) => {
+
+      const replaceURLs = (text) => {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         const atSymbolRegex = /(\S*@+\S*)/g;
-    
+      
         return text
-          .replace(
-            urlRegex,
-            (url) => `<a href="${url}" target="_blank">${url}</a>`,
-          )
+          .replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`)
           .replace(atSymbolRegex, (match) => ` ${match} `);
       };
 
@@ -366,23 +364,21 @@ export default function Post({ post, username, key }) {
                 
                     <Space h="sm" />
                     <Text
-                       size="md"
-                       style={{
-                     maxWidth: "100%",  // Ensure message text does not overflow
-                     overflow: "hidden",
-                     textOverflow: "ellipsis",
-                     whiteSpace: "normal",  // Allow text to wrap
-                     wordWrap: "break-word",
-                      textAlign: "center",  // Allow long words to break
-                       }}      
+                      size="md"
+                      style={{
+                        maxWidth: "100%",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "normal",
+                        wordWrap: "break-word",
+                        textAlign: "center",
+                      }}      
                       dangerouslySetInnerHTML={{
-                        __html:
-                            post?.Body
-                            ? replaceURLs( post.Body.replace(/\n/g, "<br> "), )
-                            : "",
+                        __html: post?.Body
+                          ? replaceURLs(post.Body).replace(/\n/g, "<br>")
+                          : "",
                       }}
-                     
-                    /> 
+                    />
                 </Spoiler>
 
                 <Space h="md" />

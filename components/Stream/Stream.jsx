@@ -664,7 +664,16 @@ export const Stream = () => {
 
                   <Space h="md" />
                   <Group justify="center">
-                    <Player title={stream?.name} playbackId={stream?.playbackId} muted />
+                    <Player 
+                    priority 
+                    controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+                    showPipButton
+                    theme={{
+                        colors: {
+                          loading: '#3cdfff',
+                        }
+                      }}
+                    title={stream?.name} playbackId={stream?.playbackId} muted />
                   </Group>
 
                   <Space h="md" />

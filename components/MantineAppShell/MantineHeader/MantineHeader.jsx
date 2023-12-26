@@ -38,6 +38,7 @@ import { SignAndSubmitTx } from '@/components/SignAndSubmit/SubmitPost';
 import { Search } from '@/components/Search';
 import { BsPlusCircleDotted } from "react-icons/bs";
 import { BiSearchAlt } from "react-icons/bi";
+import NotificationsPage from "../../../pages/notifications"
 
   export function MantineHeader() {
    const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
@@ -112,9 +113,9 @@ import { BiSearchAlt } from "react-icons/bi";
           <Group justify="space-between" h="100%">
           <Group>
           <Text size="xl" fw={900} fs="italic" variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 90 }}>Waves</Text>
-<Badge variant="filled" color="blue" radius="sm" className={classes.betaTag}>BETA</Badge>
-</Group>
-  
+          <Badge variant="filled" color="blue" radius="sm" className={classes.betaTag}>BETA</Badge>
+          </Group>
+            
             <Group h="100%" visibleFrom="sm" justify='center'>
             {currentUser && (
               <Tooltip label="Create Post">
@@ -166,10 +167,12 @@ import { BiSearchAlt } from "react-icons/bi";
       <IconWallet />
     </ActionIcon>
     </Tooltip>
+
+    <Menu offset={2} shadow="md" width={111} withArrow>
+    <Menu.Target>
     <Tooltip label="Notifications" withArrow  position="bottom" offset={3}>
     <ActionIcon
-    component={Link}
-    href="/notifications"
+    
       variant="gradient"
       size="xl"
       aria-label="Gradient action icon"
@@ -185,6 +188,15 @@ import { BiSearchAlt } from "react-icons/bi";
         
     </ActionIcon>
     </Tooltip>
+    </Menu.Target>
+
+<Menu.Dropdown>
+
+<NotificationsPage />
+
+</Menu.Dropdown>
+
+</Menu>
 
     <Tooltip label="Why Waves" withArrow  position="bottom" offset={3}>
     <ActionIcon

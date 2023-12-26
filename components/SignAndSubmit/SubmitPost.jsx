@@ -504,6 +504,14 @@ import {
                         {asset?.[0]?.playbackId && (
                           <>
                             <Player
+                              priority 
+                              controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+                              showPipButton
+                              theme={{
+                                  colors: {
+                                    loading: '#3cdfff',
+                                  }
+                                }}
                               title={asset[0].name}
                               playbackId={asset[0].playbackId}
                             />
