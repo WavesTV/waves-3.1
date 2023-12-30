@@ -5,21 +5,34 @@ import { MantineHeader } from '@/components/MantineAppShell/MantineHeader/Mantin
 import { MantineNavBar } from '@/components/MantineAppShell/MantineNavBar/MantineNavBar';
 import { MantineAside } from '@/components/MantineAppShell/MantineAside/MantineAside';
 import { MantineFooter } from '@/components/MantineAppShell/MantineFooter/MantineFooter';
+import { Chat } from '@/components/Chat';
 import { PiShootingStarLight } from "react-icons/pi";
 import { Spotlight } from '../Spotlight/Spotlight';
+import { useRouter } from "next/router";
+import { DeSoIdentityContext } from "react-deso-protocol";
+import { useContext } from "react";
+import { LiaGlobeSolid } from "react-icons/lia";
 
 export function MantineAppShell({ children }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
     const [opened, { open, close }] = useDisclosure(false);
     const [navOpened, { toggle: toggleNav }] = useDisclosure(true);
     const [asideOpened, { toggle: toggleAside }] = useDisclosure(true);
+    const router = useRouter();
+    const { userName } = router.query;
+    const { currentUser } = useContext(DeSoIdentityContext);
+    const [openedChat, { open: openChat, close: closeChat }] = useDisclosure(false);
 
     return (
  <>
   <Modal opened={opened} onClose={close} centered>
     <Spotlight/>
   </Modal>
+
+  <Modal p="md" opened={openedChat} onClose={closeChat}>
+      <Chat handle={"Global Wave"} />
+  </Modal>
+
         <AppShell
         padding="md"
         header={{ height: 60 }}
@@ -60,22 +73,30 @@ export function MantineAppShell({ children }) {
         </AppShell.Navbar>
 
         <AppShell.Aside>
-        {asideOpened && (
+          {asideOpened && (
+              <>
+                <Tooltip position="right-start" label="Close Sidebar">
+                  <ActionIcon
+                  variant="light"
+                    mt={11}
+                    ml={11}
+                    onClick={toggleAside}
+                    visibleFrom="sm"
+                  >
+                    <RiArrowRightDoubleLine />
+                  </ActionIcon>
+                </Tooltip>
+              </>
+            )}
+
+            {(router.pathname.startsWith('/wave/') && userName) || (router.pathname === '/profile' && currentUser) ? (
             <>
-              <Tooltip position="right-start" label="Close Sidebar">
-                <ActionIcon
-                variant="light"
-                  mt={11}
-                  ml={11}
-                  onClick={toggleAside}
-                  visibleFrom="sm"
-                >
-                  <RiArrowRightDoubleLine />
-                </ActionIcon>
-              </Tooltip>
+            <Space h="xl"/>
+              <Chat handle={userName || currentUser.ProfileEntryResponse.Username || "Anon"} />
             </>
-          )}
-            <MantineAside/>
+              ) : (
+              <MantineAside />
+            )}
         </AppShell.Aside>
 
         <AppShell.Footer >
@@ -83,23 +104,12 @@ export function MantineAppShell({ children }) {
         </AppShell.Footer>
    
         <AppShell.Main >
-          <Group hiddenFrom="md">
-        <Tooltip label="Spotlight">
-        <ActionIcon
-          variant="gradient"
-          gradient={{ from: "blue", to: "cyan", deg: 90 }}
-          size="xl"
-          radius="xl"
-          hiddenFrom="md"
-          onClick={open}
-        >
-          <PiShootingStarLight size="1.4rem" />
-        </ActionIcon>
-      </Tooltip>
-
       
-      </Group>
-          <Group justify='space-between'>
+      
+          
+      
+
+      <Group justify='space-between'>
       {!navOpened && (
             <Tooltip position="right-start" label="Open Navbar">
               <Group style={{ position: "fixed", zIndex: 9999 }}>
@@ -119,10 +129,40 @@ export function MantineAppShell({ children }) {
               </Group>
             </Tooltip>
           )}
-
       </Group>
           <Space h="md"/>
+          <Group justify="space-between">
            
+
+           <Tooltip label="Global Chat">
+             <ActionIcon 
+     
+               variant="gradient"
+               gradient={{ from: "blue", to: "cyan", deg: 90 }}
+               size="xl"
+               radius="xl"
+               onClick={openChat}
+             >
+               <LiaGlobeSolid size="2rem" />
+             </ActionIcon>
+           </Tooltip>
+     
+           <Group justify="right" hiddenFrom="md">
+           <Tooltip label="Spotlight">
+             <ActionIcon
+               variant="gradient"
+               gradient={{ from: "blue", to: "cyan", deg: 90 }}
+               size="xl"
+               radius="xl"
+               hiddenFrom="md"
+               onClick={open}
+             >
+               <PiShootingStarLight size="1.4rem" />
+             </ActionIcon>
+           </Tooltip>
+           </Group>
+               </Group>
+               <Space h="md"/>
               {children}
           
         </AppShell.Main>

@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { TbUserSearch } from 'react-icons/tb';
 import { BiSearchAlt } from 'react-icons/bi';
 
-export const Search = (props) => {
+export const Search = ({props, close}) => {
   const router = useRouter();
 
   const [value, setValue] = useState("");
@@ -50,6 +50,8 @@ export const Search = (props) => {
     setuserNotFound(false)
 
     router.push(`/wave/${response.Profile.Username}`, undefined, { shallow: true, state });
+
+    close();
   };
 
   return (

@@ -16,11 +16,11 @@ import {
   import { RiImageAddFill } from "react-icons/ri";
   import { TbVideoPlus } from "react-icons/tb";
   import {
-    Stack,
+    Input,
     Button,
     Center,
     Space,
-    Paper,
+    CloseButton,
     Text,
     Textarea,
     Group,
@@ -42,20 +42,49 @@ import {
   import { DeSoIdentityContext } from "react-deso-protocol";
   import { Welcome } from "../Welcome/Welcome";
   import { Player, useAssetMetrics, useCreateAsset } from "@livepeer/react";
-  
+  import { ImEmbed } from "react-icons/im";
+  import {
+    getEmbedHeight,
+    getEmbedURL,
+    getEmbedWidth,
+    isValidEmbedURL,
+  } from "../EmbedUrls";
   import { IconCheck, IconX } from "@tabler/icons-react";
   import { notifications } from "@mantine/notifications";
   import { useDropzone } from "react-dropzone";
   
-  export const SignAndSubmitTx = () => {
+  export const SignAndSubmitTx = ({ close }) => {
     const { currentUser, isLoading } = useContext(DeSoIdentityContext);
     const [newUsername, setNewUsername] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [imageLoading, setImageLoading] = useState(false);
+    const [embedUrl, setEmbedUrl] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [imageURL, setImageURL] = useState("");
     const [opened, { toggle }] = useDisclosure(false);
-    const [video, setVideo] = useState();
+    const resetImageRef = useRef(null);
+    const resetVideoRef = useRef(null);
+    const [video, setVideo] = useState(null);
+    const [bodyText, setBodyText] = useState('');
+
+    const handleEmbedLink = (e) => {
+      const link = e.target.value;
+    
+      if (link.trim().length > 0) {
+        const response = getEmbedURL(link);
+        const isValid = isValidEmbedURL(response);
+        if (isValid) {
+          setEmbedUrl(response);
+        } else {
+          setEmbedUrl(null);
+         
+        }
+      }
+    };
+
+
+
     const {
       mutate: createAsset,
       data: asset,
@@ -75,19 +104,8 @@ import {
       refetchInterval: 30000,
     });
   
-    const onDrop = useCallback(async (acceptedFiles) => {
-      if (acceptedFiles && acceptedFiles.length > 0 && acceptedFiles?.[0]) {
-        setVideo(acceptedFiles[0]);
-      }
-    }, []);
+
   
-    const { getRootProps, getInputProps } = useDropzone({
-      accept: {
-        "video/*": [".mp4"],
-      },
-      maxFiles: 1,
-      onDrop,
-    });
   
     const isVideoLoading = useMemo(
       () =>
@@ -109,22 +127,31 @@ import {
           : null,
       [progress]
     );
-  
+
+    const [uploadInitiated, setUploadInitiated] = useState(false);
     const handleUploadImage = async () => {
+      if (uploadInitiated) {
+        return; // Exit if upload has already been initiated
+      }
+      setUploadInitiated(true);
+
       try {
+        setImageLoading(true);
         const response = await uploadImage({
           UserPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
           file: imageFile,
         });
+        
+        setImageURL(response.ImageURL);
+        setImageLoading(false);
         notifications.show({
           title: "Success",
           icon: <IconCheck size="1.1rem" />,
           color: "green",
           message: "Uploaded!",
         });
-        setImageURL(response.ImageURL);
-        console.log(response);
       } catch (error) {
+        setImageLoading(false);
         notifications.show({
           title: "Error",
           icon: <IconX size="1.1rem" />,
@@ -132,6 +159,8 @@ import {
           message: "Something Happened!",
         });
         console.log("Something happened: " + error);
+      } finally {
+        setUploadInitiated(false); 
       }
     };
   
@@ -141,6 +170,12 @@ import {
       }
     }, [imageFile]); // This effect runs whenever imageFile changes
   
+    useEffect(() => {
+      if (video) {
+        createAsset(); // Call createAsset function when videoFile is set
+      }
+    }, [video]);
+    
     const handleUpdateUsername = async () => {
       try {
         await updateProfile({
@@ -362,13 +397,29 @@ import {
                             ? [`https://lvpr.tv/?v=${asset[0].playbackId}`]
                             : [],
                       },
+                      PostExtraData: {
+                        EmbedVideoURL: embedUrl ? embedUrl : "",
+                      }
                     }).then((resp) => {
                       notifications.show({
                         title: "Success",
                         icon: <IconCheck size="1.1rem" />,
                         color: "green",
                         message: "Post was successfully submitted!",
-                      });
+                      }); 
+                      setBodyText("");
+                      if (imageURL) {
+                        setImageURL("");
+                      }
+                      if (embedUrl) {
+                        setEmbedUrl("");
+                      }
+                      if (video) {
+                        setVideo(null);
+                      }
+                      if (typeof close === 'function') {
+                      close();
+                      }
                     });
   
                     // Reset the form after submission
@@ -394,10 +445,19 @@ import {
                     placeholder="Let them hear your voice!"
                     variant="filled"
                     size="md"
+                    value={bodyText}
+                    onChange={(event) => setBodyText(event.currentTarget.value)}
                   />
                   <Space h="sm" />
                   {imageURL && (
                     <div>
+                      <ActionIcon onClick={() => {
+                        setImageURL("");
+                        setImageFile(null);
+                        resetImageRef.current?.();
+                        }} size="xs" color="red"> 
+                      <IconX/>
+                      </ActionIcon>
                       <Image
                         src={imageURL}
                         alt="Uploaded"
@@ -407,69 +467,8 @@ import {
                       />
                     </div>
                   )}
-                  <Space h="sm" />
-                  <Group postion="apart">
-                    <Space h="sm" />
-                    <Button
-                      variant="gradient"
-                      gradient={{ from: "cyan", to: "indigo" }}
-                      raduis="sm"
-                      type="submit"
-                    >
-                      Create
-                    </Button>
-  
-                    <FileButton
-                      onChange={setImageFile}
-                      accept="image/png,image/jpeg"
-                    >
-                      {(props) => (
-                        <Tooltip label="Upload Image">
-                          <ActionIcon
-                            color="blue"
-                            size="lg"
-                            variant="default"
-                            {...props}
-                          >
-                            <RiImageAddFill size="1.2rem" />
-                          </ActionIcon>
-                        </Tooltip>
-                      )}
-                    </FileButton>
-                    <Tooltip label="Upload Video">
-                    <ActionIcon
-                      color="blue"
-                      size="lg"
-                      variant="default"
-                      onClick={toggle}
-                    >
-                      <TbVideoPlus size="1.2rem" />
-                    </ActionIcon>
-                    </Tooltip>
-                    <Collapse in={opened}>
-                      <div style={{ maxWidth: "100%" }}>
-                        <Divider my="sm" />
-                        <Space h="sm" />
-  
-                        {!asset && (
-                          <>
-                            <Stack>
-                              <Button
-                                color="blue"
-                                size="lg"
-                                variant="default"
-                                {...getRootProps({ className: "dropzone" })}
-                              >
-                                <input {...getInputProps()} />
-                                <Group>
-                                  <Text c="dimmed" fw={700} fz="sm">
-                                    Drag and Browse File
-                                  </Text>
-                                </Group>
-                              </Button>
-  
-                              <Group>
-                                {error?.message && (
+
+                {error?.message && (
                                   <>
                                     <Notification
                                       withCloseButton={false}
@@ -477,32 +476,22 @@ import {
                                       icon={<IconX size="1.1rem" />}
                                       color="red"
                                     >
-                                      Bummer! {error.message}
+                                      Trouble Uploading Video! {error.message}
                                     </Notification>
                                   </>
                                 )}
-                              </Group>
-                            </Stack>
-                          </>
-                        )}
-  
-                        <Space h="sm" />
-                        {video ? (
+
+             {video && asset?.[0]?.playbackId && (
                           <>
-                            <Text c="dimmed" td="underline" fw={500}>
-                              File Selected:
-                            </Text>
-                            <Text c="dimmed" fw={500}>
-                              {video.name}
-                            </Text>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-  
-                        <Space h="sm" />
-                        {asset?.[0]?.playbackId && (
-                          <>
+                           <div>
+                          <ActionIcon onClick={() => {
+                        setVideo(null);
+                        
+                        resetVideoRef.current?.();
+                        }} size="xs" color="red"> 
+                      <IconX/>
+                      </ActionIcon>
+                      </div>
                             <Player
                               priority 
                               controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
@@ -518,29 +507,112 @@ import {
                           </>
                         )}
   
-                        <Space h="sm" />
-                        <div>
-                          {progressFormatted && (
+                        {progressFormatted && (
                             <Text fz="sm" c="dimmed">
                               {progressFormatted}
                             </Text>
                           )}
-                          <Space h="sm" />
-                          {!asset?.[0].id && (
-                            <Button
-                              variant="light"
-                              size="xs"
-                              onClick={() => {
-                                createAsset?.();
-                              }}
-                              disabled={isVideoLoading || !createAsset}
-                            >
-                              Upload
-                            </Button>
-                          )}
-                        </div>
+
+                    {embedUrl && (
+                      <>
+                      <div>
+                      <ActionIcon onClick={() => setEmbedUrl("")} size="xs" color="red"> 
+                      <IconX/>
+                      </ActionIcon>
                       </div>
-                    </Collapse>
+
+                      <iframe
+                      title='extraembed-video'
+                      id='embed-iframe'
+                      className='w-full flex-shrink-0 feed-post__image'
+                      height={getEmbedHeight(embedUrl)}
+                      style={{ maxWidth: getEmbedWidth(embedUrl) }}
+                      src={embedUrl}
+                      frameBorder='0'
+                      allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
+                      allowFullScreen />
+                      
+                      </>
+                           
+                    )}
+
+                  <Space h="sm" />
+                  <Group postion="apart">
+                    <Space h="sm" />
+                    <Button
+                      variant="gradient"
+                      gradient={{ from: "cyan", to: "indigo" }}
+                      raduis="sm"
+                      type="submit"
+                      disabled={!bodyText.trim()}
+                    >
+                      Create
+                    </Button>
+  
+                    <FileButton
+                      onChange={setImageFile}
+                      accept="image/png,image/jpeg,image/png,image.gif,image/webp"
+                      resetRef={resetImageRef}
+                      type="button" 
+                    >
+                      {(props) => (
+                        <Tooltip label="Upload Image">
+                          <ActionIcon
+                            color="blue"
+                            size="lg"
+                            variant="default"
+                            {...props}
+                            loading={imageLoading}
+                          >
+                            <RiImageAddFill size="1.2rem" />
+                          </ActionIcon>
+                        </Tooltip>
+                      )}
+                    </FileButton>
+
+                    <FileButton
+                      resetRef={resetVideoRef}
+                      onChange={setVideo}
+                      accept="video/mp4,video/mov,video/mpeg,video/flv,video/mwv,video/m3u8"
+                      type="button" 
+                    >
+                      {(props) => (
+                        <Tooltip label="Upload Video">
+                          <ActionIcon
+                            color="blue"
+                            size="lg"
+                            variant="default"
+                            {...props}
+                            loading={isVideoLoading}
+                          >
+                            <TbVideoPlus size="1.2rem" />
+                          </ActionIcon>
+                        </Tooltip>
+                      )}
+                    </FileButton>
+
+                        <Tooltip label="Embed">
+                          <ActionIcon
+                            color="blue"
+                            size="lg"
+                            variant="default"
+                            onClick={toggle}
+                          >
+                            <ImEmbed size="1.2rem" />
+                          </ActionIcon>
+                        </Tooltip>
+
+                        <Collapse in={opened}>
+                          <Input 
+                            value={embedUrl}
+                            onChange={handleEmbedLink}
+                            variant="filled" 
+                            size="xs" 
+                            radius="xl" 
+                            placeholder="Add Link" 
+                           
+                          />
+                        </Collapse>
                   </Group>
                 </form>
              

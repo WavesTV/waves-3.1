@@ -34,7 +34,7 @@ export function MantineFooter() {
       PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
     });
 
-    console.log(notifData);
+
     setUnreadNotifs(notifData.NotificationsCount)
   };
 
@@ -69,7 +69,7 @@ export function MantineFooter() {
         onClose={closeCreate}
         centered
       >
-        <SignAndSubmitTx/>
+        <SignAndSubmitTx close={closeCreate}/>
       </Modal>
 
       <Group position="center" spacing="lg" grow wrap="nowrap" hiddenFrom="md">

@@ -10,7 +10,7 @@ import { WavesFeed } from "@/components/WavesFeed/WavesFeed";
 export function HomeTabs() {
   return (
     
-    <Tabs variant="unstyled" defaultValue="Hot" classNames={classes}>
+    <Tabs variant="unstyled" defaultValue="Waves" classNames={classes}>
       <Container>
       <Tabs.List style={{  display: 'flex', flexWrap: 'nowrap' }} grow>
         <Tabs.Tab
