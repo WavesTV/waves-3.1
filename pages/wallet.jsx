@@ -29,7 +29,7 @@ export default function WalletPage() {
   
   const getBalance = async () => {
    
-console.log(currentUser)
+
   const nanosBalance = currentUser.BalanceNanos;
   const desoBalance = nanosBalance * nanosPerDeSo;
   const roundedDesoBalance = Math.round(desoBalance * 100) / 100;
@@ -179,13 +179,13 @@ useEffect(() => {
               <Paper shadow="xl" p="lg" withBorder>
                 <Center>
                   <Text c="dimmed" fw={700}>
-                    Please Sign Up or Login to view your Wallet.
+                    Please Sign Up or Sign In to view your Wallet.
                   </Text>
                 </Center>
                 <Space h="xs" />
                 <Center>
                   <Text size="sm"  fw={555}>
-                    HeroSwap can be used Anonymously or Login to save 50% in fees.
+                    HeroSwap can be used Anonymously or Sign In to save 50% in fees.
                   </Text>
                 </Center>
                 <Space h="md" />

@@ -11,7 +11,7 @@ export default function HomePage() {
     <>
    <Container size="30rem" px={0}>
             
-    <SignAndSubmitTx />
+    <SignAndSubmitTx close={undefined} />
     
     </Container>
     <Space h="xl" />

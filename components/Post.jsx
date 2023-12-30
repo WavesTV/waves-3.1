@@ -1,10 +1,11 @@
 import {
     getPostsStateless,
     getFollowersForUser,
-    getIsFollowing,
+    getExchangeRates,
     submitPost,
     createPostAssociation,
     sendDiamonds,
+    getAppState
   } from "deso-protocol";
   import { useEffect, useState, useContext } from "react";
   import { DeSoIdentityContext } from "react-deso-protocol";
@@ -14,7 +15,7 @@ import {
     UnstyledButton,
     Avatar,
     Group,
-    TextInput,
+    Slider,
     rem,
     Paper,
     Menu,
@@ -38,14 +39,20 @@ import {
     IconRecycle,
     IconMessageCircle,
     IconMessageShare, IconCheck, IconX,
-    IconHeartFilled
+    IconHeartFilled,
+    IconDiamondFilled
   } from "@tabler/icons-react";
   import { Player } from "@livepeer/react";
   import { useDisclosure } from "@mantine/hooks";
   import { notifications } from "@mantine/notifications";
   import formatDate from "@/formatDate";
   import { BsChatQuoteFill } from "react-icons/bs";
-  import { BiRepost } from "react-icons/bi";
+  import {
+    getEmbedHeight,
+
+    getEmbedWidth,
+   
+  } from "./EmbedUrls";
 
 export default function Post({ post, username, key }) {
     const { currentUser } = useContext(DeSoIdentityContext);
@@ -53,8 +60,35 @@ export default function Post({ post, username, key }) {
     const [commentPostHash, setCommentPostHash] = useState("");
     const [comment, setComment] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
+    const [tip, setTip] = useState(1);
     const [openedImage, { open: openImage, close: closeImage }] = useDisclosure(false);
     const [openedQuote, { open: openQuote, close: closeQuote }] = useDisclosure(false); 
+    const [openedDiamonds, { open: openDiamond, close: closeDiamond }] = useDisclosure(false); 
+    const [diamondLevelsUsd, setDiamondLevelsUsd] = useState([]);
+
+    const getData = async () => {
+      try {
+        const appState = await getAppState({ PublicKeyBase58Check: "BC1YLjYHZfYDqaFxLnfbnfVY48wToduQVHJopCx4Byfk4ovvwT6TboD" });
+    
+        const desoUSD = appState.USDCentsPerDeSoCoinbase / 100;
+        const nanoToDeso = 0.000000001;
+        const diamondLevelMapUsd = Object.values(appState.DiamondLevelMap).map(nanos => {
+          const deso = nanos * nanoToDeso;
+          let usdValue = deso * desoUSD;
+    
+          if (usdValue < 0.01) {
+            usdValue = 0.01;
+          }
+    
+          return usdValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        });
+    
+        setDiamondLevelsUsd(diamondLevelMapUsd);
+      } catch (error) {
+        console.error('Error in getData:', error);
+      }
+    }
+    
 
     const handleCommentToggle = (postHash) => {
       setCommentPostHash(postHash);
@@ -184,48 +218,101 @@ export default function Post({ post, username, key }) {
   
 
     const sendDiamondTip = async (postHash, postPubKey) => {
-    try {
-        await sendDiamonds({
-          ReceiverPublicKeyBase58Check: postPubKey,
-          SenderPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          DiamondPostHashHex: postHash,
-          DiamondLevel: 1,
-          MinFeeRateNanosPerKB: 1000,
+
+      if (!currentUser) {
+        notifications.show({
+          title: "Sign In",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: `You need to sign in to tip ${username}`,
         });
+
+        return;
+      }
+
+    try {
+      await sendDiamonds({
+        ReceiverPublicKeyBase58Check: postPubKey,
+        SenderPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+        DiamondPostHashHex: postHash,
+        DiamondLevel: tip,
+        MinFeeRateNanosPerKB: 1000,
+      });
         notifications.show({
           title: "Success",
-          icon: <IconDiamond size="1.1rem" />,
+          icon: <IconDiamondFilled size="1.1rem" />,
           color: "blue",
-          message: "Diamond Sent!",
+          message: `You sent ${tip} Diamonds to ${username}`,
         });
+
+        closeDiamond();
         
       } catch (error) {
         notifications.show({
           title: "Error",
           icon: <IconX size="1.1rem" />,
           color: "red",
-          message: "Something Happened!",
+          message: "You already tipped this post!",
         });
         console.error("Error submitting diamond:", error);
       }
     };
 
+    const replaceURLs = (text) => {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const atSymbolRegex = /@(\w+)/g; // Captures username after '@'
+    
+      return text
+        .replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
+        .replace(atSymbolRegex, (match, username) => `<a href="/wave/${username}" target="_blank">@${username}</a>`);
+    };
+    
+    
 
-      const replaceURLs = (text) => {
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        const atSymbolRegex = /(\S*@+\S*)/g;
-      
-        return text
-          .replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-          .replace(atSymbolRegex, (match) => ` ${match} `);
-      };
-
+  
 
     return(
         <>
         <Modal opened={openedImage} onClose={closeImage} size="auto" centered>
           <Image src={selectedImage} radius="md" alt="post-image" fit="contain" />
         </Modal>
+
+        <Modal radius="xl" opened={openedDiamonds} onClose={closeDiamond} size="md" centered>
+        <Text ta="center">Diamond Tip {username}'s Post</Text>
+
+          <Group p="xl" grow h={111}>
+          <Slider
+            defaultValue={1}
+            min={1} max={6}
+            marks={[
+              { value: 1, label: diamondLevelsUsd[0] },
+              { value: 2, label: diamondLevelsUsd[1] },
+              { value: 3, label: diamondLevelsUsd[2] },
+              { value: 4, label: diamondLevelsUsd[3] },
+              { value: 5, label: diamondLevelsUsd[4] },
+              { value: 6, label: diamondLevelsUsd[5] },
+            ]}
+            value={tip} 
+            onChange={setTip}
+            step={1}
+            label={tip}
+            thumbChildren={<IconDiamondFilled size="1rem" />}
+            thumbSize={26}
+          />
+
+        </Group>
+        <Group justify="right" mr={22}>
+          <Button onClick={() => {
+            sendDiamondTip( 
+              post.PostHashHex,
+              post.PosterPublicKeyBase58Check);
+            }} 
+            leftSection={<IconDiamond size="1rem" />}>
+              Tip
+            </Button>
+        </Group>
+        </Modal>
+
 
         <Modal opened={openedQuote} onClose={closeQuote} size="xl" centered>
           
@@ -254,7 +341,8 @@ export default function Post({ post, username, key }) {
         <Group justify="right">
               <Button onClick={() =>{ 
                 if (currentUser) {
-                  submitQuote(); 
+                  submitQuote(post.PostHashHex); 
+                  closeQuote();
                 } else {
                   notifications.show({
                     title: "Must be Signed In",
@@ -383,30 +471,31 @@ export default function Post({ post, username, key }) {
 
                 <Space h="md" />
                 {post.PostExtraData?.EmbedVideoURL && (
-                  <Group  style={{
-                   
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                    <iframe
-                          style={{
-                            height: "50vh",
-                            width: "100vw",
-                            border: "none",
-                            borderRadius: "22px",
-                          }}
-                      title="embed"
-                      src={post.PostExtraData?.EmbedVideoURL}
-                    />
-                  </Group>
+                  <Group justify="center">
+                  <iframe
+                  title='extraembed-video'
+                  id='embed-iframe'
+                  className='w-full flex-shrink-0 feed-post__image'
+                  height={getEmbedHeight(post.PostExtraData?.EmbedVideoURL)}
+                  style={{ maxWidth: getEmbedWidth(post.PostExtraData?.EmbedVideoURL) }}
+                  src={post.PostExtraData?.EmbedVideoURL}
+                  frameBorder='0'
+                  allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
+                  allowFullScreen />
+                 </Group>
+                    
+                 
                 )}
 
                 {post.VideoURLs && (
+
                   <iframe
                     style={{ width: "100%", height: "100%" }}
                     src={post.VideoURLs}
                     title={post.PostHashHex}
+                    allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
+                    allowFullScreen
+                    frameBorder='0'
                   />
                 )}
 
@@ -516,13 +605,10 @@ export default function Post({ post, username, key }) {
                     label="Diamonds"
                   >
                     <ActionIcon
-                      onClick={() =>
-                        currentUser &&
-                        sendDiamondTip(
-                          post.PostHashHex,
-                          post.PosterPublicKeyBase58Check
-                        )
-                      }
+                      onClick={() => {
+                        openDiamond();
+                        getData();
+                      }}
                       variant="subtle"
                       radius="md"
                       size={36}
