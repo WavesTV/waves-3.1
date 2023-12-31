@@ -39,7 +39,7 @@ export function MantineNavBar() {
 
         setWavesSidebar(Object.values(result.PublicKeyToProfileEntry));
       } catch (error) {
-        console.log("Something went wrong:", error);
+      
       }
     };
 
@@ -98,7 +98,7 @@ useEffect(() => {
             {currentUser ? (
               followingWaves && followingWaves.length > 0 ? (
                 followingWaves
-                  .filter((post) => post.Username !== currentUser.Username)
+                  .filter((post) => post.Username !== currentUser.ProfileEntryResponse.Username)
                   .map((post) => {
                     return (
                     <UnstyledButton
@@ -150,7 +150,7 @@ useEffect(() => {
                <Space h="lg" />
                 <Center>
                   <Text fz="xs" fw={500} lineClamp={2}>
-                    Login to view your Followings' Waves.
+                    Sign in to view your Following.
                   </Text>
                 </Center>
                 <Space h="lg" />

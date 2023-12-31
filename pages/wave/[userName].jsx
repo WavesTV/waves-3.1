@@ -4,14 +4,6 @@ import { useEffect, useState, useContext } from "react";
 
 import { Player } from "@livepeer/react";
 import {
-  IconHeartFilled,
-  IconHeart,
-  IconDiamond,
-  IconRecycle,
-  IconMessageCircle,
-  IconScriptPlus,
-  IconScriptMinus,
-  IconMessageShare,
   IconScreenShare,
   IconCheck,
   IconHeartHandshake,
@@ -51,7 +43,7 @@ import {
   ActionIcon,
   Tooltip,
   Button,
-  Textarea,
+  Loader,
   Collapse,
   UnstyledButton,
   List,
@@ -67,17 +59,12 @@ import classes from './wave.module.css';
 import Post from "@/components/Post";
 
 export default function Wave() {
-
   const router = useRouter();
-
-  // Extracting the post ID from the URL
   const { userName } = router.query;
-
   const [posts, setPosts] = useState([]);
   const [NFTs, setNFTs] = useState([]);
   const [profile, setProfile] = useState([]);
   const [followerInfo, setFollowers] = useState({ followers: 0, following: 0 });
- 
   const { currentUser } = useContext(DeSoIdentityContext);
   const [isFollowingUser, setisFollowingUser] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
@@ -86,21 +73,21 @@ export default function Wave() {
   const [openedSub2, { toggle: toggleSub2 }] = useDisclosure(false);
   const [openedSub3, { toggle: toggleSub3 }] = useDisclosure(false);
   const [openedSub, { open: openSub, close: closeSub }] = useDisclosure(false);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
 
+ 
   const replaceURLs = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const atSymbolRegex = /(\S*@+\S*)/g;
-
+    const atSymbolRegex = /@(\w+)/g; // Captures username after '@'
+  
     return text
-      .replace(
-        urlRegex,
-        (url) => `<a href="${url}" target="_blank">${url}</a>`,
-      )
-      .replace(atSymbolRegex, (match) => ` ${match} `);
+      .replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
+      .replace(atSymbolRegex, (match, username) => `<a href="/wave/${username}" target="_blank">@${username}</a>`);
   };
   // Retrieve the user's DESO balance from profile.DESOBalanceNanos
   const userDESOBalance = profile.DESOBalanceNanos;
-  console.log(userDESOBalance);
+ 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -226,12 +213,13 @@ export default function Wave() {
 
   const fetchPosts = async () => {
     try {
+      setIsLoadingPosts(true);
       const postData = await getPostsForUser({
         PublicKeyBase58Check: profile.PublicKeyBase58Check,
-        NumToFetch: 25,
+        NumToFetch: 100,
       });
       setPosts(postData.Posts);
-      console.log(postData)
+      setIsLoadingPosts(false);
     } catch (error) {
       console.error("Error fetching user posts:", error);
     }
@@ -243,7 +231,7 @@ export default function Wave() {
       const exchangeRateData = await getExchangeRates({
         PublicKeyBase58Check: profile.PublicKeyBase58Check,
       });
-      console.log(exchangeRateData);
+    
 
       const subscriptionAmount = 5; // $5 USD
       const usdCentsPerDeSoExchangeRate =
@@ -302,7 +290,7 @@ export default function Wave() {
       const exchangeRateData = await getExchangeRates({
         PublicKeyBase58Check: profile.PublicKeyBase58Check,
       });
-      console.log(exchangeRateData);
+     
 
       const subscriptionAmount = 15; // $5 USD
       const usdCentsPerDeSoExchangeRate =
@@ -361,9 +349,9 @@ export default function Wave() {
       const exchangeRateData = await getExchangeRates({
         PublicKeyBase58Check: profile.PublicKeyBase58Check,
       });
-      console.log(exchangeRateData);
+    
 
-      const subscriptionAmount = 25; // $5 USD
+      const subscriptionAmount = 25; // $25 USD
       const usdCentsPerDeSoExchangeRate =
         exchangeRateData.USDCentsPerDeSoCoinbase;
       const nanosPerDeSo = 0.000000001; // 1 Nano is 0.000000001 DeSo
@@ -416,6 +404,7 @@ export default function Wave() {
 
   const fetchNFTs = async (limit) => {
     try {
+      setIsLoadingNFTs(true);
       const nftData = await getNFTsForUser({
         UserPublicKeyBase58Check: profile.PublicKeyBase58Check,
         IsForSale: true,
@@ -430,27 +419,12 @@ export default function Wave() {
       }, {});
 
       setNFTs(limitedNFTs);
-      console.log(nftData, nftData);
+      setIsLoadingNFTs(false);
     } catch (error) {
       console.error("Error fetching user NFTs:", error);
     }
   };
 
- 
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-
-    // Fetch posts if the "Posts" tab is selected
-    if (tab === "first") {
-      fetchPosts();
-    }
-
-    // Fetch NFTs if the "NFTs" tab is selected
-    if (tab === "second") {
-      fetchNFTs(25);
-    }
-  };
 
   useEffect(() => {
     fetchPosts(); // Fetch posts initially
@@ -469,7 +443,7 @@ export default function Wave() {
           <Image
             src={profile.ExtraData?.FeaturedImageURL || null}
             height={200}
-            fallbackSrc="https://www.hdwallpaper.nu/wp-content/uploads/2015/07/Ocean-wave-stock-image_WEB.jpg"
+            fallbackSrc="https://images.deso.org/4903a46ab3761c5d8bd57416ff411ff98b24b35fcf5480dde039eb9bae6eebe0.webp"
           />
         </Card.Section>
 
@@ -551,7 +525,7 @@ priority
         <Paper shadow="xl" radius="md" p="xl">
           <Group>
             <CopyButton
-              value={`https://waves-2.vercel.app/wave/${userName}`}
+              value={`https://desowaves.vercel.app/wave/${userName}`}
               timeout={2000}
             >
               {({ copied, copy }) => (
@@ -842,7 +816,7 @@ priority
                           <Space h={77} />
                           <Paper shadow="xl" p="lg" withBorder>
                             <Text fw={500}>
-                              Please Signup or Login to Subscribe.
+                              Please Signup or Sign In to Subscribe.
                             </Text>
                             <Divider my="sm" />
                             <Button
@@ -977,52 +951,77 @@ priority
             <Text fz="sm">NFTs</Text>
           </Tabs.Tab>
         </Tabs.List>
+
         <Tabs.Panel value="first">
-          {posts && posts.length > 0 ? (
-            posts.map((post) => (
-              <Post post={post} username={userName} key={post.PostHashHex}/>
-            ))
-          ) : (
-            <Center>
-              <Space h="md" />
+        {isLoadingPosts ? (
+  <>
+    <Space h="md"/>
+    <Center>
+      <Loader variant="bars" />
+    </Center>
+  </>
+) : (
+  posts && posts.length > 0 ? (
+    posts.map((post) => (
+      <Post post={post} username={userName} key={post.PostHashHex}/>
+    ))
+  ) : (
+    // If no NFTs, show the Badge
+    <>
+      <Space h="md"/>
+      <Center>
+        <Badge
+          size="md"
+          radius="sm"
+          variant="gradient"
+          gradient={{ from: "indigo", to: "cyan", deg: 45 }}
+        >
+          Post something to view them here!
+        </Badge>
+      </Center>
+    </>
+  )
+)}
 
-              <Badge
-                size="md"
-                radius="sm"
-                variant="gradient"
-                gradient={{ from: "indigo", to: "cyan", deg: 45 }}
-              >
-                Post something to view them here!
-              </Badge>
+                   <Space h={222} />
 
-              <Space h={222} />
-            </Center>
-          )}
         </Tabs.Panel>
+        
         <Tabs.Panel value="second">
-          {NFTs && Object.keys(NFTs).length > 0 ? (
-            Object.keys(NFTs).map((key, index) => {
-              const nft = NFTs[key];
-              return (
-                <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username} key={nft.PostEntryResponse.PostHashHex}/>
-              );
-            })
-          ) : (
-            <Center>
-              <Space h="md" />
-
-              <Badge
-                size="md"
-                radius="sm"
-                variant="gradient"
-                gradient={{ from: "indigo", to: "cyan", deg: 45 }}
-              >
-                Mint/Buy some NFTs to view them here!
-              </Badge>
-
-              <Space h={222} />
-            </Center>
-          )}
+        {isLoadingNFTs ? (
+  <>
+    <Space h="md"/>
+    <Center>
+      <Loader variant="bars" />
+    </Center>
+  </>
+) : (
+  // After loading, check if there are NFTs to display
+  NFTs && Object.keys(NFTs).length > 0 ? (
+    Object.keys(NFTs).map((key, index) => {
+      const nft = NFTs[key];
+      return (
+        <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username} key={nft.PostEntryResponse.PostHashHex}/>
+      );
+    })
+  ) : (
+    // If no NFTs, show the Badge
+    <>
+      <Space h="md"/>
+      <Center>
+        <Badge
+          size="md"
+          radius="sm"
+          variant="gradient"
+          gradient={{ from: "indigo", to: "cyan", deg: 45 }}
+        >
+          Mint something to view them here!
+        </Badge>
+      </Center>
+    </>
+  )
+)}
+        
         </Tabs.Panel>
       </Tabs>
 

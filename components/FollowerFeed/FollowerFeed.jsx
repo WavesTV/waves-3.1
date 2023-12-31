@@ -17,7 +17,8 @@ import {
     ActionIcon,
     Container,
     Loader,
-    Button
+    Button,
+    UnstyledButton
   } from "@mantine/core";
   import { Player } from "@livepeer/react";
   import { GiWaveCrest } from "react-icons/gi";
@@ -37,9 +38,10 @@ import {
         try {
           const followerFeedData = await getPostsStateless({
             ReaderPublicKeyBase58Check: userPublicKey,
-            NumToFetch: 30,
+            NumToFetch: 100,
             GetPostsForFollowFeed: true,
             FetchSubcomments: true,
+            
           });
   
           setFollowerFeed(followerFeedData.PostsFound);
@@ -60,7 +62,7 @@ import {
   
           setWaves(Object.values(resultWaves.PublicKeyToProfileEntry));
         } catch (error) {
-          console.log("Something went wrong:", error);
+        
         }
       };
   
@@ -129,16 +131,18 @@ import {
                   m="md"
                   shadow="lg"
                   radius="md"
-                  p="xl"
+                 
                   withBorder
                   key={post.PublicKeyBase58Check}
                 >
+                   <Space h="sm" />
                   <Center>
-                    <ActionIcon
+                    <UnstyledButton
                     component={Link}
                     href={`/wave/${post.Username}`}
-                    variant="transparent"
+                    
                     >
+                      <Group justify="center">
                       <Avatar
                         radius="xl"
                         size="lg"
@@ -148,13 +152,14 @@ import {
                           null
                         }
                       />
-                      <Space w="xs" />
+                     
                       <Text fw={500} size="md">
                         {post.Username}
                       </Text>
-                    </ActionIcon>
+                      </Group>
+                    </UnstyledButton>
                   </Center>
-                  <Space h="xl" />
+                  <Space h="md" />
                   <Player
                   priority 
                   controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}

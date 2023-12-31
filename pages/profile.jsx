@@ -16,7 +16,7 @@ import {
   Tooltip,
   Button,
   Modal,
-  Spoiler,
+  Loader,
   TextInput,
   Badge,
   rem,
@@ -49,7 +49,7 @@ import { useRouter } from 'next/router';
 import Post from "@/components/Post";
 
 export default function ProfilePage () {
- 
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
   const { currentUser } = useContext(DeSoIdentityContext);
@@ -61,39 +61,78 @@ export default function ProfilePage () {
   const [newUsername, setNewUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
+
+  const getProfile = async () => {
+    try {
+      const profileData = await getSingleProfile({
+        PublicKeyBase58Check: userPublicKey,
+      });
+
+
+      setProfile(profileData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  }
+
+  const getFollowers = async () => {
+    try {
+      const following = await getFollowersForUser({
+        PublicKeyBase58Check: userPublicKey,
+      });
+      const followers = await getFollowersForUser({
+        PublicKeyBase58Check: userPublicKey,
+        GetEntriesFollowingUsername: true,
+      });
+
+      setFollowers({ following, followers });
+
+    } catch (error) {
+      console.error("Error fetching follower data:", error);
+    }
+  }
+
+  const getPosts = async () => {
+    try {
+      setIsLoadingPosts(true);
+      const postData = await getPostsForUser({
+        PublicKeyBase58Check: userPublicKey,
+        NumToFetch: 25,
+      });
+
+      setPosts(postData.Posts);
+      setIsLoadingPosts(false)
+    } catch (error) {
+      console.error("Error fetching user profile posts:", error);
+      setIsLoadingPosts(false)
+    }
+    
+  }
+
+  const getNFTs = async () => {
+    try {
+      setIsLoadingNFTs(true);
+      const nftData = await getNFTsForUser({
+        UserPublicKeyBase58Check: userPublicKey,
+      });
+
+      setNFTs(nftData.NFTsMap);
+      setIsLoadingNFTs(false);
+    } catch (error) {
+      console.error("Error fetching user nfts:", error);
+      setIsLoadingNFTs(false);
+    }
+    
+  }
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profileData = await getSingleProfile({
-          PublicKeyBase58Check: userPublicKey,
-        });
-        const following = await getFollowersForUser({
-          PublicKeyBase58Check: userPublicKey,
-        });
-        const followers = await getFollowersForUser({
-          PublicKeyBase58Check: userPublicKey,
-          GetEntriesFollowingUsername: true,
-        });
-        const postData = await getPostsForUser({
-          PublicKeyBase58Check: userPublicKey,
-          NumToFetch: 25,
-        });
-        const nftData = await getNFTsForUser({
-          UserPublicKeyBase58Check: userPublicKey,
-        });
-
-        setNFTs(nftData.NFTsMap);
-        setPosts(postData.Posts);
-        setFollowers({ following, followers });
-        setProfile(profileData);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
     if (currentUser) {
-      fetchProfile();
+      getProfile();
+      getFollowers();
+      getPosts();
+      getNFTs();
     }
   }, [currentUser, userPublicKey]);
 
@@ -115,13 +154,14 @@ export default function ProfilePage () {
     window.location.reload();
   };
 
+  
   const replaceURLs = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const atSymbolRegex = /(\S*@+\S*)/g;
-
+    const atSymbolRegex = /@(\w+)/g; // Captures username after '@'
+  
     return text
-      .replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-      .replace(atSymbolRegex, (match) => ` ${match} `);
+      .replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
+      .replace(atSymbolRegex, (match, username) => `<a href="/wave/${username}" target="_blank">@${username}</a>`);
   };
 
   return (
@@ -218,7 +258,7 @@ export default function ProfilePage () {
               <Image
                 src={profile.ExtraData?.FeaturedImageURL || null}
                 height={200}
-                fallbackSrc="https://www.hdwallpaper.nu/wp-content/uploads/2015/07/Ocean-wave-stock-image_WEB.jpg"
+                fallbackSrc="https://images.deso.org/4903a46ab3761c5d8bd57416ff411ff98b24b35fcf5480dde039eb9bae6eebe0.webp"
               />
             </Card.Section>
             <Center>
@@ -330,59 +370,83 @@ export default function ProfilePage () {
             </Tabs.List>
 
             <Tabs.Panel value="first">
-              {posts && posts.length > 0 ? (
-                posts.map((post) => (
-                  <>
-                  <Post post={post} username={currentUser.ProfileEntryResponse?.Username} key={post.PostHashHex} />
-                  </>
-                ))
-              ) : (
-                <Center>
-                  <Space h="md" />
+            {isLoadingPosts ? (
+  <>
+    <Space h="md"/>
+    <Center>
+      <Loader variant="bars" />
+    </Center>
+  </>
+) : (
+  posts && posts.length > 0 ? (
+    posts.map((post) => (
+      <Post post={post} username={currentUser.ProfileEntryResponse?.Username} key={post.PostHashHex} />
+    ))
+  ) : (
+    // If no NFTs, show the Badge
+    <>
+      <Space h="md"/>
+      <Center>
+        <Badge
+          size="md"
+          radius="sm"
+          variant="gradient"
+          gradient={{ from: "indigo", to: "cyan", deg: 45 }}
+        >
+          Post something to view them here!
+        </Badge>
+      </Center>
+    </>
+  )
+)}
 
-                  <Badge
-                    size="md"
-                    radius="sm"
-                    variant="gradient"
-                    gradient={{ from: "indigo", to: "cyan", deg: 45 }}
-                  >
-                    Post something to view them here!
-                  </Badge>
 
-                  <Space h={222} />
-                </Center>
-              )}
+          
+                   <Space h={222} />
             </Tabs.Panel>
 
             <Tabs.Panel value="second">
-              {NFTs && Object.keys(NFTs).length > 0 ? (
-                Object.keys(NFTs).map((key, index) => {
-                  const nft = NFTs[key];
-                  return (
-                    <>
-                     <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username} key={nft.PostEntryResponse.PostHashHex}/>
-                    </>
-                  );
-                })
-              ) : (
-                <Center>
-                  <Space h="md" />
+            {isLoadingNFTs ? (
+  <>
+    <Space h="md"/>
+    <Center>
+      <Loader variant="bars" />
+    </Center>
+  </>
+) : (
+  // After loading, check if there are NFTs to display
+  NFTs && Object.keys(NFTs).length > 0 ? (
+    Object.keys(NFTs).map((key, index) => {
+      const nft = NFTs[key];
+      return (
+        <Post post={nft.PostEntryResponse} username={nft.PostEntryResponse.ProfileEntryResponse.Username} key={nft.PostEntryResponse.PostHashHex}/>
+      );
+    })
+  ) : (
+    // If no NFTs, show the Badge
+    <>
+      <Space h="md"/>
+      <Center>
+        <Badge
+          size="md"
+          radius="sm"
+          variant="gradient"
+          gradient={{ from: "indigo", to: "cyan", deg: 45 }}
+        >
+          Mint something to view them here!
+        </Badge>
+      </Center>
+    </>
+  )
+)}
 
-                  <Badge
-                    size="md"
-                    radius="sm"
-                    variant="gradient"
-                    gradient={{ from: "indigo", to: "cyan", deg: 45 }}
-                  >
-                    Mint/Buy some NFTs to view them here!
-                  </Badge>
 
-                  <Space h={222} />
-                </Center>
-              )}
+           
+
+              
             </Tabs.Panel>
           </Tabs>
-          <Space h={77} />
+          <Space h={222} />
         </>
       ) : (
         <>
@@ -390,7 +454,7 @@ export default function ProfilePage () {
             <Paper shadow="xl" p="lg" withBorder>
               <Center>
                 <Text c="dimmed" fw={700}>
-                  Please Sign Up or Login to view your Profile.
+                  Please Sign Up or Sign In to view your Profile.
                 </Text>
               </Center>
               <Space h="md" />

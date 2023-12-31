@@ -39,19 +39,20 @@ import { Search } from '@/components/Search';
 import { BsPlusCircleDotted } from "react-icons/bs";
 import { BiSearchAlt } from "react-icons/bi";
 import NotificationsPage from "../../../pages/notifications"
+import { useRouter } from 'next/router';
 
   export function MantineHeader() {
    const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
    const { currentUser, alternateUsers } = useContext(DeSoIdentityContext);
    const [openedSearch, { open: openSearch, close: closeSearch }] =
    useDisclosure(false);
-  const [openedCreate, { open: openCreate, close: closeCreate }] =
-   useDisclosure(false);
-   
+   const [openedCreate, { open: openCreate, close: closeCreate }] =
+    useDisclosure(false);
+   const router = useRouter();
   const handleUserSwitch = (publicKey) => {
     identity.setActiveUser(publicKey);
   };
-
+  const [opened, setOpened] = useState(false);
   const handleLogout = () => {
     if (alternateUsers && alternateUsers.length > 0) {
       const firstAlternateUser = alternateUsers[0];
@@ -70,7 +71,6 @@ import NotificationsPage from "../../../pages/notifications"
        PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
      });
  
-     console.log("poo" + notifData);
      setUnreadNotifs(notifData.NotificationsCount)
     
    };
@@ -100,11 +100,11 @@ import NotificationsPage from "../../../pages/notifications"
     return (
       <>
       <Modal size="xl" opened={openedCreate} onClose={closeCreate}>
-        <SignAndSubmitTx/>
+        <SignAndSubmitTx close={closeCreate}/>
       </Modal>
 
       <Modal size="md" opened={openedSearch} onClose={closeSearch}>
-        <Search />
+        <Search close={closeSearch}/>
       </Modal>
 
 
@@ -168,16 +168,16 @@ import NotificationsPage from "../../../pages/notifications"
     </ActionIcon>
     </Tooltip>
 
-    <Menu offset={2} shadow="md" width={111} withArrow>
-    <Menu.Target>
-    <Tooltip label="Notifications" withArrow  position="bottom" offset={3}>
-    <ActionIcon
+    <Menu opened={opened} onChange={setOpened} offset={2} shadow="md" width={555} withArrow>
     
+    <Tooltip label="Notifications" withArrow  position="bottom" offset={3}>
+    <Menu.Target>
+    <ActionIcon
       variant="gradient"
       size="xl"
       aria-label="Gradient action icon"
       gradient={{ from: 'blue', to: 'cyan', deg: 270 }}
-      onClick={resetUnreadNotifications}
+      onClick={() => {resetUnreadNotifications(); setOpened(true);}}
     >
      
       <IconBellRinging/>
@@ -187,13 +187,19 @@ import NotificationsPage from "../../../pages/notifications"
         )}
         
     </ActionIcon>
-    </Tooltip>
     </Menu.Target>
+    </Tooltip>
+    
 
-<Menu.Dropdown>
+<Menu.Dropdown >
+  <Group justify='right'>
 
-<NotificationsPage />
-
+  <UnstyledButton mr={11} onClick={() => { router.push("/notifications"); setOpened(false);}}><Text size="xs">View More</Text></UnstyledButton>
+  </Group>
+  
+  <ScrollArea h={555}>
+    <NotificationsPage />
+  </ScrollArea>
 </Menu.Dropdown>
 
 </Menu>
@@ -213,7 +219,7 @@ import NotificationsPage from "../../../pages/notifications"
     </ActionIcon>
     </Tooltip>
 
-    <Tooltip label="Search Profiles">
+          <Tooltip label="Search Profiles">
                 <ActionIcon
                   onClick={openSearch}
                   variant="light"
@@ -288,6 +294,21 @@ import NotificationsPage from "../../../pages/notifications"
                                   {user.ProfileEntryResponse?.Username ?? user.PublicKeyBase58Check}
                                 </Menu.Item>
                               ))}
+
+                            <Menu.Divider />
+
+                            <Menu.Label>Visit DeSo Explorer</Menu.Label>
+                            <Menu.Item
+                              onClick={() =>
+                                window.open(
+                                  "https://explorer.deso.com/",
+                                  "_blank"
+                                )
+                              }
+                              leftSection={<IconReceipt2 size={17} />}
+                            >
+                              DeSo Explorer
+                            </Menu.Item>
 
                               <Menu.Divider />
 
@@ -480,6 +501,21 @@ import NotificationsPage from "../../../pages/notifications"
                                   {user.ProfileEntryResponse?.Username ?? user.PublicKeyBase58Check}
                                 </Menu.Item>
                               ))}
+                              
+                            <Menu.Divider />
+
+                          <Menu.Label>Visit DeSo Explorer</Menu.Label>
+                          <Menu.Item
+                            onClick={() =>
+                              window.open(
+                                "https://explorer.deso.com/",
+                                "_blank"
+                              )
+                            }
+                            leftSection={<IconReceipt2 size={17} />}
+                          >
+                            DeSo Explorer
+                          </Menu.Item>
 
                               <Menu.Divider />
 

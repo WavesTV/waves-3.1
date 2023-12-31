@@ -11,7 +11,8 @@ import {
   Button,
   UnstyledButton,
   Notification,
-  ActionIcon
+  ActionIcon,
+  Badge
 } from "@mantine/core";
 import { useState, useContext, useEffect } from "react";
 import { DeSoIdentityContext } from "react-deso-protocol";
@@ -36,16 +37,17 @@ import { BiRepost } from "react-icons/bi";
 
 
 export default function NotificationsPage () {
-
-  const { currentUser, isLoading } = useContext(DeSoIdentityContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const { currentUser } = useContext(DeSoIdentityContext);
   const [notifications, setNotifications] = useState([]);
   const userPublicKey = currentUser?.PublicKeyBase58Check;
-  
+
   const fetchNotifications = async () => {
     try {
+      setIsLoading(true);
       const notificationData = await getNotifications({
         PublicKeyBase58Check: userPublicKey,
-        NumToFetch: 50,
+        NumToFetch: 100,
         FetchStartIndex: -1,
       });
 
@@ -70,13 +72,17 @@ export default function NotificationsPage () {
     })
   );
       
-  
-
       setNotifications(updatedNotifications);
-    console.log(updatedNotifications)
-
+      setIsLoading(false); 
     } catch (error) {
+      notifications.show({
+        title: "Error",
+        icon: <IconX size="1.1rem" />,
+        color: "red",
+        message: "Something Happened!",
+      });
       console.error("Error fetching user notifications:", error);
+      setIsLoading(false); 
     }
   };
 
@@ -87,7 +93,7 @@ export default function NotificationsPage () {
     }
   }, [currentUser]);
 
- 
+  
 
   return (
     <div>
@@ -103,21 +109,52 @@ export default function NotificationsPage () {
         labelPosition="center"
       />
 
-      {currentUser ? (
+      {!currentUser && (
         <>
-          {isLoading ? (
-            <Loader variant="bars" />
-          ) : (
-            /* Render the notifications once loaded */
+          <Space h="xl" />
+          <Container size="30rem" px={0}>
+            <Paper shadow="xl" p="lg" withBorder>
+              <Center>
+                <Text c="dimmed" fw={700}>
+                  Please Sign Up or Sign In to view your Notifications.
+                </Text>
+              </Center>
+              <Space h="md" />
+              <Center>
+                <Button
+                  fullWidth
+                  leftIcon={<GiWaveCrest size="1rem" />}
+                  variant="gradient"
+                  gradient={{ from: "cyan", to: "indigo" }}
+                  onClick={() => identity.login()}
+                >
+                  Sign Up
+                </Button>
+                <Space w="xs" />
+                <Button
+                  fullWidth
+                  variant="default"
+                  onClick={() => identity.login()}
+                >
+                  Sign In
+                </Button>
+              </Center>
+            </Paper>
+          </Container>
+        </>
+      )}
 
+      
+      
+
+        {currentUser && isLoading ? (
+           <Center>
+           <Loader variant="bars" />
+          </Center>
+          ) : (
             notifications.map((notification, index) => (
               <>
-                
-                  <Container >
-                  
-                 
-
-
+                <Container key={index}>
                     {notification.Metadata.TxnType === "CREATE_POST_ASSOCIATION" && notification.Metadata.CreatePostAssociationTxindexMetadata.AssociationValue === "LIKE" && (
                       <>
                       <Notification withCloseButton={false} withBorder radius="md" color='rgba(255, 25, 251, 1)' title={<><UnstyledButton component={Link} href={`/wave/${notification.username}`}>
@@ -145,10 +182,10 @@ export default function NotificationsPage () {
                               component={Link}
                               href={`/post-page/${notification.Metadata.CreatePostAssociationTxindexMetadata.PostHashHex}`}
                               variant="gradient"
-      size="xl"
-      aria-label="Gradient action icon"
-      gradient={{ from: 'blue', to: 'rgba(255, 25, 251, 1)', deg: 298 }}
-                          >
+                                size="xl"
+                                aria-label="Gradient action icon"
+                                gradient={{ from: 'blue', to: 'rgba(255, 25, 251, 1)', deg: 298 }}
+                                                    >
                             <IconThumbUp />
                             <Space w='sm'/>
                             <Text fw={500} size="sm">
@@ -167,14 +204,14 @@ export default function NotificationsPage () {
                       </>
                     )}
 
-{notification.Metadata.TxnType === "CREATE_POST_ASSOCIATION" && notification.Metadata.CreatePostAssociationTxindexMetadata.AssociationValue === "LOVE" && (
+          {notification.Metadata.TxnType === "CREATE_POST_ASSOCIATION" && notification.Metadata?.CreatePostAssociationTxindexMetadata.AssociationValue === "LOVE" && (
                       <>
                        <Notification withCloseButton={false} withBorder radius="md" color="red" title={<><UnstyledButton component={Link} href={`/wave/${notification.username}`}>
                       <Group style={{ width: "100%", flexGrow: 1 }}>
                         <Avatar
                           size="md"
                           src={
-                            `https://node.deso.org/api/v0/get-single-profile-picture/${notification.Metadata.TransactorPublicKeyBase58Check}` ||
+                            `https://node.deso.org/api/v0/get-single-profile-picture/${notification.Metadata?.TransactorPublicKeyBase58Check}` ||
                             null
                           }
                         />
@@ -192,7 +229,7 @@ export default function NotificationsPage () {
                         <ActionIcon
                         style={{ width: "100%", height: "100%" }}
                               component={Link}
-                              href={`/post-page/${notification.Metadata.CreatePostAssociationTxindexMetadata.PostHashHex}`}
+                              href={`/post-page/${notification.Metadata?.CreatePostAssociationTxindexMetadata?.PostHashHex}`}
                               variant="gradient"
       size="xl"
       aria-label="Gradient action icon"
@@ -398,15 +435,15 @@ export default function NotificationsPage () {
                     
                     <Group>
                     
-                    <ActionIcon
-                    style={{ width: "100%", height: "100%", padding: "10px" }}
+                      <ActionIcon
+                          style={{ width: "100%", height: "100%", padding: "10px" }}
                           component={Link}
                           href={`/post/${notification.Metadata.SubmitPostTxindexMetadata.PostHashBeingModifiedHex}`}
                           variant="gradient"
                           size="xl"
                           aria-label="Gradient action icon"
                           gradient={{ from: 'rgba(59, 247, 42, 1)', to: 'blue', deg: 90 }}
-                      >
+                        >
                         <IconAt/>
                         <Space w='md'/>
                     <Text fw={500} size="sm">
@@ -460,9 +497,9 @@ export default function NotificationsPage () {
                               component={Link}
                               href={`/post/${notification.Metadata.SubmitPostTxindexMetadata.ParentPostHashHex}`}
                               variant="gradient"
-      size="xl"
-      aria-label="Gradient action icon"
-      gradient={{ from: 'blue', to: 'rgba(255, 244, 25, 1)', deg: 298 }}
+                              size="xl"
+                              aria-label="Gradient action icon"
+                              gradient={{ from: 'blue', to: 'rgba(255, 244, 25, 1)', deg: 298 }}
                           >
                            <IconMessage2/>
                             <Space w='sm'/>
@@ -805,47 +842,11 @@ export default function NotificationsPage () {
                  </Container>
               </>
             ))
-            
           )}
-         
-        </>
-      ) : (
-        <>
-          <Space h="xl" />
-          <Container size="30rem" px={0}>
-            <Paper shadow="xl" p="lg" withBorder>
-              <Center>
-                <Text c="dimmed" fw={700}>
-                  Please Sign Up or Login to view your Notifications.
-                </Text>
-              </Center>
-              <Space h="md" />
-              <Center>
-                <Button
-                  fullWidth
-                  leftIcon={<GiWaveCrest size="1rem" />}
-                  variant="gradient"
-                  gradient={{ from: "cyan", to: "indigo" }}
-                  onClick={() => identity.login()}
-                >
-                  Sign Up
-                </Button>
-                <Space w="xs" />
-                <Button
-                  fullWidth
-                  variant="default"
-                  onClick={() => identity.login()}
-                >
-                  Sign In
-                </Button>
-              </Center>
-            </Paper>
-          </Container>
-          
-        </>
-      )}
-      
-      <Space h={111} />
+  
+          <Space h={222} />
+
     </div>
+    
   );
 };

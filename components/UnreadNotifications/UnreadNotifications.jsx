@@ -13,7 +13,7 @@ export default function UnreadNotifications () {
           PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         });
     
-        console.log(notifData);
+      
         setUnreadNotifs(notifData.NotificationsCount)
       };
     

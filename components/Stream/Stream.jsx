@@ -137,14 +137,14 @@ export const Stream = () => {
       console.log('something happened: ' + error);
     }
   };
-  console.log(stream);
+  
   const { mutate: recordStream } = useUpdateStream({
     streamId,
     record: true,
   });
   const handleEnableRecording = async () => {
     recordStream?.();
-    console.log(recordStream);
+   
   };
   const [isRecordingEnabled, setIsRecordingEnabled] = useState(false);
 
@@ -249,7 +249,7 @@ export const Stream = () => {
             PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
           });
 
-          console.log(result);
+         
         } catch (error) {
           console.log('Something went wrong:', error);
         }
@@ -304,7 +304,7 @@ export const Stream = () => {
       submitPost({
         UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         BodyObj: {
-          Body: `${stream?.name}\nTo Subscribe and ensure the best viewing experience, visit: \nhttps://waves-2.vercel.app/wave/${currentUser.ProfileEntryResponse.Username}`,
+          Body: `${stream?.name}\nTo Subscribe and ensure the best viewing experience, visit: \nhttps://desowaves.vercel.app/wave/${currentUser.ProfileEntryResponse.Username}`,
           VideoURLs: [`https://lvpr.tv/?v=${stream?.playbackId}`],
           ImageURLs: [],
         },
@@ -862,7 +862,7 @@ export const Stream = () => {
           <Space h="md" />
           <Group>
             <CopyButton
-              value={`https://waves-2.vercel.app/wave/${currentUser.ProfileEntryResponse.Username}`}
+              value={`https://desowaves.vercel.app.app/wave/${currentUser.ProfileEntryResponse.Username}`}
               timeout={2000}
             >
               {({ copied, copy }) => (

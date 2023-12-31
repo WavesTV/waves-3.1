@@ -4,14 +4,14 @@ import { Player } from "@livepeer/react";
 import {
   Text,
   Avatar,
-  Group,
+  UnstyledButton,
   Badge,
 
   Paper,
 
   Center,
   Space,
-  ActionIcon,
+  Group,
   Tooltip,
   Image,
   Loader,
@@ -60,6 +60,40 @@ useEffect(() => {
    // Render the filtered posts or the "No Waves" message
   return (
     <div>
+     
+          <Paper m="md" shadow="lg" radius="md" withBorder>
+            <Space h="sm" />
+              <Center>
+              <UnstyledButton component={Link}
+                 href="/wave/waves_streaming" >
+              <Group justify="center">
+                <Avatar
+                  src="https://node.deso.org/api/v0/get-single-profile-picture/BC1YLjYHZfYDqaFxLnfbnfVY48wToduQVHJopCx4Byfk4ovvwT6TboD"
+                  radius="xl"
+                  size="lg"
+                />
+                <Text fw={600} size="sm">
+                  Waves_Streaming
+                </Text>
+                </Group>
+              </UnstyledButton>
+              </Center>
+            <Space h="md" />
+            <Player 
+            playbackId="ca57j651up688am0" 
+            title="type shi" 
+            priority 
+            controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+            showPipButton
+            theme={{
+                colors: {
+                  loading: '#3cdfff',
+                }
+              }}
+                />
+           <Space h="sm" />
+          </Paper>
+
       {filteredPosts.length > 0 ? (
         filteredPosts.map((post) => (
           <>
@@ -67,17 +101,18 @@ useEffect(() => {
               m="md"
               shadow="lg"
               radius="md"
-              p="xl"
               withBorder
               key={post.PublicKeyBase58Check}
              
             >
+              <Space h="sm" />
               <Center>
-                <ActionIcon
+                <UnstyledButton
                  component={Link}
                  href={`/wave/${post.Username}`}
-                  variant="transparent"
                 >
+                   
+              <Group justify="center">
                   <Avatar
                     radius="xl"
                     size="lg"
@@ -87,13 +122,14 @@ useEffect(() => {
                       null
                     }
                   />
-                  <Space w="xs" />
+               
                   <Text fw={500} size="md">
                     {post.Username}
                   </Text>
-                </ActionIcon>
+                  </Group>
+                </UnstyledButton>
               </Center>
-              <Space h="xl" />
+              <Space h="md" />
               <Player
               priority 
               controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
@@ -108,6 +144,7 @@ useEffect(() => {
                 title={post.ExtraData.WavesStreamTitle}
                 
               />
+               <Space h="sm" />
             </Paper>
           </>
         ))
