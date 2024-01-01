@@ -46,9 +46,9 @@ export default function PostPage() {
         
       <Container size="sm">
       {comments && comments.length > 0 ? (
-        comments.map((comment) => (
+        comments.map((comment, index) => (
           <>
-           <Post  post={comment} username={comment.ProfileEntryResponse?.Username} key={comment.PostHashHex} />
+           <Post key={index} post={comment} username={comment.ProfileEntryResponse?.Username} key={comment.PostHashHex} />
           </>
         ))
       ) : (

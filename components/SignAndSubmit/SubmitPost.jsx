@@ -20,7 +20,7 @@ import {
     Button,
     Center,
     Space,
-    CloseButton,
+    Divider,
     Text,
     Textarea,
     Group,
@@ -34,13 +34,15 @@ import {
     ActionIcon,
     Image,
     Collapse,
-    Divider,
+    useMantineTheme,
     Notification,
+    List,
+    Box,
+    
   } from "@mantine/core";
   import { useDisclosure } from "@mantine/hooks";
   import { GiWaveCrest } from "react-icons/gi";
   import { DeSoIdentityContext } from "react-deso-protocol";
-  import { Welcome } from "../Welcome/Welcome";
   import { Player, useAssetMetrics, useCreateAsset } from "@livepeer/react";
   import { ImEmbed } from "react-icons/im";
   import {
@@ -51,8 +53,12 @@ import {
   } from "../EmbedUrls";
   import { IconCheck, IconX } from "@tabler/icons-react";
   import { notifications } from "@mantine/notifications";
-  import { useDropzone } from "react-dropzone";
-  
+  import { FaPoll } from "react-icons/fa";
+  import { TiInfoLargeOutline } from 'react-icons/ti';
+  import { MdAddChart } from "react-icons/md";
+  import { CgPlayListAdd } from "react-icons/cg";
+  import { MdDeleteForever } from "react-icons/md";
+
   export const SignAndSubmitTx = ({ close }) => {
     const { currentUser, isLoading } = useContext(DeSoIdentityContext);
     const [newUsername, setNewUsername] = useState("");
@@ -67,7 +73,45 @@ import {
     const resetVideoRef = useRef(null);
     const [video, setVideo] = useState(null);
     const [bodyText, setBodyText] = useState('');
+    const [poll, setPoll] = useState(false);
+    const [embed, setEmbed] = useState(false);
+    const [pollOptions, setPollOptions] = useState(["", ""]);
+    const [isLoadingPost, setIsLoadingPost] = useState(false);
 
+    const handlePollOptions = (index, value) => {
+      // Create a new array with the same values, but with the updated value at the specified index
+      const newOptions = [...pollOptions];
+      newOptions[index] = value;
+      console.log(newOptions)
+      setPollOptions(newOptions);
+    };
+
+    const addPollOption = () => {
+      setPollOptions([...pollOptions, ""]); // Add a new empty option
+    };
+
+    const deletePollOption = (index) => {
+      const newOptions = pollOptions.filter((_, idx) => idx !== index);
+      setPollOptions(newOptions);
+      console.log(newOptions)
+    };
+  
+    
+    const pollToggle = () => {
+      if (poll) {
+        setPoll(false)
+      } else {
+        setPoll(true)
+      }
+    }
+
+    const embedToggle = () => {
+      if (embed) {
+        setEmbed(false)
+      } else {
+        setEmbed(true)
+      }
+    }
     const handleEmbedLink = (e) => {
       const link = e.target.value;
     
@@ -364,7 +408,8 @@ import {
                   onSubmit={async (e) => {
                     e.preventDefault();
                     const form = formRef.current;
-  
+                    
+                    setIsLoadingPost(true);
                     // check if the user can make a post
                     if (
                       !identity.hasPermissions({
@@ -385,6 +430,10 @@ import {
                     }
   
                     const body = form.elements.body.value;
+
+                    // Filter out empty or whitespace-only options
+                     const validPollOptions = pollOptions.filter(option => option.trim() !== "");
+
   
                     await submitPost({
                       UpdaterPublicKeyBase58Check:
@@ -399,8 +448,11 @@ import {
                       },
                       PostExtraData: {
                         EmbedVideoURL: embedUrl ? embedUrl : "",
+                        PollOptions: validPollOptions.length >= 2 ? JSON.stringify(validPollOptions) : null,
+                        PollWeightType: validPollOptions.length >= 2 ? "unweighted" : null,
                       }
                     }).then((resp) => {
+                      setIsLoadingPost(false);
                       notifications.show({
                         title: "Success",
                         icon: <IconCheck size="1.1rem" />,
@@ -417,9 +469,14 @@ import {
                       if (video) {
                         setVideo(null);
                       }
+                      if (pollOptions && pollOptions.length > 1) {
+                        setPollOptions("", "")
+                        pollToggle(false)
+                      }
                       if (typeof close === 'function') {
                       close();
                       }
+                      
                     });
   
                     // Reset the form after submission
@@ -442,7 +499,7 @@ import {
                   <Textarea
                     name="body"
                     radius="md"
-                    placeholder="Let them hear your voice!"
+                    placeholder="Announce your next Wave!"
                     variant="filled"
                     size="md"
                     value={bodyText}
@@ -504,13 +561,18 @@ import {
                               title={asset[0].name}
                               playbackId={asset[0].playbackId}
                             />
+                            <Space h="xs"/>
                           </>
                         )}
   
                         {progressFormatted && (
+                          <>
                             <Text fz="sm" c="dimmed">
                               {progressFormatted}
                             </Text>
+
+                            <Space h="xs"/>
+                            </>
                           )}
 
                     {embedUrl && (
@@ -532,8 +594,101 @@ import {
                       allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
                       allowFullScreen />
                       
+                      <Space h="xs"/>
                       </>
                            
+                    )}
+
+              {embed && (
+                      <>
+                     <Space h="xs"/>
+                     <Box w={222}>
+                     <TextInput 
+                            leftSection={
+                              <>
+                              <Tooltip 
+                          label={
+                              <>
+                              <Group justify="center">
+                                Supported
+                              </Group>
+
+                              <Divider />
+
+                              <List size="xs">
+                              <List.Item>Twitch</List.Item>
+                                <List.Item>Youtube</List.Item>
+                                <List.Item>Spotify</List.Item>
+                                <List.Item>Vimeo</List.Item>
+                                <List.Item>Giphy</List.Item>
+                                <List.Item>SoundCloud</List.Item>
+                                <List.Item>Mousai</List.Item>
+                                <List.Item>Request more in Global Chat!</List.Item>
+                              </List>
+                              
+                              </>
+                            } 
+                          position="bottom" 
+                          withArrow>
+                              <ActionIcon size="xs" radius="xl" variant="default">
+                                <TiInfoLargeOutline/>
+                              </ActionIcon>
+                              </Tooltip>   
+                              </>
+                            }
+                            rightSection={embedUrl && (
+                            <ActionIcon onClick={() => setEmbedUrl("")} color="red" size="xs" radius="xl" variant="subtle">
+                            <IconX/>
+                          </ActionIcon>)}
+                            value={embedUrl}
+                            onChange={handleEmbedLink}
+                            variant="filled" 
+                            size="xs" 
+                            radius="xl" 
+                            placeholder="Add Link"/>
+                            </Box>
+                      <Space h="xs"/>
+                      </>
+                           
+                    )}
+
+                    {poll && (
+                      <>
+                      <Space h="xs"/>
+                      
+                      <Container size="sm">
+                        <Group justify="right">
+                          <Tooltip label="Add Options">
+                       
+                        <ActionIcon onClick={addPollOption} size="sm" >
+                        <CgPlayListAdd size="1.1rem"/>
+                        </ActionIcon>
+                        </Tooltip>
+                        </Group>
+                      
+                      <Space h="md"/>
+
+        {pollOptions && pollOptions?.map((option, index) => (
+              <div key={index}>
+                <TextInput
+                  variant="filled"
+                  placeholder={`Option ${index + 1}`}
+                  radius="xl"
+                  value={option}
+                  onChange={(event) => handlePollOptions(index, event.currentTarget.value)}
+                  rightSection={index > 1 && (
+                    <ActionIcon radius="xl" size="sm" color="red" variant="light" onClick={() => deletePollOption(index)}>
+                      <MdDeleteForever />
+                    </ActionIcon>
+                  )}
+                />
+             
+                <Space h="sm"/>
+              </div>
+            ))}
+                      </Container>
+                      <Space h="xs"/>
+                      </>
                     )}
 
                   <Space h="sm" />
@@ -544,7 +699,8 @@ import {
                       gradient={{ from: "cyan", to: "indigo" }}
                       raduis="sm"
                       type="submit"
-                      disabled={!bodyText.trim()}
+                      disabled={!bodyText.trim() || isLoadingPost || (poll && pollOptions.filter(option => option.trim() !== "").length < 2)}
+                      loading={isLoadingPost}
                     >
                       Create
                     </Button>
@@ -591,28 +747,29 @@ import {
                       )}
                     </FileButton>
 
+                      <Tooltip label="Add Poll">
+                          <ActionIcon
+                            color="blue"
+                            size="lg"
+                            variant="default"
+                            onClick={pollToggle}
+                          >
+                            <FaPoll size="1.2rem" />
+                          </ActionIcon>
+                        </Tooltip>
+
                         <Tooltip label="Embed">
                           <ActionIcon
                             color="blue"
                             size="lg"
                             variant="default"
-                            onClick={toggle}
+                            onClick={embedToggle}
                           >
                             <ImEmbed size="1.2rem" />
                           </ActionIcon>
                         </Tooltip>
 
-                        <Collapse in={opened}>
-                          <Input 
-                            value={embedUrl}
-                            onChange={handleEmbedLink}
-                            variant="filled" 
-                            size="xs" 
-                            radius="xl" 
-                            placeholder="Add Link" 
-                           
-                          />
-                        </Collapse>
+                        
                   </Group>
                 </form>
              

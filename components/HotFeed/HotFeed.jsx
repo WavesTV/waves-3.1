@@ -16,15 +16,18 @@ import Link from 'next/link';
 
   export const HotFeed = () => {
     const [hotFeed, setHotFeed] = useState([]);
-
+    const [isLoading, setIsLoading] = useState(false);
+    
     useEffect(() => {
       const fetchHotFeed = async () => {
         try {
+          setIsLoading(true);
           const hotFeed = await getHotFeed({
             ResponseLimit: 100,
           });
-          console.log(hotFeed)
+       
           setHotFeed(hotFeed.HotFeedPage);
+          setIsLoading(false);
         } catch (error) {
           console.error("Error fetching user hotFeed:", error);
         }
@@ -72,16 +75,14 @@ import Link from 'next/link';
            <Space h="sm" />
           </Paper>
 
-          {hotFeed && hotFeed.length > 0 ? (
-            hotFeed.map((post) => (
-              <>
-              <Post post={post} username={post.ProfileEntryResponse?.Username} key={post.PostHashHex} />
-              </>
-            ))
-          ) : (
+          {isLoading ? (
             <Center>
               <Loader variant="bars" />
             </Center>
+          ) : (
+            hotFeed.map((post) => (
+              <Post post={post} username={post.ProfileEntryResponse?.Username} key={post.PostHashHex} />
+            ))
           )}
   
           <Space h={222} />

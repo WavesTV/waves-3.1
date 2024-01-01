@@ -47,14 +47,22 @@ useEffect(() => {
     fetchWavesFeed();
   }, []);
   
-  // Filter the posts that have non-empty WavesStreamPlaybackId and WavesStreamTitle
-  const filteredPosts = wavesFeed.filter(
-    (post) =>
-      post.ExtraData?.WavesStreamPlaybackId &&
-      post.ExtraData?.WavesStreamPlaybackId !== "" &&
-      post.ExtraData?.WavesStreamTitle &&
-      post.ExtraData?.WavesStreamTitle !== ""
-  );
+   // Current timestamp in nanoseconds
+   const currentTimeNanos = Date.now() * 1e6;
+
+   // Filter the posts that are within the last 24 hours (86400 seconds)
+   const postsFromLast24Hours = wavesFeed.filter(post => {
+     return currentTimeNanos - post.TimeStampNanos <= 86400 * 1e9;
+   });
+ 
+   // Further filter for non-empty WavesStreamPlaybackId and WavesStreamTitle
+   const filteredPosts = postsFromLast24Hours.filter(
+     post =>
+       post.ExtraData?.WavesStreamPlaybackId &&
+       post.ExtraData?.WavesStreamPlaybackId !== "" &&
+       post.ExtraData?.WavesStreamTitle &&
+       post.ExtraData?.WavesStreamTitle !== ""
+   );
 
 //Map through the filteredPosts to display the current livestreams 
    // Render the filtered posts or the "No Waves" message
@@ -149,19 +157,11 @@ useEffect(() => {
           </>
         ))
       ) : (
-        <Center>
+        <>
               
-        <Badge
-                  size="md"
-                  radius="sm"
-                  variant="gradient"
-                  gradient={{ from: "indigo", to: "cyan", deg: 45 }}
-                >
-            No Waves Right Now.
-         
-        </Badge>
+       
         <Space h={222} />
-            </Center>
+            </>
       )}
     </div>
   );

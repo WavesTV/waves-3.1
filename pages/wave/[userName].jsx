@@ -220,6 +220,7 @@ export default function Wave() {
       });
       setPosts(postData.Posts);
       setIsLoadingPosts(false);
+      console.log(postData.Posts)
     } catch (error) {
       console.error("Error fetching user posts:", error);
     }

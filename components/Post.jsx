@@ -5,7 +5,10 @@ import {
     submitPost,
     createPostAssociation,
     sendDiamonds,
-    getAppState
+    getAppState,
+    getPostAssociation,
+    getPostAssociations,
+    countPostAssociations
   } from "deso-protocol";
   import { useEffect, useState, useContext } from "react";
   import { DeSoIdentityContext } from "react-deso-protocol";
@@ -30,6 +33,7 @@ import {
     Collapse,
     Modal,
     Spoiler,
+    RingProgress
   } from "@mantine/core";
   import {
     IconHeart,
@@ -49,15 +53,12 @@ import {
   import { BsChatQuoteFill } from "react-icons/bs";
   import {
     getEmbedHeight,
-
-    getEmbedWidth,
-   
+    getEmbedWidth, 
   } from "./EmbedUrls";
-
+  import { FaVoteYea } from "react-icons/fa";
+  import { BsInfoCircleFill } from "react-icons/bs";
 export default function Post({ post, username, key }) {
     const { currentUser } = useContext(DeSoIdentityContext);
-    const [commentToggles, setCommentToggles] = useState({});
-    const [commentPostHash, setCommentPostHash] = useState("");
     const [comment, setComment] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
     const [tip, setTip] = useState(1);
@@ -65,11 +66,14 @@ export default function Post({ post, username, key }) {
     const [openedQuote, { open: openQuote, close: closeQuote }] = useDisclosure(false); 
     const [openedDiamonds, { open: openDiamond, close: closeDiamond }] = useDisclosure(false); 
     const [diamondLevelsUsd, setDiamondLevelsUsd] = useState([]);
+    const [opened, { toggle }] = useDisclosure(false);
+    const [quoteBody, setQuoteBody] = useState('');
+    const [voteCount, setVoteCount] = useState();
+    const [didVote, setDidVote] = useState(false);
 
-    const getData = async () => {
+    const getDiamondUSD = async () => {
       try {
         const appState = await getAppState({ PublicKeyBase58Check: "BC1YLjYHZfYDqaFxLnfbnfVY48wToduQVHJopCx4Byfk4ovvwT6TboD" });
-    
         const desoUSD = appState.USDCentsPerDeSoCoinbase / 100;
         const nanoToDeso = 0.000000001;
         const diamondLevelMapUsd = Object.values(appState.DiamondLevelMap).map(nanos => {
@@ -89,20 +93,22 @@ export default function Post({ post, username, key }) {
       }
     }
     
-
-    const handleCommentToggle = (postHash) => {
-      setCommentPostHash(postHash);
-      setCommentToggles((prevState) => ({
-        ...prevState,
-        [postHash]: !prevState[postHash],
-      }));
-    };
-  
+    // Comment
     const submitComment = async () => {
+      if (!currentUser) {
+        notifications.show({
+          title: "Sign In",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Sign In to like this post!",
+        });
+        return;
+      }
+
       try {
         await submitPost({
           UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          ParentStakeID: commentPostHash,
+          ParentStakeID: post.PostHashHex,
           BodyObj: {
             Body: comment,
             VideoURLs: [],
@@ -129,12 +135,23 @@ export default function Post({ post, username, key }) {
       // Reset the comment state after submitting
       setComment("");
     };
-  
-    const submitRepost = async (postHash) => {
+    
+    //Repost
+    const submitRepost = async () => {
+      if (!currentUser) {
+        notifications.show({
+          title: "Sign In",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Sign In to like this post!",
+        });
+        return;
+      }
+
       try {
         await submitPost({
           UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          RepostedPostHashHex: postHash,
+          RepostedPostHashHex: post.PostHashHex,
           BodyObj: {
             Body: "",
             VideoURLs: [],
@@ -159,12 +176,22 @@ export default function Post({ post, username, key }) {
       }
     };
 
-    const [quoteBody, setQuoteBody] = useState('');
-    const submitQuote = async (postHash) => {
+    //Quote Post
+    const submitQuote = async () => {
+      if (!currentUser) {
+        notifications.show({
+          title: "Sign In",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Sign In to like this post!",
+        });
+        return;
+      }
+
       try {
         await submitPost({
           UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          RepostedPostHashHex: postHash,
+          RepostedPostHashHex: post.PostHashHex,
           BodyObj: {
             Body: quoteBody,
             VideoURLs: [],
@@ -188,12 +215,23 @@ export default function Post({ post, username, key }) {
         console.error("Error submitting Quote:", error);
       }
     };
-  
-    const submitHeart = async (postHash) => {
+    
+    //Like Post
+    const submitHeart = async () => {
+      if (!currentUser) {
+        notifications.show({
+          title: "Sign In",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Sign In to like this post!",
+        });
+        return;
+      }
+
       try {
         await createPostAssociation({
           TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          PostHashHex: postHash,
+          PostHashHex: post.PostHashHex,
           AssociationType: "REACTION",
           AssociationValue: "LIKE",
           MinFeeRateNanosPerKB: 1000,
@@ -204,7 +242,6 @@ export default function Post({ post, username, key }) {
           color: "blue",
           message: "Liked!",
         });
-      
       } catch (error) {
         notifications.show({
           title: "Error",
@@ -216,9 +253,8 @@ export default function Post({ post, username, key }) {
       }
     };
   
-
-    const sendDiamondTip = async (postHash, postPubKey) => {
-
+    //Diamond Tip Post
+    const sendDiamondTip = async () => {
       if (!currentUser) {
         notifications.show({
           title: "Sign In",
@@ -232,9 +268,9 @@ export default function Post({ post, username, key }) {
 
     try {
       await sendDiamonds({
-        ReceiverPublicKeyBase58Check: postPubKey,
+        ReceiverPublicKeyBase58Check: post.PosterPublicKeyBase58Check,
         SenderPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        DiamondPostHashHex: postHash,
+        DiamondPostHashHex: post.PostHashHex,
         DiamondLevel: tip,
         MinFeeRateNanosPerKB: 1000,
       });
@@ -257,6 +293,100 @@ export default function Post({ post, username, key }) {
         console.error("Error submitting diamond:", error);
       }
     };
+
+    //Cast a Vote
+    const submitVote = async (option) => { 
+      if(!currentUser) {
+        notifications.show({
+          title: "Sign In",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Sign In to Vote",
+        });
+        return;
+      }
+
+      try {
+        await createPostAssociation({
+          TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+          PostHashHex: post.PostHashHex,
+          AssociationType: "POLL_RESPONSE",
+          AssociationValue: option,
+          MinFeeRateNanosPerKB: 1000,
+        });
+
+        setDidVote(true);
+        notifications.show({
+          title: "Success",
+          icon: <FaVoteYea size="1.1rem" />,
+          color: "blue",
+          message: "You Voted!",
+        });
+      
+      } catch (error) {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: "Something Happened!",
+        });
+        console.error("Error submitting vote:", error);
+      }
+    };
+
+    //Get Poll Options
+    const parsePollOptionsString = (optionsString) => {
+      try {
+        const optionsArray = JSON.parse(optionsString);
+        console.log(optionsArray)
+        return optionsArray;
+      } catch (error) {
+        console.error('Error parsing options string:', error);
+        return [];
+      }
+    };
+
+    let pollOptions = [];
+    if (post.PostExtraData && typeof post.PostExtraData.PollOptions === 'string') {
+      pollOptions = parsePollOptionsString(post.PostExtraData.PollOptions);
+    }
+
+
+    // Get Votes for Poll
+    const getVotes = async () => {
+      try {
+        // Call countPostAssociations with all poll options
+        const votes = await countPostAssociations({
+          PostHashHex: post.PostHashHex,
+          AssociationType: "POLL_RESPONSE",
+          AssociationValues: pollOptions, 
+        });
+
+        setVoteCount(votes)
+        
+        // Log the vote counts
+        console.log(votes);
+      } catch (error) {
+        console.error("Error fetching poll votes:", error);
+      }
+    }
+
+    const calculatePercentage = (option) => {
+  if (voteCount && voteCount.Total > 0) {
+    const optionVoteCount = voteCount.Counts[option] || 0;
+    return Math.round(optionVoteCount / voteCount.Total * 100); // Rounds to the nearest whole number
+  }
+  return 0; // Return 0 instead of "0.00" for consistency with integer values
+};
+
+
+useEffect(() => {
+  // Call getVotes when didVote becomes true
+  if (didVote) {
+    getVotes();
+  }
+}, [didVote]); // Dependency array - effect runs when didVote changes
+   
 
     const replaceURLs = (text) => {
       const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -341,7 +471,7 @@ export default function Post({ post, username, key }) {
         <Group justify="right">
               <Button onClick={() =>{ 
                 if (currentUser) {
-                  submitQuote(post.PostHashHex); 
+                  submitQuote(); 
                   closeQuote();
                 } else {
                   notifications.show({
@@ -517,6 +647,55 @@ export default function Post({ post, username, key }) {
                   </Group>
                 )}
 
+                {post.PostExtraData?.PollOptions && (
+                      <>
+                      
+                        
+                       
+                        <Group p="xs" justify="space-between">
+
+                          <Tooltip label={`Weight Type: ${post.PostExtraData?.PollWeightType}`}>
+                            <ActionIcon variant="default" size="xs" radius="xl">
+                          <BsInfoCircleFill/>
+                          </ActionIcon>
+                          </Tooltip>
+                         {voteCount && (
+                          <>
+                            <Group ml={11}>
+                            <Text size="sm" c="dimmed">Total Votes: {voteCount.Total} </Text>
+                            </Group>
+                          </>
+                          )}
+                  
+                        </Group>
+                       
+
+                        <Space h="xs"/>
+
+                        {pollOptions.map((option, index) => (
+                          <>
+                            <Group grow>
+                                <Button 
+                                justify="space-between"
+                                fullWidth
+                                leftSection={<span />}
+                                rightSection={voteCount ? (
+                          <>
+                            <Group ml={11}>
+                            <Text size="sm">{calculatePercentage(option)}%</Text>
+                            </Group>
+                          </>
+                          ): (<span />)} disabled={didVote} onClick={() => {submitVote(option)}}variant="light" radius="xl" key={index}>{option}</Button>
+                            </Group>
+                            
+                           
+                            <Space h="xs"/>
+                          </>
+                          ))}
+
+                      </>
+                )}
+
               {post.RepostedPostEntryResponse && (
                   <Post post={post.RepostedPostEntryResponse} username={post.RepostedPostEntryResponse.ProfileEntryResponse.Username}/>
                 )}
@@ -531,9 +710,7 @@ export default function Post({ post, username, key }) {
                     label="Like"
                   >
                     <ActionIcon
-                      onClick={() =>
-                        currentUser && submitHeart(post.PostHashHex)
-                      }
+                      onClick={() =>submitHeart()}
                       variant="subtle"
                       radius="md"
                       size={36}
@@ -574,7 +751,7 @@ export default function Post({ post, username, key }) {
                     
                     <Menu.Item 
                     onClick={() =>
-                        currentUser && submitRepost(post.PostHashHex)
+                        submitRepost()
                       } 
                     leftSection={<IconRecycle style={{ width: rem(16), height: rem(16) }} />}>
                       Repost
@@ -607,7 +784,7 @@ export default function Post({ post, username, key }) {
                     <ActionIcon
                       onClick={() => {
                         openDiamond();
-                        getData();
+                        getDiamondUSD();
                       }}
                       variant="subtle"
                       radius="md"
@@ -631,7 +808,7 @@ export default function Post({ post, username, key }) {
                     label="Comments"
                   >
                     <ActionIcon
-                      onClick={() => handleCommentToggle(post.PostHashHex)}
+                      onClick={toggle}
                       variant="subtle"
                       radius="md"
                       size={36}
@@ -643,10 +820,7 @@ export default function Post({ post, username, key }) {
                     {post.CommentCount}
                   </Text>
                 </Center>
-                <Collapse in={commentToggles[post.PostHashHex]}>
-                  <>
-                  
-                    {currentUser?.ProfileEntryResponse ? (
+                <Collapse in={opened}>
                       <>
                       <Space h="md"/>
                         <Textarea
@@ -661,27 +835,7 @@ export default function Post({ post, username, key }) {
                             Comment
                           </Button>
                         </Group>
-                      </>
-                    ) : (
-                      <>
-                      <Space h="md"/>
-                        <Textarea
-                          placeholder="Please Sign In to Comment!"
-                          
-                          variant="filled"
-                          disabled
-                        />
-                        <Space h="sm" />
-                        <Group justify="right">
-                          <Button mr={5} radius="md" disabled>
-                            Comment
-                          </Button>
-                        </Group>
-                        
-                      </>
-                    )}
-                   
-                  </>
+                      </>                   
                 </Collapse>
                 <Space h="sm"/>
               </Paper>      

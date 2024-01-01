@@ -25,17 +25,19 @@ import {
   import Post from "@/components/Post";
   
   export const FollowerFeed = () => {
-    const { currentUser, isLoading } = useContext(DeSoIdentityContext);
+    const { currentUser } = useContext(DeSoIdentityContext);
     const [followerFeed, setFollowerFeed] = useState([]);
     const [followingWaves, setFollowingWaves] = useState([]);
     const [filteredWaves, setFilteredWaves] = useState([]);
     const [waves, setWaves] = useState([]);
     const userPublicKey = currentUser?.PublicKeyBase58Check;
-
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
       const fetchFollowerFeed = async () => {
         try {
+          setIsLoading(true);
+
           const followerFeedData = await getPostsStateless({
             ReaderPublicKeyBase58Check: userPublicKey,
             NumToFetch: 100,
@@ -45,7 +47,9 @@ import {
           });
   
           setFollowerFeed(followerFeedData.PostsFound);
+          setIsLoading(false);
         } catch (error) {
+          setIsLoading(false);
           console.error("Error fetching user hotFeed:", error);
         }
       };
@@ -74,15 +78,24 @@ import {
   
     // Filtering the waves array based on conditions
     const filterWaves = () => {
-      const filtered = waves.filter(
-        (post) =>
-          post.ExtraData?.WavesStreamPlaybackId &&
-          post.ExtraData?.WavesStreamPlaybackId !== "" &&
-          post.ExtraData?.WavesStreamTitle &&
-          post.ExtraData?.WavesStreamTitle !== ""
-      );
+       // Current timestamp in nanoseconds
+   const currentTimeNanos = Date.now() * 1e6;
+
+   // Filter the posts that are within the last 24 hours (86400 seconds)
+   const postsFromLast24Hours = waves.filter(post => {
+     return currentTimeNanos - post.TimeStampNanos <= 86400 * 1e9;
+   });
+ 
+   // Further filter for non-empty WavesStreamPlaybackId and WavesStreamTitle
+   const filteredPosts = postsFromLast24Hours.filter(
+     post =>
+       post.ExtraData?.WavesStreamPlaybackId &&
+       post.ExtraData?.WavesStreamPlaybackId !== "" &&
+       post.ExtraData?.WavesStreamTitle &&
+       post.ExtraData?.WavesStreamTitle !== ""
+   );
       
-      setFilteredWaves(filtered);
+      setFilteredWaves(filteredPosts);
     };
   
     // Call the filterWaves function whenever the waves array updates
