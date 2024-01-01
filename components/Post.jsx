@@ -57,6 +57,7 @@ import {
   } from "./EmbedUrls";
   import { FaVoteYea } from "react-icons/fa";
   import { BsInfoCircleFill } from "react-icons/bs";
+
 export default function Post({ post, username, key }) {
     const { currentUser } = useContext(DeSoIdentityContext);
     const [comment, setComment] = useState("");
@@ -70,6 +71,31 @@ export default function Post({ post, username, key }) {
     const [quoteBody, setQuoteBody] = useState('');
     const [voteCount, setVoteCount] = useState();
     const [didVote, setDidVote] = useState(false);
+
+
+    const getData = async () => {
+      try {
+        const appState = await getAppState({ PublicKeyBase58Check: "BC1YLjYHZfYDqaFxLnfbnfVY48wToduQVHJopCx4Byfk4ovvwT6TboD" });
+    
+        const desoUSD = appState.USDCentsPerDeSoCoinbase / 100;
+        const nanoToDeso = 0.000000001;
+        const diamondLevelMapUsd = Object.values(appState.DiamondLevelMap).map(nanos => {
+          const deso = nanos * nanoToDeso;
+          let usdValue = deso * desoUSD;
+    
+          if (usdValue < 0.01) {
+            usdValue = 0.01;
+          }
+    
+          return usdValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        });
+    
+        setDiamondLevelsUsd(diamondLevelMapUsd);
+      } catch (error) {
+        console.error('Error in getData:', error);
+      }
+    }
+    
 
     const getDiamondUSD = async () => {
       try {
@@ -266,6 +292,7 @@ export default function Post({ post, username, key }) {
         return;
       }
 
+
     try {
       await sendDiamonds({
         ReceiverPublicKeyBase58Check: post.PosterPublicKeyBase58Check,
@@ -293,6 +320,7 @@ export default function Post({ post, username, key }) {
         console.error("Error submitting diamond:", error);
       }
     };
+
 
     //Cast a Vote
     const submitVote = async (option) => { 
@@ -396,7 +424,6 @@ useEffect(() => {
         .replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
         .replace(atSymbolRegex, (match, username) => `<a href="/wave/${username}" target="_blank">@${username}</a>`);
     };
-    
     
 
   
@@ -785,6 +812,7 @@ useEffect(() => {
                       onClick={() => {
                         openDiamond();
                         getDiamondUSD();
+
                       }}
                       variant="subtle"
                       radius="md"

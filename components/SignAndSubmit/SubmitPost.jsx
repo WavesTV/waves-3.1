@@ -73,6 +73,7 @@ import {
     const resetVideoRef = useRef(null);
     const [video, setVideo] = useState(null);
     const [bodyText, setBodyText] = useState('');
+
     const [poll, setPoll] = useState(false);
     const [embed, setEmbed] = useState(false);
     const [pollOptions, setPollOptions] = useState(["", ""]);
@@ -112,6 +113,7 @@ import {
         setEmbed(true)
       }
     }
+
     const handleEmbedLink = (e) => {
       const link = e.target.value;
     
@@ -450,6 +452,7 @@ import {
                         EmbedVideoURL: embedUrl ? embedUrl : "",
                         PollOptions: validPollOptions.length >= 2 ? JSON.stringify(validPollOptions) : null,
                         PollWeightType: validPollOptions.length >= 2 ? "unweighted" : null,
+
                       }
                     }).then((resp) => {
                       setIsLoadingPost(false);
@@ -469,6 +472,7 @@ import {
                       if (video) {
                         setVideo(null);
                       }
+
                       if (pollOptions && pollOptions.length > 1) {
                         setPollOptions("", "")
                         pollToggle(false)
@@ -477,6 +481,7 @@ import {
                       close();
                       }
                       
+
                     });
   
                     // Reset the form after submission
@@ -566,7 +571,9 @@ import {
                         )}
   
                         {progressFormatted && (
+
                           <>
+
                             <Text fz="sm" c="dimmed">
                               {progressFormatted}
                             </Text>
@@ -594,6 +601,7 @@ import {
                       allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
                       allowFullScreen />
                       
+
                       <Space h="xs"/>
                       </>
                            
@@ -691,6 +699,7 @@ import {
                       </>
                     )}
 
+
                   <Space h="sm" />
                   <Group postion="apart">
                     <Space h="sm" />
@@ -701,6 +710,7 @@ import {
                       type="submit"
                       disabled={!bodyText.trim() || isLoadingPost || (poll && pollOptions.filter(option => option.trim() !== "").length < 2)}
                       loading={isLoadingPost}
+
                     >
                       Create
                     </Button>
@@ -758,18 +768,20 @@ import {
                           </ActionIcon>
                         </Tooltip>
 
+
                         <Tooltip label="Embed">
                           <ActionIcon
                             color="blue"
                             size="lg"
                             variant="default"
                             onClick={embedToggle}
+
                           >
                             <ImEmbed size="1.2rem" />
                           </ActionIcon>
                         </Tooltip>
 
-                        
+
                   </Group>
                 </form>
              

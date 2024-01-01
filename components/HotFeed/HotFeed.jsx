@@ -25,7 +25,7 @@ import Link from 'next/link';
           const hotFeed = await getHotFeed({
             ResponseLimit: 100,
           });
-       
+
           setHotFeed(hotFeed.HotFeedPage);
           setIsLoading(false);
         } catch (error) {
@@ -75,7 +75,9 @@ import Link from 'next/link';
            <Space h="sm" />
           </Paper>
 
+
           {isLoading ? (
+
             <Center>
               <Loader variant="bars" />
             </Center>
