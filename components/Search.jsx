@@ -58,16 +58,16 @@ export const Search = ({props, close}) => {
     <>
       
         <TextInput
-        ml={2}
+          ml={2}
           value={value}
           onChange={(event) => setValue(event.currentTarget.value)}
           radius="md"
-      size="md"
+          size="md"
           placeholder="Search DeSo Username"
           variant="filled"
           error={userNotFound ? userNotFound : null}
           withAsterisk
-        leftSection={<BiSearchAlt size="1rem" />}
+          leftSection={<BiSearchAlt size="1rem" />}
           rightSection={
             <ActionIcon onClick={() => {
               SearchUser();
