@@ -24,7 +24,7 @@ export default function PostPage() {
           PostHashHex: postHash,
           CommentLimit: 50,
         });
-        console.log(postData)
+       
 
         setComments(postData.PostFound.Comments);
         setSinglePost(postData.PostFound);
@@ -35,6 +35,8 @@ export default function PostPage() {
 
     fetchPost();
   }, [postHash]);
+
+  
 
   return (
     <>
@@ -48,7 +50,7 @@ export default function PostPage() {
       {comments && comments.length > 0 ? (
         comments.map((comment, index) => (
           <>
-           <Post key={index} post={comment} username={comment.ProfileEntryResponse?.Username} key={comment.PostHashHex} />
+           <Post key={index} post={comment} username={comment.ProfileEntryResponse?.Username} />
           </>
         ))
       ) : (

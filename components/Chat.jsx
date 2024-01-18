@@ -45,7 +45,7 @@ export const Chat = ({ handle }) => {
         messages.push({ ...doc.data(), id: doc.id });
       });
   
-      console.log("Received messages:", messages); // Log the messages here
+      
       setMessages(messages);
     });
   

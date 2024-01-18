@@ -83,7 +83,7 @@ import {
       // Create a new array with the same values, but with the updated value at the specified index
       const newOptions = [...pollOptions];
       newOptions[index] = value;
-      console.log(newOptions)
+      
       setPollOptions(newOptions);
     };
 
@@ -94,7 +94,7 @@ import {
     const deletePollOption = (index) => {
       const newOptions = pollOptions.filter((_, idx) => idx !== index);
       setPollOptions(newOptions);
-      console.log(newOptions)
+      
     };
   
     
@@ -505,6 +505,7 @@ import {
                     name="body"
                     radius="md"
                     placeholder="Announce your next Wave!"
+                    autosize
                     variant="filled"
                     size="md"
                     value={bodyText}
