@@ -648,14 +648,18 @@ useEffect(() => {
 
                 {post.VideoURLs && (
 
-                  <iframe
+                  <Player
                     style={{ width: "100%", height: "100%" }}
                     src={post.VideoURLs}
-                    title={post.PostHashHex}
-                    allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
-                    allowFullScreen
-                    frameBorder='0'
+                    title={`Video by ${username}`}
                     controls
+                    showPipButton
+                    theme={{
+                        colors: {
+                          loading: '#3cdfff',
+                        }
+                      }}
+                    
                   />
                 )}
 
