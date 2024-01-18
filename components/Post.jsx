@@ -638,7 +638,9 @@ useEffect(() => {
                   src={post.PostExtraData?.EmbedVideoURL}
                   frameBorder='0'
                   allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
-                  allowFullScreen />
+                  allowFullScreen 
+                  controls
+                      />
                  </Group>
                     
                  
@@ -653,6 +655,7 @@ useEffect(() => {
                     allow='picture-in-picture; clipboard-write; encrypted-media; gyroscope; accelerometer; encrypted-media;'
                     allowFullScreen
                     frameBorder='0'
+                    controls
                   />
                 )}
 
