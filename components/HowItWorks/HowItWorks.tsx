@@ -13,7 +13,7 @@ const data = [
   },
   {
     title: 'Build',
-    description: 'Waves is a place for Streamers to maximize their visibility and earnings. Start growing you Wave today!',
+    description: 'Waves is a place for Streamers to maximize their visibility and earnings. Start growing your Wave today!',
   },
 ];
 
