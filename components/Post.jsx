@@ -33,7 +33,8 @@ import {
     Collapse,
     Modal,
     Spoiler,
-    RingProgress
+    RingProgress,
+    ScrollArea
   } from "@mantine/core";
   import {
     IconHeart,
@@ -583,27 +584,12 @@ useEffect(() => {
                   </UnstyledButton>
               </Group>
                 <Space h="xl" />
-                <Spoiler
-                  maxHeight={222}
-                  showLabel={
-                    <>
-                      <Space h="xs" />
-                      <Tooltip label="Show More">
-                        <IconScriptPlus />
-                      </Tooltip>
-                    </>
-                  }
-                  hideLabel={
-                    <>
-                      <Space h="xs" />
-                      <Tooltip label="Show Less">
-                        <IconScriptMinus />
-                      </Tooltip>
-                    </>
-                  }
-                >
+
+
                 
-                    <Space h="sm" />
+              {post?.Body && (
+                <>
+                <ScrollArea mah={222} mx="auto" scrollbarSize={20} offsetScrollbars>
                     <Text
                       size="md"
                       style={{
@@ -620,9 +606,12 @@ useEffect(() => {
                           : "",
                       }}
                     />
-                </Spoiler>
+                </ScrollArea>
 
                 <Space h="md" />
+                </>
+              )}
+              
                 {post.PostExtraData?.EmbedVideoURL && (
                   <Group justify="center">
                   <iframe
