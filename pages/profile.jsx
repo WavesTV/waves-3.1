@@ -13,7 +13,7 @@ import {
   Container,
   createStyles,
   ActionIcon,
-  Tooltip,
+  Collapse,
   Button,
   Modal,
   Loader,
@@ -33,24 +33,14 @@ import {
   identity,
 } from "deso-protocol";
 import { Stream } from "../components/Stream/Stream";
-import {
-  IconHeart,
-  IconDiamond,
-  IconRecycle,
-  IconMessageCircle,
-  IconSettings,
-  IconScriptPlus,
-  IconScriptMinus,
-  IconMessageShare,
-} from "@tabler/icons-react";
+import { IconSettings } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import classes from './wave/wave.module.css';
-import { useRouter } from 'next/router';
 import Post from "@/components/Post";
+import { Chat } from '@/components/Chat';
 
 export default function ProfilePage () {
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+
   const [opened, { open, close }] = useDisclosure(false);
   const { currentUser } = useContext(DeSoIdentityContext);
   const [profile, setProfile] = useState([]);
@@ -63,6 +53,7 @@ export default function ProfilePage () {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
+  const [openedChat, { toggle }] = useDisclosure(true);
 
   const getProfile = async () => {
     try {
@@ -157,7 +148,7 @@ export default function ProfilePage () {
   
   const replaceURLs = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const atSymbolRegex = /@(\w+)/g; // Captures username after '@'
+    const atSymbolRegex = /@(\w+)/g; 
   
     return text
       .replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
@@ -355,6 +346,29 @@ export default function ProfilePage () {
               )}
             </Center>
           </Card>
+
+          <Space h="sm"/>
+            <Center>
+              <Button variant="light" hiddenFrom="md" onClick={toggle}>
+               {openedChat ? (
+                <>
+                Close Chat
+                </>
+               ):(
+                <>
+                Open Chat
+                </>
+               )}
+                
+              </Button>
+            </Center>
+              <Group justify="center" hiddenFrom="md">
+
+                <Collapse transitionDuration={1000} transitionTimingFunction="smooth" in={openedChat}>
+                  <Chat handle={currentUser.ProfileEntryResponse.Username} />
+                </Collapse>
+
+              </Group>
 
           <Space h="xl" />
 

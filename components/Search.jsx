@@ -1,57 +1,32 @@
-import { ActionIcon, Modal, Button, TextInput, Space, useMantineTheme, Text } from "@mantine/core";
-
+import { ActionIcon, UnstyledButton, Group, TextInput, Avatar, useMantineTheme, Text } from "@mantine/core";
 import { useState } from "react";
-import { getSingleProfile } from "deso-protocol";
+import { getProfiles } from "deso-protocol";
 import { useRouter } from 'next/router';
-
-import { TbUserSearch } from 'react-icons/tb';
+import { IconX } from "@tabler/icons-react";
 import { BiSearchAlt } from 'react-icons/bi';
+import classes from "./Spotlight/Spotlight.module.css";
 
-export const Search = ({props, close}) => {
+export const Search = ({close}) => {
   const router = useRouter();
-
-  const [value, setValue] = useState("");
-  const [userNotFound, setuserNotFound] = useState(false);
-  
   const theme = useMantineTheme();
+  const [value, setValue] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
   const SearchUser = async () => {
     const request = {
-      Username: value,
-      NoErrorOnMissing: true,
+      UsernamePrefix: value,
+      NumToFetch: 10,
+      OrderBy: "newest_last_post",
     };
 
-    const response = await getSingleProfile(request);
+    const response = await getProfiles(request);
+    setSearchResults(response.ProfilesFound);
+  
+  };
 
-    if (response === null) {
-      setuserNotFound(true);
-      return;
-    }
-
-    const state = {
-      userPublicKey: response.Profile.PublicKeyBase58Check,
-      userName: response.Profile.Username
-        ? response.Profile.Username
-        : response.Profile.PublicKeyBase58Check,
-      description: response.Profile.Description
-        ? response.Profile.Description
-        : null,
-      largeProfPic:
-        response.Profile.ExtraData &&
-        response.Profile.ExtraData.LargeProfilePicURL
-          ? response.Profile.ExtraData.LargeProfilePicURL
-          : null,
-      featureImage:
-        response.Profile.ExtraData &&
-        response.Profile.ExtraData.FeaturedImageURL
-          ? response.Profile.ExtraData.FeaturedImageURL
-          : null,
-    };
-
-    setuserNotFound(false)
-
-    router.push(`/wave/${response.Profile.Username}`, undefined, { shallow: true, state });
-
-    close();
+  const handleInputChange = (event) => {
+    setValue(event.currentTarget.value);
+    SearchUser();
   };
 
   return (
@@ -60,30 +35,53 @@ export const Search = ({props, close}) => {
         <TextInput
           ml={2}
           value={value}
-          onChange={(event) => setValue(event.currentTarget.value)}
+          onChange={handleInputChange}
           radius="md"
           size="md"
-          placeholder="Search DeSo Username"
+          placeholder="Search"
           variant="filled"
-          error={userNotFound ? userNotFound : null}
           withAsterisk
-          leftSection={<BiSearchAlt size="1rem" />}
+          leftSection={<BiSearchAlt size="1.2rem" />}
           rightSection={
-            <ActionIcon onClick={() => {
-              SearchUser();
-            }} size={32} radius="xl" color={theme.primaryColor} variant="light">
-              {theme.dir === 'ltr' ? (
-                <TbUserSearch size="1.1rem"  />
-              ) : (
-                <TbUserSearch size="1.1rem" />
-              )}
-            </ActionIcon>
+            value && (
+              <ActionIcon onClick={() => { setValue(""); }} size={32} radius="xl" color={theme.primaryColor} variant="light">
+              <IconX size="1.1rem"/>
+              </ActionIcon>
+            ) 
           }
           rightSectionWidth={42}
-          {...props}
+         
         />
 
-        
+        {value && searchResults.length > 0 && (
+              <div>
+                  {searchResults.map((profile) => (
+                    <UnstyledButton
+                    onClick={() => {router.push(`/wave/${profile.Username}`); close && close();}}
+                    className={classes.user}
+                  >
+                    <Group>
+                      <Avatar
+                        src={`https://node.deso.org/api/v0/get-single-profile-picture/${profile.PublicKeyBase58Check}` ||
+                        null}
+                        radius="xl"
+                      />
+          
+                      <div style={{ flex: 1 }}>
+                      <Text size="sm" fw={500}>
+                      {profile?.ExtraData?.DisplayName || profile.Username}
+                      </Text>
+          
+                      <Text c="dimmed" size="xs">
+                        @{profile.Username}
+                      </Text>
+                      </div>
+                    </Group>
+                  </UnstyledButton>
+                  ))}
+              
+              </div>
+            )}
    
     </>
   );

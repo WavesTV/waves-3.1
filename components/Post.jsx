@@ -59,6 +59,8 @@ import {
   import { FaVoteYea } from "react-icons/fa";
   import { BsInfoCircleFill } from "react-icons/bs";
 
+ 
+
 export default function Post({ post, username, key }) {
     const { currentUser } = useContext(DeSoIdentityContext);
     const [comment, setComment] = useState("");
@@ -73,6 +75,13 @@ export default function Post({ post, username, key }) {
     const [voteCount, setVoteCount] = useState();
     const [didVote, setDidVote] = useState(false);
 
+    const isWavesStream = post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v=');
+
+    const extractPlaybackId = (url) => {
+      const match = url.match(/https:\/\/lvpr\.tv\/\?v=(.*)/);
+      const playbackId = match ? match[1] : null;
+      return playbackId;
+    };
 
     const getData = async () => {
       try {
@@ -523,7 +532,7 @@ useEffect(() => {
                 radius="md"
                 p={3}
                 withBorder
-                
+                key={key}
               >
                 <Space h="xs"/>
             <div
@@ -589,7 +598,7 @@ useEffect(() => {
                 
               {post?.Body && (
                 <>
-                <ScrollArea mah={222} mx="auto" scrollbarSize={20} offsetScrollbars>
+                <ScrollArea scrollbars="y" mah={222} scrollbarSize={20} offsetScrollbars>
                     <Text
                       size="md"
                       style={{
@@ -631,22 +640,34 @@ useEffect(() => {
                  
                 )}
 
-                {post.VideoURLs && post.VideoURLs[0] && (
-
-                  <Player
-                    style={{ width: "100%", height: "100%" }}
-                    src={post.VideoURLs[0]}
-                    title={`Video by ${username}`}
-                    controls
-                    showPipButton
-                    theme={{
-                        colors: {
-                          loading: '#3cdfff',
-                        }
-                      }}
-                    
-                  />
-                )}
+              {isWavesStream ? (
+                      <Player
+                        controls
+                        showPipButton
+                        theme={{
+                          colors: {
+                            loading: '#3cdfff',
+                          },
+                        }}
+                        playbackId={extractPlaybackId(post.VideoURLs[0])}
+                        title={`Livestream by ${username}`}
+                      />
+                    ) : (
+                      post.VideoURLs && post.VideoURLs[0] && (
+                        <Player
+                          style={{ width: '100%', height: '100%' }}
+                          src={post.VideoURLs[0]}
+                          title={`Video by ${username}`}
+                          controls
+                          showPipButton
+                          theme={{
+                            colors: {
+                              loading: '#3cdfff',
+                            },
+                          }}
+                        />
+                      )
+                    )}
 
                 {post.ImageURLs && post.ImageURLs[0] && (
                   <Group justify="center">

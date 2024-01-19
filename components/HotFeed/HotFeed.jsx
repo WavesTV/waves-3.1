@@ -42,39 +42,6 @@ import Link from 'next/link';
     return (
       <>
         <div>
-        <Paper m="md" shadow="lg" radius="md" withBorder>
-            <Space h="sm" />
-              <Center>
-              <UnstyledButton component={Link}
-                 href="/wave/waves_streaming" >
-              <Group justify="center">
-                <Avatar
-                  src="https://node.deso.org/api/v0/get-single-profile-picture/BC1YLjYHZfYDqaFxLnfbnfVY48wToduQVHJopCx4Byfk4ovvwT6TboD"
-                  radius="xl"
-                  size="lg"
-                />
-                <Text fw={600} size="sm">
-                  Waves_Streaming
-                </Text>
-                </Group>
-              </UnstyledButton>
-              </Center>
-            <Space h="md" />
-            <Player 
-            playbackId="f233fkk7ul7av63z" 
-            title="type shi" 
-            priority 
-            controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
-            showPipButton
-            theme={{
-                colors: {
-                  loading: '#3cdfff',
-                }
-              }}
-                />
-           <Space h="sm" />
-          </Paper>
-
 
           {isLoading ? (
 

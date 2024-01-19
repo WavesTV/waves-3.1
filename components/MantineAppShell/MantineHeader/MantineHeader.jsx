@@ -25,6 +25,8 @@ import {
     IconLogout,
     IconReceipt2,
     IconSwitchHorizontal,
+    IconListSearch,
+    IconSearch
   } from '@tabler/icons-react';
 import classes from './MantineHeader.module.css';
 import Link from 'next/link';
@@ -297,7 +299,7 @@ import { useRouter } from 'next/router';
 
                             <Menu.Divider />
 
-                            <Menu.Label>Visit DeSo Explorer</Menu.Label>
+                            <Menu.Label>Visit DeSo</Menu.Label>
                             <Menu.Item
                               onClick={() =>
                                 window.open(
@@ -305,14 +307,12 @@ import { useRouter } from 'next/router';
                                   "_blank"
                                 )
                               }
-                              leftSection={<IconReceipt2 size={17} />}
+                              leftSection={<IconListSearch size={17} />}
                             >
                               DeSo Explorer
                             </Menu.Item>
 
-                              <Menu.Divider />
-
-                              <Menu.Label>Visit DeSo Wallet</Menu.Label>
+                  
                               <Menu.Item
                                 onClick={() =>
                                   window.open(
@@ -423,6 +423,20 @@ import { useRouter } from 'next/router';
               Notifications
             </Link>
             <Space h='md'/>
+            <Link href="/search" className={classes.link} onClick={closeDrawer}> 
+            <ActionIcon
+   
+      variant="gradient"
+      size="xl"
+      aria-label="Gradient action icon"
+      gradient={{ from: 'blue', to: 'cyan', deg: 270 }}
+    >
+      <IconSearch size="1.7rem"/>
+    </ActionIcon>
+    <Space w='md'/>
+              Search
+            </Link>
+            <Space h='md'/>
             <Link href="/why" className={classes.link} onClick={closeDrawer}> 
             <ActionIcon
    
@@ -504,7 +518,7 @@ import { useRouter } from 'next/router';
                               
                             <Menu.Divider />
 
-                          <Menu.Label>Visit DeSo Explorer</Menu.Label>
+                          <Menu.Label>Visit DeSo</Menu.Label>
                           <Menu.Item
                             onClick={() =>
                               window.open(
@@ -512,14 +526,12 @@ import { useRouter } from 'next/router';
                                 "_blank"
                               )
                             }
-                            leftSection={<IconReceipt2 size={17} />}
+                            leftSection={<IconListSearch size={17} />}
                           >
                             DeSo Explorer
                           </Menu.Item>
 
-                              <Menu.Divider />
-
-                              <Menu.Label>Visit DeSo Wallet</Menu.Label>
+                
                               <Menu.Item
                                 onClick={() =>
                                   window.open(

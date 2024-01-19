@@ -54,7 +54,7 @@ import { RiUserUnfollowLine } from "react-icons/ri";
 import { useDisclosure } from "@mantine/hooks";
 import { TiInfoLargeOutline } from 'react-icons/ti';
 import { useRouter } from 'next/router'
-import Link from 'next/link';
+import { Chat } from '@/components/Chat';
 import classes from './wave.module.css';
 import Post from "@/components/Post";
 
@@ -75,6 +75,7 @@ export default function Wave() {
   const [openedSub, { open: openSub, close: closeSub }] = useDisclosure(false);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
+  const [openedChat, { toggle }] = useDisclosure(true);
 
  
   const replaceURLs = (text) => {
@@ -489,7 +490,7 @@ export default function Wave() {
 <Player
 
 priority 
-              controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+              controls
               showPipButton
               theme={{
                   colors: {
@@ -940,7 +941,31 @@ priority
         )}
       </Card>
 
-      <Space h="xl" />
+      <Space h="sm"/>
+            <Center>
+              <Button variant="light" hiddenFrom="md" onClick={toggle}>
+               {openedChat ? (
+                <>
+                Close Chat
+                </>
+               ):(
+                <>
+                Open Chat
+                </>
+               )}
+                
+              </Button>
+            </Center>
+              <Group justify="center" hiddenFrom="md">
+
+                <Collapse transitionDuration={1000} transitionTimingFunction="smooth" in={openedChat}>
+                  <Chat handle={userName} />
+                </Collapse>
+
+              </Group>
+
+          <Space h="xl" />
+
 
       <Tabs variant="default" defaultValue="first">
         <Tabs.List grow >
