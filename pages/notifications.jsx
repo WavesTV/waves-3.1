@@ -386,7 +386,7 @@ export default function NotificationsPage () {
                               aria-label="Gradient action icon"
                               gradient={{ from: 'rgba(255, 110, 13, 1)', to: 'blue', deg: 90 }}
                           >
-                            <BiRepost/>
+                            <IconRecycle/>
                             <Space w='md'/>
                         <Text fw={500} size="sm">
                           Reposted
