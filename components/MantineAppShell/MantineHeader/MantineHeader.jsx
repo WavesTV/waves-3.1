@@ -25,7 +25,8 @@ import {
     IconLogout,
     IconReceipt2,
     IconSwitchHorizontal,
-    IconListSearch
+    IconListSearch,
+    IconSearch
   } from '@tabler/icons-react';
 import classes from './MantineHeader.module.css';
 import Link from 'next/link';
@@ -420,6 +421,20 @@ import { useRouter } from 'next/router';
     </ActionIcon>
     <Space w='md'/>
               Notifications
+            </Link>
+            <Space h='md'/>
+            <Link href="/search" className={classes.link} onClick={closeDrawer}> 
+            <ActionIcon
+   
+      variant="gradient"
+      size="xl"
+      aria-label="Gradient action icon"
+      gradient={{ from: 'blue', to: 'cyan', deg: 270 }}
+    >
+      <IconSearch size="1.7rem"/>
+    </ActionIcon>
+    <Space w='md'/>
+              Search
             </Link>
             <Space h='md'/>
             <Link href="/why" className={classes.link} onClick={closeDrawer}> 
