@@ -33,7 +33,8 @@ import {
     Collapse,
     Modal,
     Spoiler,
-    RingProgress
+    RingProgress,
+    ScrollArea
   } from "@mantine/core";
   import {
     IconHeart,
@@ -366,7 +367,7 @@ export default function Post({ post, username, key }) {
     const parsePollOptionsString = (optionsString) => {
       try {
         const optionsArray = JSON.parse(optionsString);
-        console.log(optionsArray)
+       
         return optionsArray;
       } catch (error) {
         console.error('Error parsing options string:', error);
@@ -392,8 +393,7 @@ export default function Post({ post, username, key }) {
 
         setVoteCount(votes)
         
-        // Log the vote counts
-        console.log(votes);
+      
       } catch (error) {
         console.error("Error fetching poll votes:", error);
       }
@@ -425,9 +425,6 @@ useEffect(() => {
         .replace(atSymbolRegex, (match, username) => `<a href="/wave/${username}" target="_blank">@${username}</a>`);
     };
     
-
-  
-
     return(
         <>
         <Modal opened={openedImage} onClose={closeImage} size="auto" centered>
@@ -587,27 +584,12 @@ useEffect(() => {
                   </UnstyledButton>
               </Group>
                 <Space h="xl" />
-                <Spoiler
-                  maxHeight={222}
-                  showLabel={
-                    <>
-                      <Space h="xs" />
-                      <Tooltip label="Show More">
-                        <IconScriptPlus />
-                      </Tooltip>
-                    </>
-                  }
-                  hideLabel={
-                    <>
-                      <Space h="xs" />
-                      <Tooltip label="Show Less">
-                        <IconScriptMinus />
-                      </Tooltip>
-                    </>
-                  }
-                >
+
+
                 
-                    <Space h="sm" />
+              {post?.Body && (
+                <>
+                <ScrollArea mah={222} mx="auto" scrollbarSize={20} offsetScrollbars>
                     <Text
                       size="md"
                       style={{
@@ -624,9 +606,12 @@ useEffect(() => {
                           : "",
                       }}
                     />
-                </Spoiler>
+                </ScrollArea>
 
                 <Space h="md" />
+                </>
+              )}
+              
                 {post.PostExtraData?.EmbedVideoURL && (
                   <Group justify="center">
                   <iframe
@@ -646,11 +631,11 @@ useEffect(() => {
                  
                 )}
 
-                {post.VideoURLs && (
+                {post.VideoURLs && post.VideoURLs[0] && (
 
                   <Player
                     style={{ width: "100%", height: "100%" }}
-                    src={post.VideoURLs}
+                    src={post.VideoURLs[0]}
                     title={`Video by ${username}`}
                     controls
                     showPipButton
@@ -663,7 +648,7 @@ useEffect(() => {
                   />
                 )}
 
-                {post.ImageURLs && (
+                {post.ImageURLs && post.ImageURLs[0] && (
                   <Group justify="center">
                     <UnstyledButton
                       onClick={() => {
@@ -861,6 +846,7 @@ useEffect(() => {
                         <Textarea
                           placeholder="Enter your comment..."
                           variant="filled"
+                          autosize
                           value={comment}
                           onChange={(event) => setComment(event.target.value)}
                         />
