@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import '@mantine/carousel/styles.css';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { AppShell, MantineProvider, Button, ActionIcon, Group, Space, Container, Tooltip } from '@mantine/core';

@@ -68,6 +68,7 @@ import { VscKey } from 'react-icons/vsc';
 import { BiUserCircle } from 'react-icons/bi';
 import { TiInfoLargeOutline } from 'react-icons/ti';
 import classes from './Stream.module.css';
+import { HowTo } from '@/components/HowTo/HowTo';
 
 export const Stream = () => {
   const { currentUser } = useContext(DeSoIdentityContext);
@@ -324,34 +325,8 @@ export const Stream = () => {
 
   return (
     <Paper shadow="sm" p="lg" withBorder>
-      <HoverCard width={280} closeDelay={700} shadow="md">
-        <HoverCard.Target>
-          <ActionIcon radius="xl" size="sm" variant="outline">
-            <TiInfoLargeOutline />
-          </ActionIcon>
-        </HoverCard.Target>
-        <HoverCard.Dropdown>
-          <Text ta="center" fw={500} size="sm">
-            Select a Stream Type
-          </Text>
-          <Divider my="sm" />
-          <Space h="xs" />
-          <Text size="sm">Streaming via your Webcam is the easiest way to go Live.</Text>
-          <Space h="xs" />
-          <Text size="sm">No 3rd party software is required. It is also Mobile Friendly!</Text>
-
-          <Space h="xs" />
-          <Divider my="sm" />
-          <Space h="xs" />
-
-          <Text size="sm">
-            Streaming via OBS Studio or Streamlabs is great for Gamers and more experienced
-            Streamers.
-          </Text>
-          <Space h="xs" />
-          <Text size="sm">A single use Stream Key will be provided to Go Live!</Text>
-        </HoverCard.Dropdown>
-      </HoverCard>
+      <HowTo />
+     
       <Space h="md" />
       <Tabs
         variant="pills"
@@ -417,31 +392,6 @@ export const Stream = () => {
 
                     <Divider my="sm" />
 
-                    <Group justify="center">
-                      <CopyButton value="rtmp://rtmp.livepeer.com/live" timeout={2000}>
-                        {({ copied, copy }) => (
-                          <Button fullWidth color={copied ? 'teal' : 'blue'} onClick={copy}>
-                            {copied ? (
-                              <>
-                                <Center>
-                                  <h4>Stream Server</h4>
-                                  <Space w="xs" />
-                                  <IconCheck size={16} />
-                                </Center>
-                              </>
-                            ) : (
-                              <>
-                                <Center>
-                                  <h4>Stream Server</h4>
-                                  <Space w="xs" />
-                                  <IconCopy size={16} />
-                                </Center>
-                              </>
-                            )}
-                          </Button>
-                        )}
-                      </CopyButton>
-                    </Group>
                     <Space h="md" />
                     <Group justify="center">
                       <CopyButton value={stream.streamKey} timeout={2000}>
