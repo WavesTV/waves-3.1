@@ -650,7 +650,7 @@ useEffect(() => {
                           },
                         }}
                         playbackId={extractPlaybackId(post.VideoURLs[0])}
-                        title={`Livestream by ${username}`}
+                        
                       />
                     ) : (
                       post.VideoURLs && post.VideoURLs[0] && (
