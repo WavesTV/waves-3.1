@@ -257,13 +257,15 @@ export const Stream = () => {
       }
     };
   }, [setIsButtonDisabled]);
+
+  // Checking to see if Waves_Streams Account Follows the Streamer
+  
   useEffect(() => {
     const isFollowingPublicKey = async () => {
       try {
         const result = await getIsFollowing({
-          PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
-          IsFollowingPublicKeyBase58Check:
-            'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
+          PublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
+          IsFollowingPublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
         });
 
         setisFollowingWaves(result.IsFollowing);
@@ -275,16 +277,21 @@ export const Stream = () => {
     isFollowingPublicKey();
   }, [currentUser]);
 
+  // Attaching Stream PlaybackID to user's profile
+  // We use this for displaying the stream on Wave profile
   const attachStreamToDesoProfile = async () => {
     try {
       setIsButtonDisabled(true);
 
+      // Waves_Streams follows Streamers
+      // Will be using the Waves_Streams Following Feed to display the livestreams on the Waves Feed
+      // Lazy way of building a feed
       if (isFollowingWaves === false) {
         await updateFollowingStatus({
           MinFeeRateNanosPerKB: 1000,
           IsUnfollow: false,
-          FollowedPublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
-          FollowerPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+          FollowedPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+          FollowerPublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
         });
       }
       await updateProfile({
@@ -302,6 +309,7 @@ export const Stream = () => {
         },
       });
 
+      // Posts stream onchain making it accessible across all deso apps
       submitPost({
         UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         BodyObj: {
@@ -668,7 +676,7 @@ export const Stream = () => {
           <Space h="md" />
           <Group>
             <CopyButton
-              value={`https://waves-2.vercel.app/wave/${currentUser.ProfileEntryResponse.Username}`}
+              value={`https://desowaves.vercel.app/wave/${currentUser.ProfileEntryResponse.Username}`}
               timeout={2000}
             >
               {({ copied, copy }) => (

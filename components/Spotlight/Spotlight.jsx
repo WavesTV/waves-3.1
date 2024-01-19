@@ -24,8 +24,47 @@ export function Spotlight() {
 
       
         
+    
+
+      
+
         <Text fw={700} ta="center" fs="italic">
-          Wave's Top Picks
+          Promoted Albums
+        </Text>
+        <Space h="sm" />
+        <Group mr={11} ml={11}>
+         <iframe
+          style={{
+            borderRadius: "14px",
+          }}
+          src="https://open.spotify.com/embed/album/74vEZzMxVkd08QOx4lbeRF?utm_source=generator"
+          width="100%"
+          height="152"
+          frameBorder="0"
+          
+          allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        />
+        </Group>
+          <Space h="md" />
+        <Group mr={11} ml={11}>
+          <iframe
+            style={{
+              borderRadius: "14px",
+            }}
+            src="https://open.spotify.com/embed/album/4m1SepLgm4jLLnNIKK8D5v?utm_source=generator"
+            width="100%"
+            height="152"
+            frameBorder="0"
+            
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+          />
+        </Group>
+
+        <Space h="sm" />
+
+        <Text fw={700} ta="center" fs="italic">
+          Waves Top Artists
         </Text>
 
         <Space h="sm" />
@@ -97,8 +136,7 @@ export function Spotlight() {
         </UnstyledButton>
 
         <Space h="sm" />
-        
-        
+          
         <Text fw={700} ta="center" fs="italic">
           Powered By
         </Text>
@@ -145,41 +183,7 @@ export function Spotlight() {
             </div>
           </Group>
         </UnstyledButton>
-        <Space h="sm" />
-
-        <Text fw={700} ta="center" fs="italic">
-          Promoted Artists
-        </Text>
-        <Space h="sm" />
-        <Group mr={11} ml={11}>
-         <iframe
-          style={{
-            borderRadius: "14px",
-          }}
-          src="https://open.spotify.com/embed/album/74vEZzMxVkd08QOx4lbeRF?utm_source=generator"
-          width="100%"
-          height="152"
-          frameBorder="0"
-          
-          allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        />
-        </Group>
-          <Space h="md" />
-        <Group mr={11} ml={11}>
-          <iframe
-            style={{
-              borderRadius: "14px",
-            }}
-            src="https://open.spotify.com/embed/album/4m1SepLgm4jLLnNIKK8D5v?utm_source=generator"
-            width="100%"
-            height="152"
-            frameBorder="0"
-            
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-          />
-        </Group>
-        
+       
        
 
 

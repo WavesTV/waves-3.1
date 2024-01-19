@@ -489,7 +489,7 @@ export default function Wave() {
 <Player
 
 priority 
-              controls={{ autohide: 0, hotkeys: false, defaultVolume: 0.6 }}
+              controls
               showPipButton
               theme={{
                   colors: {

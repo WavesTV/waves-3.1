@@ -25,6 +25,7 @@ import {
     IconLogout,
     IconReceipt2,
     IconSwitchHorizontal,
+    IconListSearch
   } from '@tabler/icons-react';
 import classes from './MantineHeader.module.css';
 import Link from 'next/link';
@@ -297,7 +298,7 @@ import { useRouter } from 'next/router';
 
                             <Menu.Divider />
 
-                            <Menu.Label>Visit DeSo Explorer</Menu.Label>
+                            <Menu.Label>Visit DeSo</Menu.Label>
                             <Menu.Item
                               onClick={() =>
                                 window.open(
@@ -305,14 +306,12 @@ import { useRouter } from 'next/router';
                                   "_blank"
                                 )
                               }
-                              leftSection={<IconReceipt2 size={17} />}
+                              leftSection={<IconListSearch size={17} />}
                             >
                               DeSo Explorer
                             </Menu.Item>
 
-                              <Menu.Divider />
-
-                              <Menu.Label>Visit DeSo Wallet</Menu.Label>
+                  
                               <Menu.Item
                                 onClick={() =>
                                   window.open(
@@ -504,7 +503,7 @@ import { useRouter } from 'next/router';
                               
                             <Menu.Divider />
 
-                          <Menu.Label>Visit DeSo Explorer</Menu.Label>
+                          <Menu.Label>Visit DeSo</Menu.Label>
                           <Menu.Item
                             onClick={() =>
                               window.open(
@@ -512,14 +511,12 @@ import { useRouter } from 'next/router';
                                 "_blank"
                               )
                             }
-                            leftSection={<IconReceipt2 size={17} />}
+                            leftSection={<IconListSearch size={17} />}
                           >
                             DeSo Explorer
                           </Menu.Item>
 
-                              <Menu.Divider />
-
-                              <Menu.Label>Visit DeSo Wallet</Menu.Label>
+                
                               <Menu.Item
                                 onClick={() =>
                                   window.open(

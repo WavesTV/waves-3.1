@@ -14,57 +14,49 @@ import {
 import { RxDotFilled } from "react-icons/rx";
 import { GiWaveSurfer } from "react-icons/gi";
 import classes from './MantineNavBar.module.css';
-import { getFollowersForUser, getIsFollowing, getUnreadNotificationsCount, setNotificationMetadata } from 'deso-protocol';
+import { getPostsStateless, getIsFollowing, getUnreadNotificationsCount, setNotificationMetadata } from 'deso-protocol';
 import { DeSoIdentityContext } from 'react-deso-protocol';
 import Link from 'next/link';
 
 export function MantineNavBar() {
-  const [active, setActive] = useState('Billing');
-  const [wavesSidebar, setWavesSidebar] = useState([]);
+  const [wavesFeed, setWavesFeed] = useState([]);
   const [followingWaves, setFollowingWaves] = useState([]);
-  const [unreadNotifs, setUnreadNotifs] = useState(0);
-  const { currentUser, isLoading } = useContext(DeSoIdentityContext);
+  const { currentUser } = useContext(DeSoIdentityContext);
  
-
   useEffect(() => {
-    const fetchWavesSidebar = async () => {
+    const fetchWavesFeed = async () => {
       try {
-        //Getting Profiles that are following the Waves_Streams Account
-        const result = await getFollowersForUser({
-          Username: "Waves_Streams",
-          GetEntriesFollowingUsername: true,
-          //Will have to increase as the followers increase
-          NumToFetch: 20,
+
+        const followerFeedData = await getPostsStateless({
+          ReaderPublicKeyBase58Check: "BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6",
+          NumToFetch: 100,
+          GetPostsForFollowFeed: true,
         });
 
-        setWavesSidebar(Object.values(result.PublicKeyToProfileEntry));
+        // Iterate through posts and filter based on conditions
+        const filteredPosts = followerFeedData.PostsFound.filter((post) => {
+          const hasVideoURL = post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v=');
+          return hasVideoURL;
+        });
+
+        setWavesFeed(filteredPosts);
+
       } catch (error) {
-      
+        console.log("Something went wrong:", error);
       }
     };
 
-    fetchWavesSidebar();
+    fetchWavesFeed();
   }, []);
-
-  //Filter the posts that have non-empty WavesStreamPlaybackId and WavesStreamTitle to get livestreams
-  //For the Recommended Waves section
-  const filteredPosts = wavesSidebar.filter(
-    (post) =>
-      post.ExtraData?.WavesStreamPlaybackId &&
-      post.ExtraData?.WavesStreamPlaybackId !== "" &&
-      post.ExtraData?.WavesStreamTitle &&
-      post.ExtraData?.WavesStreamTitle !== ""
-  );
 
   // Check if the current user is following the profiles in filteredPosts
   const fetchFollowingWaves = async () => {
     const followingPosts = [];
-    for (const post of filteredPosts) {
-      const request = {
+    for (const post of wavesFeed) {
+      const response = await getIsFollowing({
         PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        IsFollowingPublicKeyBase58Check: post.PublicKeyBase58Check,
-      };
-      const response = await getIsFollowing(request);
+        IsFollowingPublicKeyBase58Check: post.ProfileEntryResponse.PublicKeyBase58Check,
+      });
       if (response.IsFollowing === true) {
         followingPosts.push(post);
       }
@@ -84,11 +76,11 @@ useEffect(() => {
 
   return (
     
-    <nav className={classes.navbar}>
+    <nav>
       <div>
       <Space h="lg" />
             
-              <Text fs="italic" size="md" fw={800} >
+              <Text fs="italic" size="md" fw={800}  ta="center">
                 Following
               </Text>
               <Space w={2}/>
@@ -97,36 +89,31 @@ useEffect(() => {
             <Space h="sm" />
             {currentUser ? (
               followingWaves && followingWaves.length > 0 ? (
-                followingWaves
-                  .filter((post) => post.Username !== currentUser.ProfileEntryResponse.Username)
-                  .map((post) => {
+                followingWaves.map((post) => {
                     return (
                     <UnstyledButton
                       component={Link}
-                      href={`/wave/${post.Username}`}
+                      href={`/wave/${post.ProfileEntryResponse.Username}`}
                       className={classes.user}
                       >
                       <Group>
                         <Avatar
                            src={
-                            post.ExtraData?.LargeProfilePicURL ||
-                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.PublicKeyBase58Check}` ||
+                            post.ProfileEntryResponse.ExtraData?.LargeProfilePicURL ||
+                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.ProfileEntryResponse.PublicKeyBase58Check}` ||
                             null
                           }
                           radius="xl"
-                          size="sm"
+                         
                         />
             
                         <div style={{ flex: 1 }}>
                           <Text size="sm" fw={500}>
-                          {post.Username}
+                          {post.ProfileEntryResponse.Username}
                           </Text>
                         </div>
 
-                        <Space w="lg" />
-                    <Group postition="right">
-                      <RxDotFilled size={22} color="red" />{" "}
-                    </Group>
+                        
                       </Group>
 
                       
@@ -157,44 +144,40 @@ useEffect(() => {
               </>
             )}
 
-            <Divider my="sm" />
             <Space h="lg" />
 
             
-            <Text fs="italic" size="md" fw={800}>
+            <Text fs="italic" size="md" fw={800}  ta="center">
                 Recommended Waves
               </Text>
           
 
             <Space h="sm" />
-            {filteredPosts && filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
+            {wavesFeed && wavesFeed.length > 0 ? (
+              wavesFeed.map((post) => (
                 <UnstyledButton
                       component={Link}
-                      href={`/wave/${post.Username}`}
+                      href={`/wave/${post.ProfileEntryResponse.Username}`}
                       className={classes.user}
                       >
                       <Group>
                         <Avatar
                            src={
-                            post.ExtraData?.LargeProfilePicURL ||
-                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.PublicKeyBase58Check}` ||
+                            post.ProfileEntryResponse.ExtraData?.LargeProfilePicURL ||
+                            `https://node.deso.org/api/v0/get-single-profile-picture/${post.ProfileEntryResponse.PublicKeyBase58Check}` ||
                             null
                           }
                           radius="xl"
-                          size="sm"
                         />
             
                         <div style={{ flex: 1 }}>
                           <Text size="sm" fw={500}>
-                          {post.Username}
+                          {post.ProfileEntryResponse.Username}
                           </Text>
                         </div>
 
-                        <Space w="lg" />
-                    <Group postition="right">
-                      <RxDotFilled size={22} color="red" />{" "}
-                    </Group>
+                       
+                   
                       </Group>
 
                       
@@ -210,6 +193,11 @@ useEffect(() => {
                 </Center>
                 </>
             )}
+
+
+            <Space h="lg" />
+
+  
   
       </div>
     </nav>
