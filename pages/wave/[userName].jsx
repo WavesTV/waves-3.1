@@ -12,6 +12,7 @@ import {
 import { GiWaveCrest } from "react-icons/gi";
 import {
   getFollowersForUser,
+  
   getPostsForUser,
   getNFTsForUser,
   getSingleProfile,
@@ -93,95 +94,129 @@ export default function Wave() {
       .replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`)
       .replace(atSymbolRegex, (match, username) => `<a href="/wave/${username}" target="_blank">@${username}</a>`);
   };
-  // Retrieve the user's DESO balance from profile.DESOBalanceNanos
-  const userDESOBalance = profile.DESOBalanceNanos;
- 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profileData = await getSingleProfile({
-          Username: userName,
-          NoErrorOnMissing: true,
-        });
 
-        setProfile(profileData.Profile);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    fetchProfile();
-  }, [userName]);
-
-  useEffect(() => {
-    if (profile) {
-      const fetchFollowerInfo = async () => {
-        try {
-          const following = await getFollowersForUser({
-            PublicKeyBase58Check: profile.PublicKeyBase58Check,
-          });
-          const followers = await getFollowersForUser({
-            PublicKeyBase58Check: profile.PublicKeyBase58Check,
-            GetEntriesFollowingUsername: true,
-          });
-
-          setFollowers({ following, followers });
-        } catch (error) {
-          console.error("Error fetching follower information:", error);
-        }
-      };
-
-      fetchFollowerInfo();
-    }
-  }, [profile]);
-
-  useEffect(() => {
-    if (currentUser) {
-      const getIsFollowingData = async () => {
-        try {
-          const result = await getIsFollowing({
-            PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-            IsFollowingPublicKeyBase58Check: profile.PublicKeyBase58Check,
-          });
-
-          setisFollowingUser(result.IsFollowing);
-        } catch (error) {
-          console.error("Error checking if following:", error);
-        }
-      };
-
-      getIsFollowingData();
-    }
-  }, [currentUser, profile, userName, isFollowingUser]);
-
-  const getIsFollowingData = async () => {
+  // Get Profile For userName
+  const fetchProfile = async () => {
     try {
-      const result = await getIsFollowing({
-        PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        IsFollowingPublicKeyBase58Check: profile.PublicKeyBase58Check,
+      const profileData = await getSingleProfile({
+        Username: userName,
+        NoErrorOnMissing: true,
+      });
+      
+      setProfile(profileData.Profile);
+      
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+ 
+  // Get Follow Counts for userName
+  const fetchFollowerInfo = async () => {
+    try {
+      const following = await getFollowersForUser({
+        Username: userName,
+      });
+      const followers = await getFollowersForUser({
+        Username: userName,
+        GetEntriesFollowingUsername: true,
       });
 
-      setisFollowingUser(result.IsFollowing);
+      setFollowers({ following, followers });
     } catch (error) {
-      console.error("Error checking if following:", error);
+      console.error("Error fetching follower information:", error);
     }
   };
 
+  
+  // Get For Sale NFTs
+  const fetchNFTs = async (limit) => {
+    try {
+      setIsLoadingNFTs(true);
+      const nftData = await getNFTsForUser({
+        UserPublicKeyBase58Check: profile.PublicKeyBase58Check,
+        IsForSale: true,
+      });
+      
+      const nftKeys = Object.keys(nftData.NFTsMap);
+      const limitedNFTKeys = nftKeys.slice(0, limit);
+
+      const limitedNFTs = limitedNFTKeys.reduce((result, key) => {
+        result[key] = nftData.NFTsMap[key];
+        return result;
+      }, {});
+
+      setNFTs(limitedNFTs);
+      setIsLoadingNFTs(false);
+    } catch (error) {
+      console.error("Error fetching user NFTs:", error);
+    }
+  };
+
+  // Get Posts
+  const fetchPosts = async () => {
+    try {
+      setIsLoadingPosts(true);
+      const postData = await getPostsForUser({
+        Username: userName,
+        NumToFetch: 100,
+      });
+      setPosts(postData.Posts);
+      setIsLoadingPosts(false);
+
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+    }
+  };
+
+ 
+
+  // Get if Logged In User follows userName
+  const getIsFollowingData = async () => {
+    try {
+      
+      const req = {
+        PublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+        IsFollowingPublicKeyBase58Check: profile.PublicKeyBase58Check,
+      }
+
+      const result = await getIsFollowing(req);
+      setisFollowingUser(result.IsFollowing);
+     
+    
+    } catch (error) {
+      console.error("Error checking if following:", error);
+    } 
+  };
+
+  
+
+  // Function to Follow userName
   const followUser = async () => {
     try {
-    await updateFollowingStatus({
-      MinFeeRateNanosPerKB: 1000,
-      IsUnfollow: false,
-      FollowedPublicKeyBase58Check: profile.PublicKeyBase58Check,
-      FollowerPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-    });
-    getIsFollowingData();
-    notifications.show({
-      title: "Success",
-      icon: <IconCheck size="1.1rem" />,
-      color: "green",
-      message: `You successfully followed ${userName}`,
-    });  
+      if (IsFollowing)
+          {
+            await updateFollowingStatus({
+              MinFeeRateNanosPerKB: 1000,
+              IsUnfollow: false,
+              FollowedPublicKeyBase58Check: profile.PublicKeyBase58Check,
+              FollowerPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+            });
+            getIsFollowingData();
+            notifications.show({
+              title: "Success",
+              icon: <IconCheck size="1.1rem" />,
+              color: "green",
+              message: `You successfully followed ${userName}`,
+            }); 
+          } else {
+            notifications.show({
+              title: `Wait!`,
+              icon: <IconX size="1.1rem" />,
+              color: "red",
+              message: `You successfully followed ${userName}`,
+            }); 
+
+          }
   } catch (error) {
       notifications.show({
         title: "Error",
@@ -193,6 +228,7 @@ export default function Wave() {
     }
   };
 
+  // Function to Unfollow userName
   const unfollowUser = async () => {
     try {
     await updateFollowingStatus({
@@ -219,28 +255,14 @@ export default function Wave() {
   }
   };
 
-  const fetchPosts = async () => {
-    try {
-      setIsLoadingPosts(true);
-      const postData = await getPostsForUser({
-        PublicKeyBase58Check: profile.PublicKeyBase58Check,
-        NumToFetch: 100,
-      });
-      setPosts(postData.Posts);
-      setIsLoadingPosts(false);
-
-    } catch (error) {
-      console.error("Error fetching user posts:", error);
-    }
-  };
-
+  // Getting userName's most recent Wave livestream
   const fetchLivestreamPost = async () => {
     try {
       setIsLoadingLivestream(true);
   
       // Fetch the user's posts
       const postData = await getPostsForUser({
-        PublicKeyBase58Check: profile.PublicKeyBase58Check,
+        Username: userName,
         NumToFetch: 20, // Fetch the first 20 posts
       });
   
@@ -257,14 +279,7 @@ export default function Wave() {
       console.error("Error fetching livestream post:", error);
     }
   };
-  
-  // Call the fetchLivestreamPost function when needed
-  // For example, you might call it when the user's posts are fetched
-  useEffect(() => {
-    fetchLivestreamPost();
-  }, [profile.PublicKeyBase58Check]);
 
-  
   const subTier1 = async () => {
     try {
       const exchangeRateData = await getExchangeRates({
@@ -441,38 +456,26 @@ export default function Wave() {
     }
   };
 
-  const fetchNFTs = async (limit) => {
-    try {
-      setIsLoadingNFTs(true);
-      const nftData = await getNFTsForUser({
-        UserPublicKeyBase58Check: profile.PublicKeyBase58Check,
-        IsForSale: true,
-      });
-      
-      const nftKeys = Object.keys(nftData.NFTsMap);
-      const limitedNFTKeys = nftKeys.slice(0, limit);
-
-      const limitedNFTs = limitedNFTKeys.reduce((result, key) => {
-        result[key] = nftData.NFTsMap[key];
-        return result;
-      }, {});
-
-      setNFTs(limitedNFTs);
-      setIsLoadingNFTs(false);
-    } catch (error) {
-      console.error("Error fetching user NFTs:", error);
+  useEffect(() => {
+    if(userName) {
+      fetchPosts(); 
+      fetchLivestreamPost();
+      fetchProfile();
+      fetchFollowerInfo();
     }
-  };
-
+  }, [userName]);
 
   useEffect(() => {
-    fetchPosts(); // Fetch posts initially
+    if(profile.PublicKeyBase58Check) {
+    fetchNFTs(25); 
+    }
   }, [profile.PublicKeyBase58Check]);
 
   useEffect(() => {
-    fetchNFTs(25); // Fetch NFTs initially
-  }, [profile.PublicKeyBase58Check]);
-
+    if (profile?.PublicKeyBase58Check && currentUser?.PublicKeyBase58Check) {
+      getIsFollowingData();
+    }
+  }, [currentUser?.PublicKeyBase58Check, profile?.PublicKeyBase58Check]);
   
 
   return (
@@ -592,7 +595,7 @@ export default function Wave() {
               )}
             </CopyButton>
 
-            <Button rightIcon={<GiWaveCrest size="1rem" />} onClick={openSub}>
+            <Button rightSection={<GiWaveCrest size="1rem" />} onClick={openSub}>
               Subscribe
             </Button>
             <Modal
