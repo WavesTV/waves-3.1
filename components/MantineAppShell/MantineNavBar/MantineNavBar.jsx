@@ -49,7 +49,7 @@ const filterUniqueUsernames = (posts) => {
 
         // Iterate through posts and filter based on conditions
         const filteredPosts = filterUniqueUsernames(
-          followerFeedData.PostsFound.filter((post) => post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v='))
+          followerFeedData.PostsFound.filter((post) => post.PostExtraData.WavesStreamTitle)
         );
   
         setWavesFeed(filteredPosts);
@@ -137,22 +137,22 @@ useEffect(() => {
               ) : (
                 <>
                  <Space h="lg" />
-                  <Center>
-                    <Text fz="xs" fw={500} lineClamp={2}>
+                  
+                    <Text ml={22} fz="xs" fw={500} lineClamp={2}>
                       No Followers are Live.
                     </Text>
-                  </Center>
+                  
                   <Space h="lg" />
                 </>
               )
             ) : (
               <>
                <Space h="lg" />
-                <Center>
-                  <Text fz="xs" fw={500} lineClamp={2}>
+                
+                  <Text ml={22} fz="xs" fw={500} lineClamp={2}>
                     Sign in to view your Following.
                   </Text>
-                </Center>
+             
                 <Space h="lg" />
               </>
             )}
@@ -199,11 +199,11 @@ useEffect(() => {
             ) : (
               <>
               <Space h="lg" />
-                <Center>
-                  <Text fz="xs" fw={500} lineClamp={1}>
+                
+                  <Text ml={22} fz="xs" fw={500} lineClamp={1}>
                     No Waves Right Now.
                   </Text>
-                </Center>
+               
                 </>
             )}
 

@@ -650,6 +650,7 @@ useEffect(() => {
                           },
                         }}
                         playbackId={extractPlaybackId(post.VideoURLs[0])}
+                        title={post.PostExtraData?.WavesStreamTitle || `Video by ${username}`}
                         
                       />
                     ) : (

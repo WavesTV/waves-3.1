@@ -180,7 +180,7 @@ export default function NotificationsPage () {
                         <ActionIcon
                         style={{ width: "100%", height: "100%" }}
                               component={Link}
-                              href={`/post-page/${notification.Metadata.CreatePostAssociationTxindexMetadata.PostHashHex}`}
+                              href={`/post/${notification.Metadata.CreatePostAssociationTxindexMetadata.PostHashHex}`}
                               variant="gradient"
                                 size="xl"
                                 aria-label="Gradient action icon"
@@ -227,13 +227,13 @@ export default function NotificationsPage () {
                     <Group>
                     
                         <ActionIcon
-                        style={{ width: "100%", height: "100%" }}
-                              component={Link}
-                              href={`/post-page/${notification.Metadata?.CreatePostAssociationTxindexMetadata?.PostHashHex}`}
-                              variant="gradient"
-      size="xl"
-      aria-label="Gradient action icon"
-      gradient={{ from: 'blue', to: 'pink', deg: 298 }}
+                            style={{ width: "100%", height: "100%" }}
+                            component={Link}
+                            href={`/post/${notification.Metadata?.CreatePostAssociationTxindexMetadata?.PostHashHex}`}
+                            variant="gradient"
+                            size="xl"
+                            aria-label="Gradient action icon"
+                            gradient={{ from: 'blue', to: 'pink', deg: 298 }}
                           >
                             <IconHeartPlus />
                             <Space w='md'/>

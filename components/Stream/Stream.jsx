@@ -73,7 +73,7 @@ import { HowTo } from '@/components/HowTo/HowTo';
 
 export const Stream = () => {
   const { currentUser } = useContext(DeSoIdentityContext);
-  console.log(currentUser)
+  
   const [streamName, setStreamName] = useState('');
   const [isFollowingWaves, setisFollowingWaves] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
