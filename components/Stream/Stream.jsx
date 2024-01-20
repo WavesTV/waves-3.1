@@ -221,44 +221,6 @@ export const Stream = () => {
     kickMultistream?.();
   };
 
-  //On the instance where a user clicks off their profile while streaming or the 'end wave' doesnt work
-  //Users can clear the playbackid and title
-  const clearWave = async () => {
-    try {
-      await updateProfile({
-        UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        ProfilePublicKeyBase58Check: '',
-        NewUsername: '',
-        MinFeeRateNanosPerKB: 1000,
-        NewCreatorBasisPoints: 100,
-        NewDescription: '',
-        NewStakeMultipleBasisPoints: 12500,
-        ExtraData: {
-          WavesStreamPlaybackId: '',
-          WavesStreamTitle: '',
-          WavesStreamID: '',
-        },
-      });
-    } catch (error) {
-      console.log('something happened: ' + error);
-    }
-  };
-
-  useEffect(() => {
-    const getUpdatedProfile = async () => {
-      if (setIsButtonDisabled) {
-        try {
-          const result = await getSingleProfile({
-            PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
-          });
-
-         
-        } catch (error) {
-          console.log('Something went wrong:', error);
-        }
-      }
-    };
-  }, [setIsButtonDisabled]);
 
   // Checking to see if Waves_Streams Account Follows the Streamer
   useEffect(() => {
@@ -278,6 +240,7 @@ export const Stream = () => {
     isFollowingPublicKey();
   }, [currentUser]);
 
+  
   const postStreamToDeso = async () => {
     try {
       setIsButtonDisabled(true);
@@ -692,11 +655,7 @@ export const Stream = () => {
               )}
             </CopyButton>
 
-            <Tooltip label="Clear Idle Wave from your profile">
-              <Button size="xs" color="red" onClick={clearWave}>
-                Clear Wave
-              </Button>
-            </Tooltip>
+            
           </Group>
         </Tabs.Panel>
         <Tabs.Panel value="second">
@@ -836,11 +795,6 @@ export const Stream = () => {
               )}
             </CopyButton>
 
-            <Tooltip label="Clear Idle Wave from your profile">
-              <Button size="xs" color="red" onClick={clearWave}>
-                Clear Wave
-              </Button>
-            </Tooltip>
           </Group>
         </Tabs.Panel>
       </Tabs>
