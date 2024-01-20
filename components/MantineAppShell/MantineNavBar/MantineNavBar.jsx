@@ -22,6 +22,20 @@ export function MantineNavBar() {
   const [wavesFeed, setWavesFeed] = useState([]);
   const [followingWaves, setFollowingWaves] = useState([]);
   const { currentUser } = useContext(DeSoIdentityContext);
+
+  // Function to filter out duplicate usernames from an array of posts
+const filterUniqueUsernames = (posts) => {
+  const uniqueUsernames = [];
+  const filteredPosts = posts.filter((post) => {
+    const username = post.ProfileEntryResponse?.Username;
+    if (!uniqueUsernames.includes(username)) {
+      uniqueUsernames.push(username);
+      return true;
+    }
+    return false;
+  });
+  return filteredPosts;
+};
  
   useEffect(() => {
     const fetchWavesFeed = async () => {
@@ -34,11 +48,10 @@ export function MantineNavBar() {
         });
 
         // Iterate through posts and filter based on conditions
-        const filteredPosts = followerFeedData.PostsFound.filter((post) => {
-          const hasVideoURL = post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v=');
-          return hasVideoURL;
-        });
-
+        const filteredPosts = filterUniqueUsernames(
+          followerFeedData.PostsFound.filter((post) => post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v='))
+        );
+  
         setWavesFeed(filteredPosts);
 
       } catch (error) {
@@ -71,7 +84,7 @@ useEffect(() => {
   if (currentUser) {
     fetchFollowingWaves();
   }
-}, [currentUser]);
+}, [currentUser, wavesFeed]);
 
 
   return (

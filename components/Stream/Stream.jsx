@@ -55,6 +55,7 @@ import {
   IconBrandTwitch,
   IconKey,
   IconUser,
+  IconX,
 } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { RiYoutubeLine } from 'react-icons/ri';
@@ -72,6 +73,7 @@ import { HowTo } from '@/components/HowTo/HowTo';
 
 export const Stream = () => {
   const { currentUser } = useContext(DeSoIdentityContext);
+  console.log(currentUser)
   const [streamName, setStreamName] = useState('');
   const [isFollowingWaves, setisFollowingWaves] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -259,13 +261,12 @@ export const Stream = () => {
   }, [setIsButtonDisabled]);
 
   // Checking to see if Waves_Streams Account Follows the Streamer
-  
   useEffect(() => {
     const isFollowingPublicKey = async () => {
       try {
         const result = await getIsFollowing({
-          PublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
-          IsFollowingPublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+          PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+          IsFollowingPublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
         });
 
         setisFollowingWaves(result.IsFollowing);
@@ -277,9 +278,7 @@ export const Stream = () => {
     isFollowingPublicKey();
   }, [currentUser]);
 
-  // Attaching Stream PlaybackID to user's profile
-  // We use this for displaying the stream on Wave profile
-  const attachStreamToDesoProfile = async () => {
+  const postStreamToDeso = async () => {
     try {
       setIsButtonDisabled(true);
 
@@ -290,33 +289,22 @@ export const Stream = () => {
         await updateFollowingStatus({
           MinFeeRateNanosPerKB: 1000,
           IsUnfollow: false,
-          FollowedPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          FollowerPublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
+          FollowedPublicKeyBase58Check: 'BC1YLfjx3jKZeoShqr2r3QttepoYmvJGEs7vbYx1WYoNmNW9FY5VUu6',
+          FollowerPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         });
       }
-      await updateProfile({
-        UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-        ProfilePublicKeyBase58Check: '',
-        NewUsername: '',
-        MinFeeRateNanosPerKB: 1000,
-        NewCreatorBasisPoints: 100,
-        NewDescription: '',
-        NewStakeMultipleBasisPoints: 12500,
-        ExtraData: {
-          WavesStreamPlaybackId: stream?.playbackId,
-          WavesStreamTitle: stream?.name,
-          WavesStreamID: stream?.id,
-        },
-      });
 
       // Posts stream onchain making it accessible across all deso apps
-      submitPost({
+      await submitPost({
         UpdaterPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
         BodyObj: {
           Body: `${stream?.name}\nTo Subscribe and ensure the best viewing experience, visit: \nhttps://desowaves.vercel.app/wave/${currentUser.ProfileEntryResponse.Username}`,
           VideoURLs: [`https://lvpr.tv/?v=${stream?.playbackId}`],
           ImageURLs: [],
         },
+        PostExtraData: {
+          WavesStreamTitle: stream?.name,
+        }
       });
 
       notifications.show({
@@ -326,6 +314,12 @@ export const Stream = () => {
         message: 'Your Wave has Launched to DeSo',
       });
     } catch (error) {
+      notifications.show({
+        title: 'Error',
+        icon: <IconX size="1.1rem" />,
+        color: 'red',
+        message: `Something Happened: ${error}`,
+      });
       console.log('something happened: ' + error);
       setIsButtonDisabled(false);
     }
@@ -431,8 +425,8 @@ export const Stream = () => {
                         fullWidth
                         className={classes.button}
                         onClick={() => {
-                          attachStreamToDesoProfile();
-                          loaded ? setLoaded(false) : !interval.active && interval.start();
+                          postStreamToDeso();
+                          
                         }}
                         color={'blue'}
                       >

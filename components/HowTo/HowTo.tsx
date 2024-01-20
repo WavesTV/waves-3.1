@@ -1,4 +1,4 @@
-import { ActionIcon, Modal, Code, Title, Text, Image, Divider, Space, Center } from "@mantine/core";
+import { ActionIcon, Modal, Code, Title, Text, Image, Divider, Space, Center, Paper } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { Carousel } from '@mantine/carousel';
 import { TiInfoLargeOutline } from "react-icons/ti";
@@ -88,8 +88,10 @@ export function HowTo() {
 
         <Title order={2}>Recommended OBS Settings</Title>
         <Space h="xs" />
-        <Text fw={500} size="md">
-        1. Low latency, high quality
+        
+        <Paper shadow="xl" radius="xl" withBorder p="xl">
+        <Text td="underline" fw={500} size="md">
+        Low latency, High quality
         </Text>
         <Code>
         Rate Control: CRF
@@ -101,10 +103,12 @@ export function HowTo() {
         x264 options: bframes=0
         Resolution: 1080p
         </Code>
+        </Paper>
 
         <Space h="xs" />
-        <Text fw={500} size="md">
-        2. Low latency for bad connections
+        <Paper shadow="xl" radius="xl" withBorder p="xl">
+        <Text td="underline" fw={500} size="md">
+        Low latency for bad connections
         </Text>
         <Code>
         Rate Control: CBR
@@ -116,10 +120,11 @@ export function HowTo() {
         x264 options: bframes=0
         Resolution: 720p
         </Code>
-
+        </Paper>
         <Space h="xs" />
-        <Text fw={500} size="md">
-        3. Balanced High Quality
+        <Paper shadow="xl" radius="xl" withBorder p="xl">
+        <Text td="underline" fw={500} size="md">
+        Balanced High Quality
         </Text>
         <Code>
         Rate Control: CRF
@@ -131,10 +136,11 @@ export function HowTo() {
         No additional x264 options
         Resolution: Any
         </Code>
-
+        </Paper>
         <Space h="xs" />
-        <Text fw={500} size="md">
-        4. Balanced for bad connections
+        <Paper shadow="xl" radius="xl" withBorder p="xl">
+        <Text td="underline" fw={500} size="md">
+        Balanced for bad connections
         </Text>
         <Code>
         Rate Control: CBR
@@ -146,11 +152,13 @@ export function HowTo() {
         No additional x264 options
         Resolution: Up to 1080p
         </Code>
-
+        </Paper>
         <Space h="xs" />
-        <Text fw={500} size="md">
-        5. High quality, high latency
+        <Paper shadow="xl" radius="xl" withBorder p="xl">
+        <Text td="underline" fw={500} size="md">
+        High quality, High latency
         </Text>
+        
         <Code>
         Rate Control: CRF
         CRF: 27
@@ -161,10 +169,11 @@ export function HowTo() {
         x264 options: bframes=3
         Resolution: 1080p
         </Code>
-
+        </Paper>
         <Space h="xs" />
-        <Text fw={500} size="md">
-        6. Low bandwidth, high latency
+        <Paper shadow="xl" radius="xl" withBorder p="xl">
+        <Text td="underline" fw={500} size="md">
+        Low bandwidth, High latency
         </Text>
         <Code>
         Rate Control: CBR
@@ -176,17 +185,7 @@ export function HowTo() {
         x264 options: bframes=3
         Resolution: 720p or lower
         </Code>
-
-        <Space h="md" />
-
-        <Title order={2}>Multistreaming</Title>
-        <Space h="xs" />
-        <Text fw={500} size="md" c="dimmed">
-        1.  Once you've started your livestream on Wave you will be able to Multistream to Twitch, Kick, and/or Youtube!
-        </Text>
-        <Text fw={500} size="md" c="dimmed">
-        2.  Just add in the required data and hit the &rsquo;Launch&rsquo; button.
-        </Text>
+        </Paper>
       
         
       
