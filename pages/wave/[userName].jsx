@@ -76,7 +76,14 @@ export default function Wave() {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isLoadingNFTs, setIsLoadingNFTs] = useState(false);
   const [openedChat, { toggle }] = useDisclosure(true);
+  const [livestreamPost, setLivestreamPost] = useState(null); 
+  const [isLoadingLivestream, setIsLoadingLivestream] = useState(false);
 
+  const extractPlaybackId = (url) => {
+    const match = url.match(/https:\/\/lvpr\.tv\/\?v=(.*)/);
+    const playbackId = match ? match[1] : null;
+    return playbackId;
+  };
  
   const replaceURLs = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -226,6 +233,36 @@ export default function Wave() {
       console.error("Error fetching user posts:", error);
     }
   };
+
+  const fetchLivestreamPost = async () => {
+    try {
+      setIsLoadingLivestream(true);
+  
+      // Fetch the user's posts
+      const postData = await getPostsForUser({
+        PublicKeyBase58Check: profile.PublicKeyBase58Check,
+        NumToFetch: 20, // Fetch the first 20 posts
+      });
+  
+      // Find the first post with WavesStreamTitle in PostExtraData
+      const livestreamPost = postData.Posts.find(
+        (post) => post.PostExtraData?.WavesStreamTitle
+      );
+  
+      // Set the livestream post to state
+      setLivestreamPost(livestreamPost);
+      
+      setIsLoadingLivestream(false);
+    } catch (error) {
+      console.error("Error fetching livestream post:", error);
+    }
+  };
+  
+  // Call the fetchLivestreamPost function when needed
+  // For example, you might call it when the user's posts are fetched
+  useEffect(() => {
+    fetchLivestreamPost();
+  }, [profile.PublicKeyBase58Check]);
 
   
   const subTier1 = async () => {
@@ -480,16 +517,18 @@ export default function Wave() {
 
         <Space h="md" />
         <Card.Section>
-          {profile &&
-          profile.ExtraData &&
-          profile.ExtraData.WavesStreamPlaybackId &&
-          profile.ExtraData.WavesStreamTitle ? (
+          {isLoadingLivestream ? ( 
+
+              <Group justify="center">
+              <Loader size="sm" />
+              </Group>
+          ) : livestreamPost ? (
             <>
            
 
-<Player
+           <Player
 
-priority 
+              priority 
               controls
               showPipButton
               theme={{
@@ -497,8 +536,8 @@ priority
                     loading: '#3cdfff',
                   }
                 }}
-              playbackId={profile.ExtraData?.WavesStreamPlaybackId}
-              title={profile.ExtraData?.WavesStreamTitle}
+              playbackId={extractPlaybackId(livestreamPost.VideoURLs[0])}
+              title={livestreamPost.ExtraData?.WavesStreamTitle}
               
             />
             
