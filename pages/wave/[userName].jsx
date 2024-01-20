@@ -984,30 +984,7 @@ export default function Wave() {
       </Card>
 
       <Space h="sm"/>
-            <Center>
-              <Button variant="light" hiddenFrom="md" onClick={toggle}>
-               {openedChat ? (
-                <>
-                Close Chat
-                </>
-               ):(
-                <>
-                Open Chat
-                </>
-               )}
-                
-              </Button>
-            </Center>
-              <Group justify="center" hiddenFrom="md">
-
-                <Collapse transitionDuration={1000} transitionTimingFunction="smooth" in={openedChat}>
-                  <Chat handle={userName} />
-                </Collapse>
-
-              </Group>
-
-          <Space h="xl" />
-
+       
 
       <Tabs variant="default" defaultValue="first">
         <Tabs.List grow >
