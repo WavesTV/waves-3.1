@@ -598,8 +598,9 @@ useEffect(() => {
                 
               {post?.Body && (
                 <>
-                <ScrollArea scrollbars="y" mah={222} scrollbarSize={20} offsetScrollbars>
+               <ScrollArea mah={250} offsetScrollbars scrollbarSize={20} scrollHideDelay={2000}>
                     <Text
+                      ta="center"
                       size="md"
                       style={{
                         maxWidth: "100%",
@@ -607,7 +608,6 @@ useEffect(() => {
                         textOverflow: "ellipsis",
                         whiteSpace: "normal",
                         wordWrap: "break-word",
-                        textAlign: "center",
                       }}      
                       dangerouslySetInnerHTML={{
                         __html: post?.Body
