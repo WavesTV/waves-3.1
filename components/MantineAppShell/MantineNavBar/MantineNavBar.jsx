@@ -49,7 +49,7 @@ const filterUniqueUsernames = (posts) => {
 
         // Iterate through posts and filter based on conditions
         const filteredPosts = filterUniqueUsernames(
-          followerFeedData.PostsFound.filter((post) => post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v='))
+          followerFeedData.PostsFound.filter((post) => post.PostExtraData.WavesStreamTitle)
         );
   
         setWavesFeed(filteredPosts);
