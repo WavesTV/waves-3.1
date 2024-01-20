@@ -125,7 +125,7 @@ export default function ProfilePage () {
       getPosts();
       getNFTs();
     }
-  }, [currentUser, userPublicKey]);
+  }, [currentUser]);
 
   const handleUpdateUsername = async () => {
     try {
@@ -157,20 +157,23 @@ export default function ProfilePage () {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Update Profile" centered>
-        <Paper m="md" shadow="lg" radius="sm" p="xl" withBorder>
-          <Center>
-            <Badge
-              size="md"
-              radius="sm"
+      <Modal 
+      centered
+      opened={opened} 
+      onClose={close} 
+      title= { 
+           <Text
+              fw={666}
+              size="xl"
               variant="gradient"
               gradient={{ from: "indigo", to: "cyan", deg: 45 }}
             >
-              Enter Username
-            </Badge>
-
-            <Space h="xs" />
-          </Center>
+              Update Profile
+            </Text>
+        }
+        >
+        <Paper m="md" shadow="lg" radius="sm" p="xl" withBorder>
+          
           <Group justify="center" grow>
             <TextInput
               type="text"
@@ -217,6 +220,7 @@ export default function ProfilePage () {
               error={errorMessage}
             />
           </Group>
+
 
           <Space h="sm" />
 
