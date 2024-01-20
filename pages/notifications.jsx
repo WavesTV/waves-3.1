@@ -16,7 +16,7 @@ import {
 } from "@mantine/core";
 import { useState, useContext, useEffect } from "react";
 import { DeSoIdentityContext } from "react-deso-protocol";
-import { getNotifications, getSingleProfile, identity, setNotificationMetadata, getUnreadNotificationsCount } from "deso-protocol";
+import { getNotifications, getSingleProfile, identity, getAppState, getUnreadNotificationsCount } from "deso-protocol";
 import Link from 'next/link';
 import { GiWaveCrest } from "react-icons/gi";
 import {
@@ -41,6 +41,11 @@ export default function NotificationsPage () {
   const { currentUser } = useContext(DeSoIdentityContext);
   const [notifications, setNotifications] = useState([]);
   const userPublicKey = currentUser?.PublicKeyBase58Check;
+  const [usd, setUSD] = useState(null);
+
+
+
+
 
   const fetchNotifications = async () => {
     try {
@@ -73,7 +78,10 @@ export default function NotificationsPage () {
   );
       
       setNotifications(updatedNotifications);
+      
       setIsLoading(false); 
+
+      console.log(notifications)
     } catch (error) {
       notifications.show({
         title: "Error",
@@ -92,6 +100,40 @@ export default function NotificationsPage () {
       fetchNotifications();
     }
   }, [currentUser]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const appState = await getAppState({ PublicKeyBase58Check: "BC1YLjYHZfYDqaFxLnfbnfVY48wToduQVHJopCx4Byfk4ovvwT6TboD" });
+        const desoUSD = appState?.USDCentsPerDeSoCoinbase / 100;
+
+        setUSD(desoUSD);
+      
+      } catch (error) {
+        console.error('Error fetching app state:', error);
+      }
+    };
+
+    fetchData();
+  }, [notifications]);
+
+  const convertToUSD = (nanos) => {
+    try {
+      const nanoToDeso = 0.000000001;
+      const deso = nanos * nanoToDeso;
+      let usdValue = deso * usd;
+
+      if (usdValue < 0.01) {
+        usdValue = 0.01;
+      }
+
+      return usdValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    } catch (error) {
+      console.error('Error converting Nanos to USD:', error);
+      return null;
+    }
+  };
 
   
 
@@ -663,10 +705,7 @@ export default function NotificationsPage () {
                            <IconDiamond/>
                             <Space w='sm'/>
                             <Text fw={500} size="sm">
-      Tipped {notification.Metadata.BasicTransferTxindexMetadata.DiamondLevel}{" "}
-      {notification.Metadata.BasicTransferTxindexMetadata.DiamondLevel === 1
-        ? "Diamond"
-        : "Diamonds"}
+      Tipped {convertToUSD(notification?.Metadata?.BasicTransferTxindexMetadata?.TotalOutputNanos)} in Diamonds
     </Text>
                         
                         
@@ -713,18 +752,20 @@ export default function NotificationsPage () {
                     
                         <ActionIcon
                         style={{ width: "100%", height: "100%" }}
-                     
-                              variant="gradient"
-      size="xl"
-      aria-label="Gradient action icon"
-      gradient={{ from: 'blue', to: 'rgba(42, 247, 199, 1)', deg: 298 }}
+                        variant="gradient"
+                        size="xl"
+                        aria-label="Gradient action icon"
+                        gradient={{ from: 'blue', to: 'rgba(42, 247, 199, 1)', deg: 298 }}
                           >
                             <IconCoin />
                             <Space w='sm'/>
-                            <Text fw={500} size="sm">Bought your Creator Coin</Text>
-
+                            <Text fw={500} size="sm">Bought {convertToUSD(notification?.Metadata?.BasicTransferTxindexMetadata?.TotalOutputNanos)} of your Creator Coin</Text>
+                            
                           </ActionIcon>
+                         
                     </Group>
+
+                    
                     <Space h='md'/>
 
                         <Group>
@@ -737,6 +778,7 @@ export default function NotificationsPage () {
 
                         </>
                       )}
+
                     {notification.Metadata.TxnType === "CREATOR_COIN" &&
                       notification.Metadata.CreatorCoinTxindexMetadata
                         .OperationType === "sold" && (
@@ -762,16 +804,15 @@ export default function NotificationsPage () {
                     <Group>
                     
                         <ActionIcon
-                        style={{ width: "100%", height: "100%" }}
-                     
-                              variant="gradient"
-      size="xl"
-      aria-label="Gradient action icon"
-      gradient={{ from: 'blue', to: 'rgba(42, 247, 199, 1)', deg: 298 }}
+                            style={{ width: "100%", height: "100%" }}
+                            variant="gradient"
+                            size="xl"
+                            aria-label="Gradient action icon"
+                            gradient={{ from: 'blue', to: 'rgba(42, 247, 199, 1)', deg: 298 }}
                           >
                             <IconCoinOff />
                             <Space w='sm'/>
-                            <Text fw={500} size="sm">Sold your Creator Coin</Text>
+                            <Text fw={500} size="sm">Sold {convertToUSD(notification?.Metadata?.BasicTransferTxindexMetadata?.TotalOutputNanos)} of your Creator Coin</Text>
 
                           </ActionIcon>
                     </Group>
