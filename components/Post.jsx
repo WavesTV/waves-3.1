@@ -598,7 +598,6 @@ useEffect(() => {
                 
               {post?.Body && (
                 <>
-               <ScrollArea mah={250} offsetScrollbars scrollbarSize={20} scrollHideDelay={2000}>
                     <Text
                       ta="center"
                       size="md"
@@ -615,7 +614,7 @@ useEffect(() => {
                           : "",
                       }}
                     />
-                </ScrollArea>
+            
 
                 <Space h="md" />
                 </>
