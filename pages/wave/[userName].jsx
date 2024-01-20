@@ -483,7 +483,7 @@ export default function Wave() {
       <Card ml={17} shadow="sm" padding="lg" radius="md" withBorder>
         <Card.Section>
           <Image
-            src={profile.ExtraData?.FeaturedImageURL || null}
+            src={profile?.ExtraData?.FeaturedImageURL || null}
             height={200}
             fallbackSrc="https://images.deso.org/4903a46ab3761c5d8bd57416ff411ff98b24b35fcf5480dde039eb9bae6eebe0.webp"
           />
@@ -494,8 +494,8 @@ export default function Wave() {
             size={80}
             radius={80}
             src={
-              `https://node.deso.org/api/v0/get-single-profile-picture/${profile.PublicKeyBase58Check}` ||
-              profile.ExtraData.LargeProfilePicURL
+              `https://node.deso.org/api/v0/get-single-profile-picture/${profile?.PublicKeyBase58Check}` ||
+              profile?.ExtraData?.LargeProfilePicURL || null
             }
             alt="Profile Picture"
             mx="auto"
