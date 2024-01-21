@@ -1,7 +1,7 @@
 import {
     getPostsStateless,
     getFollowersForUser,
-    getExchangeRates,
+    countPostAssociation,
     submitPost,
     createPostAssociation,
     sendDiamonds,
@@ -74,8 +74,8 @@ export default function Post({ post, username, key }) {
     const [quoteBody, setQuoteBody] = useState('');
     const [voteCount, setVoteCount] = useState();
     const [didVote, setDidVote] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(post?.LikeCount);
+    const [isHeart, setIsHearted] = useState(false);
+    const [heartCount, setHeartCount] = useState();
 
     const isWavesStream = post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v=');
 
@@ -84,6 +84,46 @@ export default function Post({ post, username, key }) {
       const playbackId = match ? match[1] : null;
       return playbackId;
     };
+
+    // Getting "LOVE" Post Association Count
+    const getHeartCount = async () => {
+      try {
+        const heartStats = await countPostAssociation({ 
+          PostHashHex: post.PostHashHex, 
+          AssociationType: "REACTION",
+          AssociationValue: "LOVE",
+        });
+        
+        setHeartCount(heartStats.Count)
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Getting "LOVE" Post Association Count
+    const getDidUserHeart = async () => {
+      try {
+        const heartStats = await countPostAssociation({ 
+          PostHashHex: post.PostHashHex, 
+          TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+          AssociationType: "REACTION",
+          AssociationValue: "LOVE",
+        });
+        console.log(heartStats);
+
+        if (heartStats.Count > 1)
+        {
+        setIsHearted(true)
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    useEffect(() => {
+        getHeartCount();
+        getDidUserHeart();
+    }, [post]); 
 
     // Getting Diamond Values in USD
     const getDiamondUSD = async () => {
@@ -248,16 +288,17 @@ export default function Post({ post, username, key }) {
           TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
           PostHashHex: post.PostHashHex,
           AssociationType: "REACTION",
-          AssociationValue: "HEART",
+          AssociationValue: "LOVE",
           MinFeeRateNanosPerKB: 1000,
         });
 
-        setIsLiked(true);
+        setIsHearted(true);
+        setHeartCount(heartCount + 1);
         notifications.show({
           title: "Success",
           icon: <IconHeartFilled size="1.1rem" />,
           color: "blue",
-          message: `You Hearted ${username}&apos post! Keep it going!`,
+          message: `You hearted ${username}'s post! Keep it going!`,
         });
 
       } catch (error) {
@@ -267,8 +308,8 @@ export default function Post({ post, username, key }) {
           color: "red",
           message: `Something Happened: ${error}`,
         });
-        setIsLiked(false);
-        setLikeCount(likeCount + 1);
+        setIsHearted(false);
+        
         console.error("Error submitting heart:", error);
       }
     };
@@ -402,11 +443,10 @@ export default function Post({ post, username, key }) {
 
 
 useEffect(() => {
-  // Call getVotes when didVote becomes true
   if (didVote) {
     getVotes();
   }
-}, [didVote]); // Dependency array - effect runs when didVote changes
+}, [didVote]); 
    
     
     return(
@@ -730,15 +770,15 @@ useEffect(() => {
                       radius="md"
                       size={36}
                     >
-                      {isLiked ? (
-                        <IconHeartFiled size={18} />
+                      {isHeart ? (
+                        <IconHeartFilled size={18} />
                       ) :( 
                         <IconHeart size={18} />
                       )} 
                     </ActionIcon>
                   </Tooltip>
                   <Text size="xs" c="dimmed">
-                    {likeCount}
+                    {heartCount}
                   </Text>
 
                   <Space w="sm" />
