@@ -777,7 +777,7 @@ useEffect(() => {
               >
                 <ActionIcon
                   variant="gradient"
-                  gradient={{ from: "cyan", to: "indigo" }}
+                  gradient={{ from: "indigo", to: "cyan" }}
                   size={36}
                   onClick={unfollowUser}
                   mb={22}
