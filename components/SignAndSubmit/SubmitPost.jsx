@@ -50,7 +50,7 @@ import {
     getEmbedURL,
     getEmbedWidth,
     isValidEmbedURL,
-  } from "../EmbedUrls";
+  } from "../../helpers/EmbedUrls";
   import { IconCheck, IconX } from "@tabler/icons-react";
   import { notifications } from "@mantine/notifications";
   import { FaPoll } from "react-icons/fa";
@@ -294,7 +294,7 @@ import {
        
               <Group>
                 <Avatar size="md" radius="xl" alt="Profile Picture" />
-                <Text fz="lg" fw={777} variant="gradient" truncate></Text>
+                <Text fz="lg" fw={777} variant="gradient" truncate="end"></Text>
               </Group>
               <Space h="sm" />
               <Textarea
@@ -495,12 +495,12 @@ import {
                   <Group>
                     <Avatar
                       size="lg"
-                      radius="xl"
+                      radius="md"
                       src={`https://node.deso.org/api/v0/get-single-profile-picture/${currentUser?.PublicKeyBase58Check}`}
                       alt="Profile Picture"
                     />
-                    <Text fz="lg" fw={777} variant="gradient" truncate>
-                      {currentUser.ProfileEntryResponse?.Username ?? currentUser.PublicKeyBase58Check}
+                    <Text fz="lg" fw={500} truncate="end">
+                      {currentUser.ProfileEntryResponse?.ExtraData?.DisplayName || currentUser.ProfileEntryResponse?.Username || currentUser.PublicKeyBase58Check}
                     </Text>
                   </Group>
                   <Space h="sm" />

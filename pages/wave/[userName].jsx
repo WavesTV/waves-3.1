@@ -87,7 +87,7 @@ export default function Wave() {
     return playbackId;
   };
  
-  // Get Profile For userName
+  // Get Profile
   const fetchProfile = async () => {
     try {
       const profileData = await getSingleProfile({
@@ -96,13 +96,13 @@ export default function Wave() {
       });
       
       setProfile(profileData.Profile);
-      console.log(profile)
+      
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
   };
  
-  // Get Follow Counts for userName
+  // Get Follow Counts
   const fetchFollowerInfo = async () => {
     try {
       const following = await getFollowersForUser({
@@ -162,7 +162,7 @@ export default function Wave() {
 
  
 
-  // Get if Logged In User follows userName
+  // Get if Current User follows profile
   const getIsFollowingData = async () => {
     try {
       
@@ -444,6 +444,7 @@ export default function Wave() {
       fetchProfile();
       fetchFollowerInfo();
     }
+    console.log(profile)
   }, [userName]);
 
   useEffect(() => {
@@ -502,7 +503,7 @@ export default function Wave() {
               </Text>
             </>
           ) : (
-            <Text fz="lg" fw={777} truncate>
+            <Text fz="lg" fw={777} truncate="end">
               User does not exist
             </Text>
           )}

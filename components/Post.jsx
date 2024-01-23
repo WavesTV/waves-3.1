@@ -1,5 +1,5 @@
 import {
-    getPostsStateless,
+  getIsFollowing,
     deletePostAssociation,
     countPostAssociation,
     submitPost,
@@ -7,7 +7,8 @@ import {
     sendDiamonds,
     getAppState,
     countPostAssociations, 
-    getPostAssociations
+    getPostAssociations,
+    updateFollowingStatus
   } from "deso-protocol";
   import { useEffect, useState, useContext } from "react";
   import { DeSoIdentityContext } from "react-deso-protocol";
@@ -26,12 +27,12 @@ import {
     ActionIcon,
     Tooltip,
     Image,
-    Loader,
+    Box,
     Button,
     Textarea,
     Collapse,
     Modal,
-    Spoiler,
+    HoverCard,
     RingProgress,
     ScrollArea
   } from "@mantine/core";
@@ -55,11 +56,13 @@ import {
   import {
     getEmbedHeight,
     getEmbedWidth, 
-  } from "./EmbedUrls";
+  } from "../helpers/EmbedUrls";
   import { FaVoteYea } from "react-icons/fa";
   import { BsInfoCircleFill } from "react-icons/bs";
   import { replaceURLs } from "../helpers/linkHelper";
   import { useHover } from '@mantine/hooks';
+  import { HiUsers, HiUserAdd, HiUserRemove } from "react-icons/hi";
+  import { RiUserUnfollowLine, RiUserAddLine  } from "react-icons/ri";
 
 export default function Post({ post, username, key }) {
   const { hovered, ref } = useHover();
@@ -76,12 +79,12 @@ export default function Post({ post, username, key }) {
     const [voteCount, setVoteCount] = useState();
     const [didVote, setDidVote] = useState(false);
     const [isHearted, setIsHearted] = useState();
-    const [heartCount, setHeartCount] = useState();
+    const [heartCount, setHeartCount] = useState(post.LikeCount);
     const [didHeartId, setDidHeartId] = useState();
     const [repostCount, setRepostCount] = useState(post.RepostCount);
     const [diamondCount, setDiamondCount] = useState(post.DiamondCount);
     const [commentCount, setCommentCount] = useState(post.CommentCount);
-
+    const [isFollowingUser, setisFollowingUser] = useState(false);
     const isWavesStream = post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v=');
 
     const extractPlaybackId = (url) => {
@@ -89,6 +92,89 @@ export default function Post({ post, username, key }) {
       const playbackId = match ? match[1] : null;
       return playbackId;
     };
+
+    
+  // Get if Current User follows profile
+  const getIsFollowingData = async () => {
+    try {
+      
+      const req = {
+        PublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+        IsFollowingPublicKeyBase58Check: post.PosterPublicKeyBase58Check,
+      }
+
+      const result = await getIsFollowing(req);
+      setisFollowingUser(result.IsFollowing);
+     
+    
+    } catch (error) {
+      console.error("Error checking if following:", error);
+    } 
+  };
+  useEffect(() => {
+      if (currentUser){
+        getIsFollowingData();
+      }
+  }, [currentUser]);
+  
+
+  // Follow profile
+  const followUser = async () => {
+    try {
+      
+      
+            await updateFollowingStatus({
+              MinFeeRateNanosPerKB: 1000,
+              IsUnfollow: false,
+              FollowedPublicKeyBase58Check: post?.PosterPublicKeyBase58Check,
+              FollowerPublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+            });
+            getIsFollowingData();
+            notifications.show({
+              title: "Success",
+              icon: <RiUserAddLine size="1.1rem" />,
+              color: "blue",
+              message: `You successfully followed ${username}`,
+            }); 
+         
+        } catch (error) {
+            notifications.show({
+              title: "Error",
+              icon: <IconX size="1.1rem" />,
+              color: "red",
+              message: `Something Happened: ${error}`,
+            });
+          
+          }
+  };
+
+  // Unfollow profile
+  const unfollowUser = async () => {
+    try {
+    await updateFollowingStatus({
+      MinFeeRateNanosPerKB: 1000,
+      IsUnfollow: true,
+      FollowedPublicKeyBase58Check: post.PosterPublicKeyBase58Check,
+      FollowerPublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+    });
+    getIsFollowingData();
+    notifications.show({
+      title: "Success",
+      icon: <RiUserUnfollowLine size="1.1rem" />,
+      color: "blue",
+      message: `You successfully unfollowed ${username}`,
+    });
+  } catch (error) {
+    notifications.show({
+      title: "Error",
+      icon: <IconX size="1.1rem" />,
+      color: "red",
+      message: "Something Happened!",
+    });
+   
+  }
+  };
+
 
 
 
@@ -249,7 +335,7 @@ export default function Post({ post, username, key }) {
               AssociationValue: "LOVE",
             });
             
-            setHeartCount(heartStats.Count)
+            setHeartCount((prevHeartCount) => prevHeartCount + heartStats.Count);
           } catch (error) {
             console.error(error);
           }
@@ -274,16 +360,16 @@ export default function Post({ post, username, key }) {
           }
 
 
-useEffect(() => {
-if(currentUser){
-  getDidUserHeart();
-}
-}, [currentUser, isHearted]); 
+        useEffect(() => {
+        if(currentUser){
+          getDidUserHeart();
+        }
+        }, [currentUser, isHearted]); 
 
-useEffect(() => {
-        getHeartCount();
-      
-    }, []); 
+        useEffect(() => {
+                getHeartCount();
+              
+            }, []); 
     
         
     //Love Post Function
@@ -629,37 +715,133 @@ useEffect(() => {
                     </ActionIcon>
                   </Tooltip>
                 </Group>
-            </div>
-
-
-
-                
-              
+              </div>
 
                 <Space h="sm"/>
                 <Group justify="center" style={{ display: 'flex', alignItems: 'center' }}>
-                  <UnstyledButton
-                   component={Link}
-                   href={`/wave/${username}`}
-                   style={{ display: 'flex', alignItems: 'center' }}
-                  >
-                    <Avatar
-                      radius="xl"
-                      size="lg"
-                      src={
-                        post.ProfileEntryResponse?.ExtraData
-                          ?.LargeProfilePicURL ||
-                        `https://node.deso.org/api/v0/get-single-profile-picture/${post.ProfileEntryResponse?.PublicKeyBase58Check || post.PosterPublicKeyBase58Check}` ||
-                        null
-                      }
-                    />
+                <HoverCard width={280} shadow="md">
+                  <HoverCard.Target>
+                        <UnstyledButton
+                        component={Link}
+                        href={`/wave/${username}`}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                        >
+                          <Avatar
+                            radius="xl"
+                            size="lg"
+                            src={
+                              post.ProfileEntryResponse?.ExtraData
+                                ?.LargeProfilePicURL ||
+                              `https://node.deso.org/api/v0/get-single-profile-picture/${post.ProfileEntryResponse?.PublicKeyBase58Check || post.PosterPublicKeyBase58Check}` ||
+                              null
+                            }
+                          />
 
-                    <Space w="xs" />
-                    <Text fw={500} size="sm">
-                    {username}
-                    </Text>
-                  </UnstyledButton>
-              </Group>
+                          <Space w="xs" />
+                          <div>
+                          <Box w={111}>
+                          <Text fw={500} size="sm" truncate="end">
+                          {post.ProfileEntryResponse?.ExtraData?.DisplayName || username}
+                          </Text>
+                          </Box>
+                          <Text size="xs"  tt="lowercase" truncate="end">
+                            @{username}
+                            </Text>
+                            </div>
+                        </UnstyledButton>
+                   
+                    </HoverCard.Target>
+
+                    <HoverCard.Dropdown width={280} shadow="md">
+                   
+                    <Group justify="space-between">
+                        <Avatar
+                            radius="md"
+                            size="lg"
+                            src={
+                              post.ProfileEntryResponse?.ExtraData
+                                ?.LargeProfilePicURL ||
+                              `https://node.deso.org/api/v0/get-single-profile-picture/${post.ProfileEntryResponse?.PublicKeyBase58Check || post.PosterPublicKeyBase58Check}` ||
+                              null
+                            }
+                            
+                          />
+
+        {currentUser && isFollowingUser ? (
+            
+              
+              <Tooltip
+                label={`Unfollow @${username}`}
+                withArrow
+                arrowPosition="center"
+              >
+                <ActionIcon
+                  variant="gradient"
+                  gradient={{ from: "cyan", to: "indigo" }}
+                  size={36}
+                  onClick={unfollowUser}
+                  mb={22}
+                >
+                  <RiUserUnfollowLine size="1.2rem" stroke={1.5} />
+                </ActionIcon>
+              </Tooltip>
+            
+          ) : (
+            <Tooltip
+            label={`Follow @${username}`}
+                withArrow
+                arrowPosition="center"
+              >
+                <ActionIcon
+                  variant="gradient"
+                  gradient={{ from: "cyan", to: "indigo" }}
+                  size={36}
+                  onClick={followUser}
+                  mb={22}
+                >
+                  <RiUserAddLine  size="1.2rem" stroke={1.5} />
+                </ActionIcon>
+              </Tooltip>
+          
+        )}
+                        </Group>
+                        <Space h="xs" />
+                       
+                        <Box w={255}>
+                            <Text fw={500} truncate="end">
+                            {post.ProfileEntryResponse?.ExtraData?.DisplayName || username}
+                            </Text>
+                            </Box>
+                            <Text size="xs"  tt="lowercase" truncate="end">
+                            @{username}
+                            </Text>
+                         
+                        
+                        
+                        
+
+                        <Space h="xl" />
+                      
+                        <Text
+                          fz="sm"
+                          style={{
+                            maxWidth: "100%",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "wrap",
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              post.ProfileEntryResponse?.Description
+                                ? replaceURLs(post.ProfileEntryResponse?.Description).replace(/\n/g, "<br>")
+                                : "",
+                          }}
+                        />
+            
+
+                    </HoverCard.Dropdown>
+                  </HoverCard>
+                  </Group>
                 <Space h="xl" />
 
 

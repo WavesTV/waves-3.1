@@ -156,11 +156,11 @@ export default function ProfilePage () {
               />
         
         <div>
-              <Text fw={500} truncate>
+              <Text fw={500} truncate="end">
                 {currentUser.ProfileEntryResponse?.ExtraData.DisplayName || currentUser.ProfileEntryResponse?.Username || currentUser.PublicKeyBase58Check}
               </Text>
               <Text size="xs" fw={500} tt="lowercase">
-                @{currentUser.ProfileEntryResponse?.Username ?? currentUser.PublicKeyBase58Check}
+                @{currentUser.ProfileEntryResponse?.Username || currentUser.PublicKeyBase58Check}
               </Text>
               </div>
               </Group>
