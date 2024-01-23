@@ -96,7 +96,7 @@ export default function Wave() {
       });
       
       setProfile(profileData.Profile);
-      
+      console.log(profile)
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
@@ -465,39 +465,50 @@ export default function Wave() {
         <Card.Section>
           <Image
             src={profile?.ExtraData?.FeaturedImageURL || null}
-            height={200}
+       
             fallbackSrc="https://images.deso.org/4903a46ab3761c5d8bd57416ff411ff98b24b35fcf5480dde039eb9bae6eebe0.webp"
+            height={321}
+
           />
         </Card.Section>
 
-        <Center>
+        <Group>
+          <>
           <Avatar
-            size={80}
-            radius={80}
+            
             src={
-              `https://node.deso.org/api/v0/get-single-profile-picture/${profile?.PublicKeyBase58Check}` ||
-              profile?.ExtraData?.LargeProfilePicURL || null
+              profile?.ExtraData?.LargeProfilePicURL || `https://node.deso.org/api/v0/get-single-profile-picture/${profile?.PublicKeyBase58Check}` ||
+              null
             }
             alt="Profile Picture"
-            mx="auto"
-            mt={-30}
-         
+            className={classes.avatar}
+            size={123}
+            radius="md"
+           
+            mt={-55}
           />
-        </Center>
+        
+        </>
+        <div>
 
-        <Center>
+        
           {profile !== null ? (
             <>
-              <Text className={classes.Avatar} fz="lg" fw={777} variant="gradient" truncate>
-                {userName}
+              <Text className={classes.Avatar} fw={500}>
+                {profile?.ExtraData?.DisplayName || userName}
+              </Text>
+              <Text size="xs" className={classes.Avatar} tt="lowercase">
+                @{userName}
               </Text>
             </>
           ) : (
-            <Text fz="lg" fw={777} variant="gradient" truncate>
+            <Text fz="lg" fw={777} truncate>
               User does not exist
             </Text>
           )}
-        </Center>
+       
+        </div>
+        </Group>
 
         <Space h="md" />
         <Card.Section>

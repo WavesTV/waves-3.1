@@ -1,14 +1,13 @@
 import {
     getPostsStateless,
-    getFollowersForUser,
+    deletePostAssociation,
     countPostAssociation,
     submitPost,
     createPostAssociation,
     sendDiamonds,
     getAppState,
-    getPostAssociation,
-    getPostAssociations,
-    countPostAssociations
+    countPostAssociations, 
+    getPostAssociations
   } from "deso-protocol";
   import { useEffect, useState, useContext } from "react";
   import { DeSoIdentityContext } from "react-deso-protocol";
@@ -45,7 +44,8 @@ import {
     IconMessageCircle,
     IconMessageShare, IconCheck, IconX,
     IconHeartFilled,
-    IconDiamondFilled
+    IconDiamondFilled,
+    IconHeartBroken,
   } from "@tabler/icons-react";
   import { Player } from "@livepeer/react";
   import { useDisclosure } from "@mantine/hooks";
@@ -59,9 +59,10 @@ import {
   import { FaVoteYea } from "react-icons/fa";
   import { BsInfoCircleFill } from "react-icons/bs";
   import { replaceURLs } from "../helpers/linkHelper";
- 
+  import { useHover } from '@mantine/hooks';
 
 export default function Post({ post, username, key }) {
+  const { hovered, ref } = useHover();
     const { currentUser } = useContext(DeSoIdentityContext);
     const [comment, setComment] = useState("");
     const [selectedImage, setSelectedImage] = useState("");
@@ -74,8 +75,12 @@ export default function Post({ post, username, key }) {
     const [quoteBody, setQuoteBody] = useState('');
     const [voteCount, setVoteCount] = useState();
     const [didVote, setDidVote] = useState(false);
-    const [isHeart, setIsHearted] = useState(false);
+    const [isHearted, setIsHearted] = useState();
     const [heartCount, setHeartCount] = useState();
+    const [didHeartId, setDidHeartId] = useState();
+    const [repostCount, setRepostCount] = useState(post.RepostCount);
+    const [diamondCount, setDiamondCount] = useState(post.DiamondCount);
+    const [commentCount, setCommentCount] = useState(post.CommentCount);
 
     const isWavesStream = post.VideoURLs && post.VideoURLs[0] && post.VideoURLs[0].includes('https://lvpr.tv/?v=');
 
@@ -85,45 +90,7 @@ export default function Post({ post, username, key }) {
       return playbackId;
     };
 
-    // Getting "LOVE" Post Association Count
-    const getHeartCount = async () => {
-      try {
-        const heartStats = await countPostAssociation({ 
-          PostHashHex: post.PostHashHex, 
-          AssociationType: "REACTION",
-          AssociationValue: "LOVE",
-        });
-        
-        setHeartCount(heartStats.Count)
-      } catch (error) {
-        console.error(error);
-      }
-    }
 
-    // Getting "LOVE" Post Association Count
-    const getDidUserHeart = async () => {
-      try {
-        const heartStats = await countPostAssociation({ 
-          PostHashHex: post.PostHashHex, 
-          TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
-          AssociationType: "REACTION",
-          AssociationValue: "LOVE",
-        });
-        console.log(heartStats);
-
-        if (heartStats.Count > 1)
-        {
-        setIsHearted(true)
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    useEffect(() => {
-        getHeartCount();
-        getDidUserHeart();
-    }, [post]); 
 
     // Getting Diamond Values in USD
     const getDiamondUSD = async () => {
@@ -177,6 +144,8 @@ export default function Post({ post, username, key }) {
           color: "green",
           message: "Your comment was submitted!",
         });
+
+        setCommentCount(post.CommentCount + 1);
       } catch (error) {
         notifications.show({
           title: "Error",
@@ -219,7 +188,7 @@ export default function Post({ post, username, key }) {
           color: "green",
           message: "Reposted!",
         });
-        
+        setRepostCount(post.RepostCount + 1)
       } catch (error) {
         notifications.show({
           title: "Error",
@@ -259,7 +228,7 @@ export default function Post({ post, username, key }) {
           color: "green",
           message: "Quoted!",
         });
-        
+        setRepostCount(post.RepostCount + 1)
       } catch (error) {
         notifications.show({
           title: "Error",
@@ -270,8 +239,54 @@ export default function Post({ post, username, key }) {
         console.error("Error submitting Quote:", error);
       }
     };
+
+        // Getting "LOVE" Post Association Count
+        const getHeartCount = async () => {
+          try {
+            const heartStats = await countPostAssociation({ 
+              PostHashHex: post.PostHashHex, 
+              AssociationType: "REACTION",
+              AssociationValue: "LOVE",
+            });
+            
+            setHeartCount(heartStats.Count)
+          } catch (error) {
+            console.error(error);
+          }
+        }
     
-    //Like Post Function
+            // Getting if user Loved post & getting association Id so user has option to delete the association
+          const getDidUserHeart = async () => {
+            try {
+              const didHeart = await getPostAssociations({ 
+                PostHashHex: post.PostHashHex, 
+                TransactorPublicKeyBase58Check: currentUser?.PublicKeyBase58Check,
+                AssociationType: "REACTION",
+                AssociationValue: "LOVE",
+              });
+
+             
+              setDidHeartId(didHeart.Associations[0]?.AssociationID)
+             
+            } catch (error) {
+              console.error(error);
+            }
+          }
+
+
+useEffect(() => {
+if(currentUser){
+  getDidUserHeart();
+}
+}, [currentUser, isHearted]); 
+
+useEffect(() => {
+        getHeartCount();
+      
+    }, []); 
+    
+        
+    //Love Post Function
     const submitHeart = async () => {
       if (!currentUser) {
         notifications.show({
@@ -282,6 +297,7 @@ export default function Post({ post, username, key }) {
         });
         return;
       }
+
 
       try {
         await createPostAssociation({
@@ -309,6 +325,42 @@ export default function Post({ post, username, key }) {
           message: `Something Happened: ${error}`,
         });
         setIsHearted(false);
+        
+        console.error("Error submitting heart:", error);
+      }
+    };
+
+    //Love Post Function
+    const deleteHeart = async () => {
+
+      try {
+        await deletePostAssociation({
+          TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
+          PostHashHex: post.PostHashHex,
+          AssociationID: didHeartId,
+          AssociationType: "REACTION",
+          AssociationValue: "LOVE",
+          MinFeeRateNanosPerKB: 1000,
+        });
+
+        setDidHeartId(null);
+        setIsHearted(false);
+        setHeartCount(heartCount - 1);
+        notifications.show({
+          title: "Removed",
+          icon: <IconHeartBroken size="1.1rem" />,
+          color: "blue",
+          message: `You removed your Heart Reaction!`,
+        });
+
+      } catch (error) {
+        notifications.show({
+          title: "Error",
+          icon: <IconX size="1.1rem" />,
+          color: "red",
+          message: `Something Happened: ${error}`,
+        });
+        setIsHearted(true);
         
         console.error("Error submitting heart:", error);
       }
@@ -344,7 +396,7 @@ export default function Post({ post, username, key }) {
         });
 
         closeDiamond();
-        
+        setDiamondCount(post.DiamondCount + 1)
       } catch (error) {
         notifications.show({
           title: "Error",
@@ -369,6 +421,7 @@ export default function Post({ post, username, key }) {
         return;
       }
 
+     
       try {
         await createPostAssociation({
           TransactorPublicKeyBase58Check: currentUser.PublicKeyBase58Check,
@@ -636,6 +689,7 @@ useEffect(() => {
               )}
               
                 {post.PostExtraData?.EmbedVideoURL && (
+                  <>
                   <Group justify="center">
                   <iframe
                   title='extraembed-video'
@@ -651,7 +705,8 @@ useEffect(() => {
                       />
                  </Group>
                     
-                 
+                    <Space h="xs" />
+                    </>
                 )}
 
               {isWavesStream ? (
@@ -685,6 +740,7 @@ useEffect(() => {
                     )}
 
                 {post.ImageURLs && post.ImageURLs[0] && (
+                  <>
                   <Group justify="center">
                     <UnstyledButton
                       onClick={() => {
@@ -700,6 +756,8 @@ useEffect(() => {
                       />
                     </UnstyledButton>
                   </Group>
+                  <Space h="xs" />
+                </>
                 )}
 
                 {post.PostExtraData?.PollOptions && (
@@ -758,25 +816,45 @@ useEffect(() => {
                 <Space h="md" />
 
                 <Center>
-                  <Tooltip
-                    transition="slide-down"
-                    withArrow
-                    position="bottom"
-                    label="Like"
-                  >
-                    <ActionIcon
-                      onClick={() =>submitHeart()}
-                      variant="subtle"
-                      radius="md"
-                      size={36}
-                    >
-                      {isHeart ? (
-                        <IconHeartFilled size={18} />
-                      ) :( 
-                        <IconHeart size={18} />
-                      )} 
-                    </ActionIcon>
-                  </Tooltip>
+                {isHearted || didHeartId ? (
+  <Tooltip
+    transition="slide-down"
+    withArrow
+    position="bottom"
+    label="Unlike"
+  >
+    <ActionIcon
+      onClick={() => deleteHeart()}
+      variant="subtle"
+      radius="md"
+      size={36}
+      ref={ref}
+    >
+      
+      {hovered ? <IconHeartBroken size={18} /> : <IconHeartFilled size={18} />}
+     
+      
+    </ActionIcon>
+  </Tooltip>
+) : (
+  <Tooltip
+    transition="slide-down"
+    withArrow
+    position="bottom"
+    label="Like"
+  >
+    <ActionIcon
+      onClick={() => submitHeart()}
+      variant="subtle"
+      radius="md"
+      size={36}
+    >
+      <IconHeart size={18} />
+    </ActionIcon>
+  </Tooltip>
+)}
+
+                    
                   <Text size="xs" c="dimmed">
                     {heartCount}
                   </Text>
@@ -825,7 +903,7 @@ useEffect(() => {
                     </Menu>
                   
                   <Text size="xs" c="dimmed">
-                    {post.RepostCount}
+                    {repostCount}
                   </Text>
 
                   <Space w="sm" />
@@ -852,7 +930,7 @@ useEffect(() => {
                     </ActionIcon>
                   </Tooltip>
                   <Text size="xs" c="dimmed">
-                    {post.DiamondCount}
+                    {diamondCount}
                   </Text>
 
                   <Space w="sm" />
@@ -873,7 +951,7 @@ useEffect(() => {
                     </ActionIcon>
                   </Tooltip>
                   <Text size="xs" c="dimmed">
-                    {post.CommentCount}
+                    {commentCount}
                   </Text>
                 </Center>
                 <Collapse in={opened}>
