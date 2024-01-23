@@ -719,7 +719,7 @@ useEffect(() => {
 
                 <Space h="sm"/>
                 <Group justify="center" style={{ display: 'flex', alignItems: 'center' }}>
-                <HoverCard width={280} shadow="md">
+                <HoverCard width={333} shadow="md">
                   <HoverCard.Target>
                         <UnstyledButton
                         component={Link}
@@ -757,7 +757,7 @@ useEffect(() => {
                     <Group justify="space-between">
                         <Avatar
                             radius="md"
-                            size="lg"
+                            size="xl"
                             src={
                               post.ProfileEntryResponse?.ExtraData
                                 ?.LargeProfilePicURL ||
@@ -821,8 +821,9 @@ useEffect(() => {
                         
 
                         <Space h="xl" />
-                      
+                        
                         <Text
+                        
                           fz="sm"
                           style={{
                             maxWidth: "100%",
@@ -837,7 +838,7 @@ useEffect(() => {
                                 : "",
                           }}
                         />
-            
+                     
 
                     </HoverCard.Dropdown>
                   </HoverCard>
