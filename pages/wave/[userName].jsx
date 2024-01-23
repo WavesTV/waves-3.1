@@ -331,12 +331,7 @@ export default function Wave() {
 
         <Space h="md" />
         <Card.Section>
-          {isLoadingLivestream ? ( 
-
-              <Group justify="center">
-              <Loader size="sm" />
-              </Group>
-          ) : livestreamPost ? (
+          {livestreamPost ? (
             <>
            
 
