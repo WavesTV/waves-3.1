@@ -284,7 +284,7 @@ import {
                 </Group>
   
             <Space h="xl" />
-                  
+                  <Container size="lg">
             <Tabs radius="sm" defaultValue="first">
               <Tabs.List grow position="center">
                 <Tabs.Tab value="first">
@@ -373,6 +373,7 @@ import {
                 
               </Tabs.Panel>
             </Tabs>
+            </Container>
             <Space h={222} />
           </>
         ) : (
